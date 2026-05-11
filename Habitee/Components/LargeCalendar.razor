@@ -1,0 +1,192 @@
+@using Habitee.Models
+
+<div class="large-calendar glass-panel">
+    <div class="calendar-header">
+        <h3 class="month-title">@currentMonth.ToString("MMMM yyyy")</h3>
+        <div class="month-nav">
+            <button class="nav-btn glass-panel" @onclick="PrevMonth">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <button class="nav-btn glass-panel" @onclick="NextMonth">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+        </div>
+    </div>
+
+    <div class="weekdays">
+        <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+    </div>
+
+    <div class="days-grid">
+        @{
+            var firstDayOfMonth = new DateTime(currentMonth.Year, currentMonth.Month, 1);
+            var daysInMonth = DateTime.DaysInMonth(currentMonth.Year, currentMonth.Month);
+            
+            // 1 = Monday, 7 = Sunday
+            var startDayOfWeek = (int)firstDayOfMonth.DayOfWeek;
+            if (startDayOfWeek == 0) startDayOfWeek = 7;
+            
+            // Empty cells
+            for (int i = 1; i < startDayOfWeek; i++)
+            {
+                <div class="day-cell empty"></div>
+            }
+
+            for (int day = 1; day <= daysInMonth; day++)
+            {
+                var currentDate = new DateTime(currentMonth.Year, currentMonth.Month, day);
+                var isFuture = currentDate > DateTime.Today;
+                var dateStr = currentDate.ToString("yyyy-MM-dd");
+                var isCompleted = Logs.Any(l => l.Date == dateStr && l.CompletedCount >= Habit.TargetCount);
+                
+                <div class="day-cell @(isFuture ? "future" : "") @(isCompleted ? "completed" : "") glass-panel"
+                     style="@(isCompleted ? $"background-color: {Habit.Color}; border-color: {Habit.Color}; color: var(--bg-color);" : "")">
+                    
+                    @if (isFuture)
+                    {
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lock-icon">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                    }
+                    else
+                    {
+                        @day
+                    }
+                    
+                    @if (isCompleted)
+                    {
+                        <div class="completed-dot"></div>
+                    }
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<style>
+    .large-calendar {
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .month-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .month-nav {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .nav-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: var(--text-color);
+        transition: transform 0.2s;
+        border: var(--outline-width, 1px) solid var(--card-border);
+    }
+    
+    .nav-btn:active {
+        transform: scale(0.95);
+    }
+
+    .weekdays {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .weekdays span {
+        text-align: center;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    .days-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 0.5rem;
+    }
+
+    .day-cell {
+        aspect-ratio: 1;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        font-weight: 500;
+        position: relative;
+        border: var(--outline-width, 1px) solid transparent;
+    }
+
+    .day-cell.empty {
+        background: transparent;
+        border: none;
+        box-shadow: none;
+    }
+
+    .day-cell.future {
+        background: transparent;
+        color: var(--text-muted);
+        border: 1px dashed var(--card-border);
+        box-shadow: none;
+        opacity: 0.5;
+    }
+
+    .day-cell.completed {
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        color: white; /* Fallback if inline style fails */
+    }
+
+    .lock-icon {
+        opacity: 0.5;
+    }
+
+    .completed-dot {
+        position: absolute;
+        bottom: 4px;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background-color: currentColor;
+        opacity: 0.8;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public Habit Habit { get; set; } = new();
+
+    [Parameter]
+    public List<HabitLog> Logs { get; set; } = new();
+
+    private DateTime currentMonth = DateTime.Today;
+
+    private void PrevMonth()
+    {
+        currentMonth = currentMonth.AddMonths(-1);
+    }
+
+    private void NextMonth()
+    {
+        currentMonth = currentMonth.AddMonths(1);
+    }
+}

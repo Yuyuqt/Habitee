@@ -30,17 +30,46 @@
     --success-color: #10b981;
 }
 
-/* Theme B: Pastel Dream (Pink/Mint/Lavender) */
+/* Theme B: Pastel Dream (Kawaii Style) */
 [data-theme="pastel"] {
-    --primary-color: #a78bfa; /* Lavender */
-    --success-color: #34d399; /* Mint */
-    --bg-color: #fdf4ff; /* Light pinkish */
-    --card-bg: rgba(255, 255, 255, 0.7);
-    --font-family: 'Comfortaa', cursive;
+    --bg-color: #FFE6EB;
+    --bg-gradient: linear-gradient(135deg, #A7C7E7 0%, #C1B3DA 50%, #F7C9DA 100%);
+    --text-color: #705246;
+    --text-muted: #8d736a;
+    --card-bg: rgba(255, 255, 255, 0.4);
+    --card-border: #705246;
+    --card-shadow: 6px 6px 0px rgba(112, 82, 70, 0.2);
+    
+    --primary-color: #A7D8F5;
+    --success-color: #A7EBDC;
+    --accent-color: #FDE8C0;
+    
+    --font-family: 'Quicksand', sans-serif;
+    --font-weight-title: 700;
+    --font-weight-desc: 600;
+    
+    --border-radius: 40px;
+    --outline-width: 3px;
+    
+    --theme-btn-bg: #705246;
+    --theme-btn-text: #FFE6EB;
 }
+
 [data-theme="pastel"][data-theme-mode="dark"] {
-    --bg-color: #2e1065;
-    --card-bg: rgba(76, 29, 149, 0.4);
+    --bg-color: #2b1f3d;
+    --bg-gradient: linear-gradient(135deg, #221833 0%, #30234a 50%, #443560 100%);
+    --text-color: #fce4ec;
+    --text-muted: #d1b8c4;
+    --card-bg: rgba(43, 31, 61, 0.6);
+    --card-border: #fce4ec;
+    --card-shadow: 6px 6px 0px rgba(0, 0, 0, 0.4);
+    
+    --primary-color: #7fb3d5;
+    --success-color: #76c7b5;
+    --accent-color: #d4ac0d;
+    
+    --theme-btn-bg: #fce4ec;
+    --theme-btn-text: #2b1f3d;
 }
 
 /* Theme C: Starry Galaxy (Deep blue/purple) */

@@ -21,13 +21,15 @@
         width: 12px;
         height: 12px;
         border-radius: 3px;
-        background-color: var(--card-border);
+        background-color: transparent;
+        border: var(--outline-width, 1px) solid var(--card-border);
         transition: background-color 0.3s ease;
     }
 
     .heatmap-cell.completed {
         background-color: var(--success-color);
         box-shadow: 0 0 4px var(--success-color);
+        border-color: var(--card-border);
     }
 </style>
 

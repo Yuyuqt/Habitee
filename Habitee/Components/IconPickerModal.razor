@@ -1,0 +1,199 @@
+@using Microsoft.AspNetCore.Components
+
+<div class="modal-overlay slide-up">
+    <div class="modal-content">
+        <header class="modal-header">
+            <button class="icon-btn" @onclick="OnClose">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <h2 class="modal-title">Pick Icon</h2>
+            <button class="icon-btn" @onclick="OnClose">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </button>
+        </header>
+
+        <div class="modal-body content-scroll">
+            <div class="icon-section">
+                <h3 class="section-title">ACTIVITIES</h3>
+                <div class="icon-grid">
+                    @foreach (var icon in activityIcons)
+                    {
+                        <button class="icon-swatch glass-panel @(SelectedIcon == icon ? "selected" : "")" 
+                                @onclick="() => SelectIcon(icon)">
+                            @RenderIcon(icon)
+                        </button>
+                    }
+                </div>
+            </div>
+            
+            <div class="icon-section">
+                <h3 class="section-title">SPORTS</h3>
+                <div class="icon-grid">
+                    @foreach (var icon in sportIcons)
+                    {
+                        <button class="icon-swatch glass-panel @(SelectedIcon == icon ? "selected" : "")" 
+                                @onclick="() => SelectIcon(icon)">
+                            @RenderIcon(icon)
+                        </button>
+                    }
+                </div>
+            </div>
+
+            <div style="height: 50px;"></div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Most styles shared with ColorPicker, but keeping scoped for clarity or move to global later */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: var(--bg-color);
+        z-index: 1000;
+        display: flex;
+        justify-content: center;
+    }
+
+    .slide-up {
+        animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @@keyframes slideUp {
+        from { transform: translateY(100%); }
+        to { transform: translateY(0); }
+    }
+
+    .modal-content {
+        width: 100%;
+        max-width: 800px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        background: var(--bg-gradient, var(--bg-color));
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem;
+    }
+
+    .modal-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .icon-btn {
+        background: none;
+        border: none;
+        color: var(--text-color);
+        cursor: pointer;
+        padding: 0.5rem;
+        display: flex;
+    }
+
+    .content-scroll {
+        flex: 1;
+        overflow-y: auto;
+        padding: 0 1.5rem;
+    }
+
+    .icon-section {
+        margin-bottom: 2rem;
+    }
+
+    .section-title {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        letter-spacing: 1px;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+    }
+
+    .icon-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+        gap: 0.75rem;
+    }
+
+    .icon-swatch {
+        aspect-ratio: 1;
+        border-radius: 12px;
+        border: var(--outline-width, 1px) solid var(--card-border);
+        background: var(--card-bg);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        color: var(--text-color);
+    }
+    
+    .icon-swatch:active {
+        transform: scale(0.9);
+    }
+
+    .icon-swatch.selected {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+        background: rgba(var(--primary-color), 0.1); /* Assuming primary-color can be rgba, if not just slightly tinted */
+    }
+</style>
+
+@code {
+    [Parameter]
+    public string SelectedIcon { get; set; } = "check";
+
+    [Parameter]
+    public EventCallback<string> OnIconSelected { get; set; }
+
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
+    private async Task SelectIcon(string icon)
+    {
+        SelectedIcon = icon;
+        await OnIconSelected.InvokeAsync(icon);
+    }
+
+    private string[] activityIcons = new[] { "target", "water", "book", "pill", "code", "heart" };
+    private string[] sportIcons = new[] { "dumbbell", "bike", "run" };
+
+    // A helper to map icon names to SVG strings (simplified for this demo)
+    private RenderFragment RenderIcon(string name) => builder =>
+    {
+        // Simple fallback SVGs using Feather icons format
+        string svgPath = name switch
+        {
+            "target" => "<circle cx=\"12\" cy=\"12\" r=\"10\"></circle><circle cx=\"12\" cy=\"12\" r=\"6\"></circle><circle cx=\"12\" cy=\"12\" r=\"2\"></circle>",
+            "water" => "<path d=\"M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z\"></path>",
+            "book" => "<path d=\"M4 19.5A2.5 2.5 0 0 1 6.5 17H20\"></path><path d=\"M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z\"></path>",
+            "pill" => "<path d=\"M14 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6z\"></path><path d=\"M14 3v5h5M16 13H8M16 17H8\"></path>", // Note: this is actually a file icon, but we'll use it as placeholder
+            "code" => "<polyline points=\"16 18 22 12 16 6\"></polyline><polyline points=\"8 6 2 12 8 18\"></polyline>",
+            "heart" => "<path d=\"M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z\"></path>",
+            "dumbbell" => "<path d=\"M14.4 14.4l5.6-5.6\"></path><path d=\"M20 12l2 2\"></path><path d=\"M2 10l2 2\"></path><path d=\"M9.6 9.6l-5.6 5.6\"></path><path d=\"M14 2l8 8\"></path><path d=\"M2 14l8 8\"></path>",
+            "bike" => "<circle cx=\"5.5\" cy=\"17.5\" r=\"3.5\"></circle><circle cx=\"18.5\" cy=\"17.5\" r=\"3.5\"></circle><path d=\"M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5V14l-3-3 4-3 2 3h2\"></path>",
+            "run" => "<path d=\"M13 4v4l-4 2\"></path><path d=\"M13 14l4-4\"></path><path d=\"M13 18l-3-4\"></path><path d=\"M16 22l-3-4\"></path>",
+            _ => "<circle cx=\"12\" cy=\"12\" r=\"10\"></circle><path d=\"M12 8v8\"></path><path d=\"M8 12h8\"></path>" // check/plus fallback
+        };
+
+        builder.OpenElement(0, "svg");
+        builder.AddAttribute(1, "width", "24");
+        builder.AddAttribute(2, "height", "24");
+        builder.AddAttribute(3, "viewBox", "0 0 24 24");
+        builder.AddAttribute(4, "fill", "none");
+        builder.AddAttribute(5, "stroke", "currentColor");
+        builder.AddAttribute(6, "stroke-width", "2");
+        builder.AddAttribute(7, "stroke-linecap", "round");
+        builder.AddAttribute(8, "stroke-linejoin", "round");
+        builder.AddMarkupContent(9, svgPath);
+        builder.CloseElement();
+    };
+}

@@ -2,6 +2,7 @@
 @using Habitee.Models
 @using Habitee.Services
 @inject DatabaseService DbService
+@inject NavigationManager NavManager
 
 <div class="container">
     <header class="view-header">
@@ -9,7 +10,7 @@
             <h1 class="view-title">Daily Focus</h1>
             <p class="view-subtitle">@DateTime.Today.ToString("dddd, MMMM d")</p>
         </div>
-        <button class="glass-button" @onclick="CreateDemoHabit">
+        <button class="glass-button" @onclick='() => NavManager.NavigateTo("/add-habit")'>
             + New
         </button>
     </header>
@@ -81,7 +82,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // Wait briefly to ensure DB is initialized (handled in MainLayout, but just in case)
         await LoadData();
     }
 
@@ -118,20 +118,6 @@
         }
 
         await DbService.SaveLogAsync(log);
-        // We don't necessarily need to reload all data, just statehaschanged to re-render UI
         StateHasChanged();
-    }
-
-    private async Task CreateDemoHabit()
-    {
-        var newHabit = new Habit
-        {
-            Title = "Read 10 Pages",
-            Description = "Self improvement reading",
-            Color = "var(--primary-color)",
-            Icon = "book"
-        };
-        await DbService.SaveHabitAsync(newHabit);
-        await LoadData();
     }
 }

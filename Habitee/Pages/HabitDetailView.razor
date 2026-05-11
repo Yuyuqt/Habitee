@@ -1,0 +1,176 @@
+@page "/habit/{Id}"
+@using Habitee.Models
+@using Habitee.Services
+@inject DatabaseService DbService
+@inject NavigationManager NavManager
+
+<div class="view-container slide-in">
+    <header class="app-header">
+        <button class="icon-btn" @onclick='() => NavManager.NavigateTo("/")'>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <h1 class="header-title">@habit?.Title</h1>
+        <button class="icon-btn" @onclick="EditHabit">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+        </button>
+    </header>
+
+    @if (isLoading)
+    {
+        <div class="flex-center" style="height: 200px;">
+            <p>Loading...</p>
+        </div>
+    }
+    else if (habit != null)
+    {
+        <div class="content-scroll">
+            <!-- Reusing the HabitCard for the top section -->
+            <Habitee.Components.HabitCard Habit="habit" Logs="logs" DisableNavigation="true" />
+
+            <!-- The large interactive calendar -->
+            <Habitee.Components.LargeCalendar Habit="habit" Logs="logs" />
+
+            <div style="height: 100px;"></div>
+        </div>
+
+        <div class="fixed-bottom">
+            <button class="archive-btn glass-panel" @onclick="ArchiveHabit">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>
+                Archive
+            </button>
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <p>Habit not found.</p>
+            <button class="glass-button" @onclick='() => NavManager.NavigateTo("/")'>Go Back</button>
+        </div>
+    }
+</div>
+
+<style>
+    .view-container {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        max-width: 800px;
+        margin: 0 auto;
+        position: relative;
+    }
+
+    .app-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem;
+    }
+
+    .header-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin: 0;
+        text-align: center;
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding: 0 1rem;
+    }
+
+    .icon-btn {
+        background: none;
+        border: none;
+        color: var(--text-color);
+        cursor: pointer;
+        padding: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .content-scroll {
+        flex: 1;
+        overflow-y: auto;
+        padding: 0 1.5rem;
+    }
+
+    .fixed-bottom {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 1.5rem;
+        background: linear-gradient(to top, var(--bg-color) 60%, transparent);
+        display: flex;
+        justify-content: center;
+    }
+
+    .archive-btn {
+        width: 100%;
+        max-width: 400px;
+        background: rgba(244, 63, 94, 0.1);
+        color: #f43f5e;
+        border: var(--outline-width, 1px) solid rgba(244, 63, 94, 0.3);
+        padding: 1rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .archive-btn:hover {
+        background: rgba(244, 63, 94, 0.2);
+    }
+</style>
+
+@code {
+    [Parameter]
+    public string Id { get; set; } = "";
+
+    private Habit? habit;
+    private List<HabitLog> logs = new();
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        isLoading = true;
+        StateHasChanged();
+        
+        var allHabits = await DbService.GetAllHabitsAsync();
+        habit = allHabits.FirstOrDefault(h => h.Id == Id);
+        
+        if (habit != null)
+        {
+            var allLogs = await DbService.GetLogsAsync();
+            logs = allLogs.Where(l => l.HabitId == habit.Id).ToList();
+        }
+        
+        isLoading = false;
+        StateHasChanged();
+    }
+
+    private void EditHabit()
+    {
+        // Coming soon
+    }
+
+    private async Task ArchiveHabit()
+    {
+        if (habit != null)
+        {
+            await DbService.DeleteHabitAsync(habit.Id);
+            NavManager.NavigateTo("/");
+        }
+    }
+}

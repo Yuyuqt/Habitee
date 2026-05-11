@@ -1,8 +1,9 @@
 @using Habitee.Services
 @inject ThemeService ThemeService
+@inject ConfettiService ConfettiService
 @implements IDisposable
 
-<div class="background-layer" style="z-index: -1;">
+<div class="background-layer" style="z-index: -1; background: var(--bg-gradient, var(--bg-color));">
     @if (ThemeService.CurrentTheme == "habitee")
     {
         for (int i = 0; i < 15; i++)
@@ -12,9 +13,20 @@
     }
     else if (ThemeService.CurrentTheme == "pastel")
     {
-        for (int i = 0; i < 30; i++)
+        @for (int i = 0; i < 20; i++)
         {
-            <div class="particle star" style="left: @(RandomNumber(5, 95))vw; top: @(RandomNumber(-20, 10))vh; animation-duration: @(RandomNumber(8, 20))s; animation-delay: @(RandomNumber(0, 10))s;">✨</div>
+            var color = pastelColors[RandomNumber(0, pastelColors.Length)];
+            var size = RandomNumber(30, 80);
+            <div class="particle star-character" style="left: @(RandomNumber(0, 100))vw; animation-duration: @(RandomNumber(15, 30))s; animation-delay: -@(RandomNumber(0, 30))s; width: @(size)px; height: @(size)px;">
+                @StarSVG(color)
+            </div>
+        }
+
+        @foreach (var star in activeConfetti)
+        {
+            <div class="particle confetti-star" style="left: @(star.X)vw; top: @(star.Y)vh; --tx: @(star.TX)vw; --ty: @(star.TY)vh; --tr: @(star.TR)deg; width: @(star.Size)px; height: @(star.Size)px;">
+                @StarSVG(star.Color)
+            </div>
         }
     }
     else if (ThemeService.CurrentTheme == "galaxy")
@@ -52,18 +64,36 @@
         background-color: var(--primary-color);
         border-radius: 8px;
         opacity: 0;
-        animation-name: floatSquare;
-        animation-timing-function: linear;
-        animation-iteration-count: infinite;
+        animation: floatSquare linear infinite;
     }
 
-    /* Stars */
-    .star {
-        font-size: 1.5rem;
-        opacity: 0;
-        animation-name: fallStar;
-        animation-timing-function: linear;
-        animation-iteration-count: infinite;
+    @@keyframes floatSquare {
+        0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+        10% { opacity: 0.3; }
+        90% { opacity: 0.3; }
+        100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; }
+    }
+
+    /* Pastel Star Character */
+    .star-character {
+        position: absolute;
+        top: -10%;
+        animation: fallAndSway linear infinite;
+    }
+
+    @@keyframes fallAndSway {
+        0% { top: -10%; transform: rotate(0deg) translateX(0px); }
+        100% { top: 110%; transform: rotate(360deg) translateX(50px); }
+    }
+
+    .confetti-star {
+        position: absolute;
+        animation: burst 1.5s ease-out forwards;
+    }
+
+    @@keyframes burst {
+        0% { transform: translate(0, 0) scale(0) rotate(0deg); opacity: 1; }
+        100% { transform: translate(var(--tx), var(--ty)) scale(1.2) rotate(var(--tr)); opacity: 0; }
     }
 
     /* Sparkles */
@@ -73,9 +103,12 @@
         background-color: white;
         border-radius: 50%;
         box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.8);
-        animation-name: twinkleSparkle;
-        animation-timing-function: ease-in-out;
-        animation-iteration-count: infinite;
+        animation: twinkleSparkle ease-in-out infinite;
+    }
+
+    @@keyframes twinkleSparkle {
+        0%, 100% { opacity: 0.3; transform: scale(1); }
+        50% { opacity: 1; transform: scale(1.5); }
     }
 
     /* Cyber Grid */
@@ -92,23 +125,73 @@
         transform: perspective(500px) rotateX(60deg);
         animation: moveGrid 3s linear infinite;
     }
+
+    @@keyframes moveGrid {
+        0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
+        100% { transform: perspective(500px) rotateX(60deg) translateY(40px); }
+    }
 </style>
 
 @code {
     private Random rnd = new Random();
+    private List<ConfettiItem> activeConfetti = new();
+
+    private string[] pastelColors = new[] { "#FDE8C0", "#A7D8F5", "#FFC0CB", "#A7EBDC", "#E0BBE4" };
+
+    private RenderFragment StarSVG(string color) => __builder => {
+        <svg viewBox="0 0 100 100" width="100%" height="100%">
+            <!-- Classic Star with rounded joints -->
+            <path d="M50 15 L61 39 L97 39 L68 60 L79 95 L50 74 L21 95 L32 60 L3 39 L39 39 Z" 
+                  fill="@color" stroke="@color" stroke-width="12" stroke-linejoin="round" />
+        </svg>
+    };
 
     protected override void OnInitialized()
     {
         ThemeService.OnThemeChanged += StateHasChanged;
+        ConfettiService.OnBurst += HandleBurst;
     }
 
     public void Dispose()
     {
         ThemeService.OnThemeChanged -= StateHasChanged;
+        ConfettiService.OnBurst -= HandleBurst;
     }
 
-    private int RandomNumber(int min, int max)
+    private void HandleBurst()
     {
-        return rnd.Next(min, max);
+        if (ThemeService.CurrentTheme != "pastel") return;
+
+        var newItems = new List<ConfettiItem>();
+        for (int i = 0; i < 20; i++)
+        {
+            newItems.Add(new ConfettiItem {
+                X = 50, Y = 50, 
+                TX = RandomNumber(-40, 40),
+                TY = RandomNumber(-40, 40),
+                TR = RandomNumber(0, 360),
+                Color = pastelColors[RandomNumber(0, pastelColors.Length)],
+                Size = RandomNumber(20, 50)
+            });
+        }
+        activeConfetti.AddRange(newItems);
+        StateHasChanged();
+
+        Task.Delay(1500).ContinueWith(_ => {
+            activeConfetti.RemoveAll(x => newItems.Contains(x));
+            InvokeAsync(StateHasChanged);
+        });
+    }
+
+    private int RandomNumber(int min, int max) => rnd.Next(min, max);
+
+    private class ConfettiItem {
+        public double X { get; set; }
+        public double Y { get; set; }
+        public double TX { get; set; }
+        public double TY { get; set; }
+        public double TR { get; set; }
+        public string Color { get; set; } = "";
+        public int Size { get; set; }
     }
 }
