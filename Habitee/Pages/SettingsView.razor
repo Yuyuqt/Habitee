@@ -1,0 +1,258 @@
+@page "/settings"
+@using Habitee.Services
+@inject ThemeService ThemeService
+@inject DatabaseService DbService
+@inject IJSRuntime JSRuntime
+
+<div class="container">
+    <header class="view-header">
+        <h1 class="view-title">Settings</h1>
+    </header>
+
+    <div class="settings-grid">
+        <!-- Appearance Section -->
+        <section class="settings-section glass-panel">
+            <h2>Appearance</h2>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <h3>Dark Mode</h3>
+                    <p>Toggle between light and dark themes</p>
+                </div>
+                <button class="glass-button toggle-btn @(ThemeService.CurrentMode == "dark" ? "active" : "")" @onclick="ToggleMode">
+                    @(ThemeService.CurrentMode == "dark" ? "On" : "Off")
+                </button>
+            </div>
+
+            <div class="setting-item" style="flex-direction: column; align-items: flex-start; gap: 1rem;">
+                <div class="setting-info">
+                    <h3>Theme</h3>
+                    <p>Choose your aesthetic</p>
+                </div>
+                <div class="theme-selector">
+                    <button class="theme-btn habitee @(ThemeService.CurrentTheme == "habitee" ? "selected" : "")" @onclick="@(() => SetTheme("habitee"))">Habitee+</button>
+                    <button class="theme-btn pastel @(ThemeService.CurrentTheme == "pastel" ? "selected" : "")" @onclick="@(() => SetTheme("pastel"))">Pastel Dream</button>
+                    <button class="theme-btn galaxy @(ThemeService.CurrentTheme == "galaxy" ? "selected" : "")" @onclick="@(() => SetTheme("galaxy"))">Starry Galaxy</button>
+                    <button class="theme-btn cyberpunk @(ThemeService.CurrentTheme == "cyberpunk" ? "selected" : "")" @onclick="@(() => SetTheme("cyberpunk"))">Cyberpunk</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Data Management Section -->
+        <section class="settings-section glass-panel">
+            <h2>Data Management</h2>
+            <p style="margin-bottom: 1.5rem;">Habitee is local-first. Your data never leaves your device. Export your data to back it up or move to another device.</p>
+            
+            <div class="data-actions">
+                <button class="glass-button action-btn export" @onclick="ExportData">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>
+                    Export JSON
+                </button>
+                
+                <label class="glass-button action-btn import">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" x2="12" y1="3" y2="15"></line></svg>
+                    Import JSON
+                    <input type="file" style="display:none;" accept=".json" @onchange="ImportData" />
+                </label>
+            </div>
+            
+            @if (!string.IsNullOrEmpty(statusMessage))
+            {
+                <div class="status-message fade-in">@statusMessage</div>
+            }
+        </section>
+    </div>
+</div>
+
+<style>
+    .view-header {
+        margin-bottom: 2rem;
+        padding-top: 2rem;
+    }
+
+    .view-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin: 0;
+        background: linear-gradient(to right, var(--text-color), var(--primary-color));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .settings-grid {
+        display: grid;
+        gap: 2rem;
+        max-width: 800px;
+    }
+
+    .settings-section {
+        padding: 2rem;
+    }
+
+    .settings-section h2 {
+        margin-top: 0;
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+    }
+
+    .setting-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--card-border);
+    }
+    
+    .setting-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .setting-info h3 {
+        margin: 0;
+        font-size: 1.1rem;
+    }
+
+    .setting-info p {
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+    .toggle-btn {
+        min-width: 80px;
+    }
+    
+    .toggle-btn.active {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .theme-selector {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 1rem;
+        width: 100%;
+    }
+
+    .theme-btn {
+        padding: 1rem;
+        border-radius: 12px;
+        border: 2px solid transparent;
+        background: var(--card-border);
+        color: var(--text-color);
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+    .theme-btn.selected {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 15px rgba(var(--primary-color), 0.3);
+    }
+
+    .theme-btn.habitee { border-left: 4px solid #3b82f6; }
+    .theme-btn.pastel { border-left: 4px solid #a78bfa; font-family: 'Comfortaa', cursive; }
+    .theme-btn.galaxy { border-left: 4px solid #8b5cf6; }
+    .theme-btn.cyberpunk { border-left: 4px solid #f43f5e; font-family: 'JetBrains Mono', monospace; }
+
+    .data-actions {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .action-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        flex: 1;
+        min-width: 150px;
+        padding: 1rem;
+    }
+    
+    .status-message {
+        margin-top: 1rem;
+        padding: 1rem;
+        border-radius: 8px;
+        background-color: var(--card-border);
+        text-align: center;
+        color: var(--success-color);
+    }
+</style>
+
+@code {
+    private string statusMessage = "";
+
+    protected override void OnInitialized()
+    {
+        ThemeService.OnThemeChanged += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        ThemeService.OnThemeChanged -= StateHasChanged;
+    }
+
+    private async Task ToggleMode()
+    {
+        await ThemeService.ToggleModeAsync();
+    }
+
+    private async Task SetTheme(string theme)
+    {
+        await ThemeService.SetThemeAsync(theme);
+    }
+
+    private async Task ExportData()
+    {
+        var json = await DbService.ExportDataAsync();
+        
+        // Use JS interop to trigger download
+        await JSRuntime.InvokeVoidAsync("eval", $@"
+            const blob = new Blob([{System.Text.Json.JsonSerializer.Serialize(json)}], {{ type: 'application/json' }});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'habitee-backup-{DateTime.Now.ToString("yyyyMMdd")}.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        ");
+        
+        statusMessage = "Data exported successfully!";
+        await Task.Delay(3000);
+        statusMessage = "";
+    }
+
+    private async Task ImportData(Microsoft.AspNetCore.Components.Forms.InputFileChangeEventArgs e)
+    {
+        try
+        {
+            var file = e.File;
+            if (file == null) return;
+            
+            using var stream = file.OpenReadStream(maxAllowedSize: 1024 * 1024 * 5); // 5MB limit
+            using var reader = new StreamReader(stream);
+            var json = await reader.ReadToEndAsync();
+            
+            var success = await DbService.ImportDataAsync(json);
+            if (success)
+            {
+                statusMessage = "Data imported successfully!";
+            }
+            else
+            {
+                statusMessage = "Failed to import data. Invalid format.";
+            }
+        }
+        catch (Exception ex)
+        {
+            statusMessage = $"Error: {ex.Message}";
+        }
+        
+        await Task.Delay(3000);
+        statusMessage = "";
+    }
+}

@@ -1,0 +1,82 @@
+/* Base Light/Dark Variables */
+:root {
+    --bg-color: #f8f9fa;
+    --text-color: #212529;
+    --text-muted: #6c757d;
+    --card-bg: rgba(255, 255, 255, 0.6);
+    --card-border: rgba(255, 255, 255, 0.4);
+    --card-shadow: rgba(0, 0, 0, 0.05);
+    
+    --primary-color: #0d6efd;
+    --success-color: #198754;
+    
+    --font-family: 'Inter', sans-serif;
+    --font-weight-title: 600;
+    --font-weight-desc: 300;
+}
+
+[data-theme-mode="dark"] {
+    --bg-color: #121212;
+    --text-color: #e0e0e0;
+    --text-muted: #a0a0a0;
+    --card-bg: rgba(30, 30, 30, 0.5);
+    --card-border: rgba(255, 255, 255, 0.1);
+    --card-shadow: rgba(0, 0, 0, 0.3);
+}
+
+/* Theme A: Habitee+ (Clean White/Gray base) */
+[data-theme="habitee"] {
+    --primary-color: #3b82f6;
+    --success-color: #10b981;
+}
+
+/* Theme B: Pastel Dream (Pink/Mint/Lavender) */
+[data-theme="pastel"] {
+    --primary-color: #a78bfa; /* Lavender */
+    --success-color: #34d399; /* Mint */
+    --bg-color: #fdf4ff; /* Light pinkish */
+    --card-bg: rgba(255, 255, 255, 0.7);
+    --font-family: 'Comfortaa', cursive;
+}
+[data-theme="pastel"][data-theme-mode="dark"] {
+    --bg-color: #2e1065;
+    --card-bg: rgba(76, 29, 149, 0.4);
+}
+
+/* Theme C: Starry Galaxy (Deep blue/purple) */
+[data-theme="galaxy"] {
+    --primary-color: #8b5cf6;
+    --success-color: #0ea5e9;
+    --bg-color: #0f172a; /* Slate 900 */
+    --text-color: #f1f5f9;
+    --card-bg: rgba(30, 41, 59, 0.6);
+}
+[data-theme="galaxy"][data-theme-mode="light"] {
+    --bg-color: #e0e7ff; /* Indigo 100 */
+    --text-color: #1e1b4b;
+    --card-bg: rgba(255, 255, 255, 0.6);
+}
+
+/* Theme D: Cyberpunk (High-contrast black/neon) */
+[data-theme="cyberpunk"] {
+    --primary-color: #f43f5e; /* Neon pink */
+    --success-color: #06b6d4; /* Neon cyan */
+    --bg-color: #000000;
+    --text-color: #22d3ee;
+    --text-muted: #164e63;
+    --card-bg: rgba(0, 0, 0, 0.8);
+    --card-border: #f43f5e;
+    --card-shadow: rgba(244, 63, 94, 0.5);
+    --font-family: 'JetBrains Mono', monospace;
+}
+[data-theme="cyberpunk"][data-theme-mode="light"] {
+    /* Cyberpunk light is basically high contrast white/neon */
+    --bg-color: #ffffff;
+    --text-color: #000000;
+    --card-bg: rgba(240, 240, 240, 0.8);
+}
+
+/* Debounce transition for body */
+body {
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+}

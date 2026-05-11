@@ -1,0 +1,126 @@
+@page "/calendar"
+@using Habitee.Models
+@using Habitee.Services
+@inject DatabaseService DbService
+
+<div class="container">
+    <header class="view-header">
+        <h1 class="view-title">Year in Review</h1>
+    </header>
+
+    @if (isLoading)
+    {
+        <div class="flex-center" style="height: 200px;">
+            <p>Loading data...</p>
+        </div>
+    }
+    else
+    {
+        <div class="glass-panel" style="padding: 2rem; overflow-x: auto;">
+            <div class="heatmap-container">
+                @for (int w = 0; w < 52; w++)
+                {
+                    <div class="heatmap-column">
+                        @for (int d = 0; d < 7; d++)
+                        {
+                            var date = startDate.AddDays(w * 7 + d);
+                            if (date <= DateTime.Today)
+                            {
+                                var dateStr = date.ToString("yyyy-MM-dd");
+                                var completions = logs.Where(l => l.Date == dateStr).Sum(l => l.CompletedCount);
+                                var intensityClass = GetIntensityClass(completions);
+                                
+                                <div class="heatmap-box @intensityClass" title="@($"{dateStr}: {completions} completions")"></div>
+                            }
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .view-header {
+        margin-bottom: 2rem;
+        padding-top: 2rem;
+    }
+
+    .view-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin: 0;
+        background: linear-gradient(to right, var(--text-color), var(--primary-color));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .heatmap-container {
+        display: flex;
+        gap: 4px;
+        align-items: flex-start;
+    }
+
+    .heatmap-column {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .heatmap-box {
+        width: 14px;
+        height: 14px;
+        border-radius: 3px;
+        background-color: var(--card-border);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .heatmap-box:hover {
+        transform: scale(1.2);
+        box-shadow: 0 0 8px var(--primary-color);
+        z-index: 2;
+    }
+
+    .level-1 { background-color: rgba(16, 185, 129, 0.3); }
+    .level-2 { background-color: rgba(16, 185, 129, 0.6); }
+    .level-3 { background-color: rgba(16, 185, 129, 0.8); }
+    .level-4 { background-color: rgba(16, 185, 129, 1); box-shadow: 0 0 5px rgba(16, 185, 129, 0.5); }
+    
+    [data-theme="pastel"] .level-1 { background-color: rgba(167, 139, 250, 0.3); }
+    [data-theme="pastel"] .level-2 { background-color: rgba(167, 139, 250, 0.6); }
+    [data-theme="pastel"] .level-3 { background-color: rgba(167, 139, 250, 0.8); }
+    [data-theme="pastel"] .level-4 { background-color: rgba(167, 139, 250, 1); }
+</style>
+
+@code {
+    private List<HabitLog> logs = new();
+    private bool isLoading = true;
+    private DateTime startDate = DateTime.Today.AddDays(-364); // 52 weeks
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Align to Sunday
+        while (startDate.DayOfWeek != DayOfWeek.Sunday)
+        {
+            startDate = startDate.AddDays(-1);
+        }
+        
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        isLoading = true;
+        logs = await DbService.GetLogsAsync();
+        isLoading = false;
+    }
+
+    private string GetIntensityClass(int completions)
+    {
+        if (completions == 0) return "";
+        if (completions == 1) return "level-1";
+        if (completions == 2) return "level-2";
+        if (completions == 3) return "level-3";
+        return "level-4";
+    }
+}

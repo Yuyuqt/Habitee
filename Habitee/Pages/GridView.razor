@@ -1,0 +1,109 @@
+@page "/grid"
+@using Habitee.Models
+@using Habitee.Services
+@inject DatabaseService DbService
+
+<div class="container">
+    <header class="view-header">
+        <h1 class="view-title">Grid View</h1>
+    </header>
+
+    @if (isLoading)
+    {
+        <div class="flex-center" style="height: 200px;">
+            <p>Loading habits...</p>
+        </div>
+    }
+    else
+    {
+        <div class="habits-grid">
+            @foreach (var habit in habits)
+            {
+                var habitLogs = logs.Where(l => l.HabitId == habit.Id).ToList();
+                <div class="grid-card glass-panel card-hover-lift">
+                    <div class="grid-card-header">
+                        <div class="habit-icon-wrapper" style="background-color: @(habit.Color)20; border: 1px solid @(habit.Color);">
+                            <div style="width:16px; height:16px; background-color:@(habit.Color); border-radius:50%;"></div>
+                        </div>
+                        <h3 class="grid-title">@habit.Title</h3>
+                    </div>
+                    <div class="grid-card-body">
+                        <MiniHeatmap Logs="habitLogs" TargetCount="habit.TargetCount" />
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<style>
+    .view-header {
+        margin-bottom: 2rem;
+        padding-top: 2rem;
+    }
+
+    .view-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin: 0;
+        background: linear-gradient(to right, var(--text-color), var(--primary-color));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .habits-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .grid-card {
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .grid-card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .habit-icon-wrapper {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .grid-title {
+        font-size: 1rem;
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+
+@code {
+    private List<Habit> habits = new();
+    private List<HabitLog> logs = new();
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        isLoading = true;
+        habits = await DbService.GetAllHabitsAsync();
+        logs = await DbService.GetLogsAsync();
+        isLoading = false;
+    }
+}

@@ -1,0 +1,40 @@
+@inherits LayoutComponentBase
+@using Habitee.Services
+@inject ThemeService ThemeService
+@inject DatabaseService DbService
+
+<BackgroundLayer />
+
+<div class="page-container fade-in">
+    <main class="content-wrapper">
+        @Body
+    </main>
+</div>
+
+<DockNavigation />
+
+<style>
+    .page-container {
+        position: relative;
+        z-index: 1; /* Ensure content is above background */
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .content-wrapper {
+        flex: 1;
+        padding-bottom: 6rem; /* Space for the dock */
+        max-width: 1200px;
+        margin: 0 auto;
+        width: 100%;
+    }
+</style>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await ThemeService.InitializeAsync();
+        await DbService.InitializeAsync();
+    }
+}

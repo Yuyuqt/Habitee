@@ -1,0 +1,138 @@
+@using Habitee.Models
+
+<div class="habit-card glass-panel card-hover-lift">
+    <div class="habit-icon-wrapper" style="background-color: @(Habit.Color)20; border: 1px solid @(Habit.Color);">
+        <!-- Using a placeholder SVG, ideally map Habit.Icon to a specific path -->
+        <svg class="habit-icon @(isPopping ? "animate-pop" : "")" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="@Habit.Color" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            @if (Habit.Icon == "check")
+            {
+                <polyline points="20 6 9 17 4 12"></polyline>
+            }
+            else
+            {
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" x2="12" y1="8" y2="16"></line>
+                <line x1="8" x2="16" y1="12" y2="12"></line>
+            }
+        </svg>
+    </div>
+    
+    <div class="habit-details">
+        <h3 class="habit-title">@Habit.Title</h3>
+        @if (!string.IsNullOrEmpty(Habit.Description))
+        {
+            <p class="habit-desc">@Habit.Description</p>
+        }
+        
+        <div class="habit-meta">
+            <MiniHeatmap Logs="Logs" TargetCount="Habit.TargetCount" />
+            <span class="habit-streak">
+                @(TodayLog?.CompletedCount ?? 0) / @Habit.TargetCount
+            </span>
+        </div>
+    </div>
+
+    <button class="habit-action glass-button" @onclick="CompleteHabit">
+        @if ((TodayLog?.CompletedCount ?? 0) >= Habit.TargetCount)
+        {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--success-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+        }
+        else if (Habit.TargetCount > 1)
+        {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"></line><line x1="5" x2="19" y1="12" y2="12"></line></svg>
+        }
+        else
+        {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        }
+    </button>
+</div>
+
+<style>
+    .habit-card {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .habit-icon-wrapper {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .habit-details {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .habit-title {
+        font-size: 1.1rem;
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .habit-desc {
+        font-size: 0.85rem;
+        margin: 0.25rem 0 0.5rem 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .habit-meta {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 0.5rem;
+    }
+
+    .habit-streak {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        font-family: var(--font-family); /* Or JetBrains Mono */
+    }
+
+    .habit-action {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        flex-shrink: 0;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public Habit Habit { get; set; } = new();
+
+    [Parameter]
+    public List<HabitLog> Logs { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<Habit> OnComplete { get; set; }
+
+    private bool isPopping = false;
+
+    private HabitLog? TodayLog => Logs.FirstOrDefault(l => l.Date == DateTime.Today.ToString("yyyy-MM-dd"));
+
+    private async Task CompleteHabit()
+    {
+        isPopping = false;
+        await Task.Delay(10); // reset animation
+        isPopping = true;
+        
+        await OnComplete.InvokeAsync(Habit);
+    }
+}
