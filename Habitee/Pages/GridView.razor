@@ -1,146 +1,308 @@
 @page "/grid"
+@using Habitee.Components
 @using Habitee.Models
 @using Habitee.Services
-@using Habitee.Components
 @inject DatabaseService DbService
 @inject NavigationManager NavManager
 @inject ThemeService ThemeService
 
-<div class="view-container fade-in">
-    <header class="view-header">
-        <h1 class="view-title">All Habits</h1>
-        <p class="view-subtitle">Grid View</p>
+<div class="grid-view fade-in">
+    <header class="grid-header">
+        <div>
+            <h1 class="grid-title">All Habits</h1>
+            <p class="grid-subtitle">Monthly contribution snapshots</p>
+        </div>
     </header>
 
     @if (isLoading)
     {
-        <div class="flex-center" style="height: 200px;">
+        <div class="flex-center loading-state">
             <div class="loading-spinner"></div>
+        </div>
+    }
+    else if (!habits.Any())
+    {
+        <div class="grid-empty glass-panel">
+            <h2>No habits yet</h2>
+            <p>Add your first habit to start building a contribution grid.</p>
         </div>
     }
     else
     {
-        <div class="habits-grid">
+        <div class="habit-card-grid">
             @foreach (var habit in habits)
             {
-                <div class="grid-card glass-panel card-hover-lift @(ThemeService.CurrentTheme == "pastel" ? "pastel-card" : "")" @onclick='() => NavManager.NavigateTo($"/habit/{habit.Id}")'>
-                    <div class="grid-icon-container">
-                        <HabitIcon Name="@habit.Icon" Color="@habit.Color" Size="32" />
+                var habitLogs = logs.Where(log => log.HabitId == habit.Id).ToList();
+                var todayProgress = GetTodayProgress(habit, habitLogs);
+
+                <button class="grid-habit-card glass-panel @(ThemeService.CurrentTheme == "pastel" ? "pastel-card" : "")"
+                        @onclick='() => NavManager.NavigateTo($"/habit/{habit.Id}")'>
+                    <div class="grid-card-top">
+                        <div class="grid-habit-copy">
+                            <div class="grid-icon-ring" style="@($"--habit-color: {habit.Color};")">
+                                <HabitIcon Name="@habit.Icon" Color="@habit.Color" Size="24" />
+                            </div>
+                            <div class="grid-copy-text">
+                                <h3>@habit.Title</h3>
+                                @if (!string.IsNullOrWhiteSpace(habit.Description))
+                                {
+                                    <p>@habit.Description</p>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="grid-status-badge @todayProgress.CssClass" style="@($"--habit-color: {habit.Color};")">
+                            @if (todayProgress.IsComplete)
+                            {
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                            }
+                            else
+                            {
+                                <span>@todayProgress.Label</span>
+                            }
+                        </div>
                     </div>
-                    <div class="grid-card-footer">
-                        <span class="grid-habit-title">@habit.Title</span>
+
+                    <div class="grid-contribution-wrap">
+                        <MonthlyContributionGraph Logs="habitLogs"
+                                                  TargetCount="habit.TargetCount"
+                                                  Color="@habit.Color"
+                                                  Compact="true"
+                                                  MonthsToShow="1"
+                                                  ShowMonthLabel="false" />
                     </div>
-                </div>
+                </button>
             }
-            
-            <div class="grid-card add-card glass-panel card-hover-lift @(ThemeService.CurrentTheme == "pastel" ? "pastel-card" : "")" @onclick='() => NavManager.NavigateTo("/add-habit")'>
-                <div class="grid-icon-container">
-                    <div class="plus-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"></line><line x1="5" x2="19" y1="12" y2="12"></line></svg>
-                    </div>
+
+            <button class="grid-habit-card add-habit-card glass-panel @(ThemeService.CurrentTheme == "pastel" ? "pastel-card" : "")"
+                    @onclick='() => NavManager.NavigateTo("/add-habit")'>
+                <div class="add-icon">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" x2="12" y1="5" y2="19"></line>
+                        <line x1="5" x2="19" y1="12" y2="12"></line>
+                    </svg>
                 </div>
-                <div class="grid-card-footer">
-                    <span class="grid-habit-title">New Habit</span>
+                <div class="add-copy">
+                    <h3>New Habit</h3>
+                    <p>Create another habit card for your grid.</p>
                 </div>
-            </div>
+            </button>
         </div>
     }
 </div>
 
 <style>
-    .view-container {
+    .grid-view {
         padding: 1.5rem;
-        max-width: 1000px;
+        max-width: 1120px;
         margin: 0 auto;
     }
 
-    .view-header {
-        margin-bottom: 2rem;
-    }
-
-    .view-title {
-        font-size: 2rem;
-        font-weight: 800;
-        margin: 0;
-    }
-
-    .view-subtitle {
-        color: var(--text-muted);
-        margin: 0;
-        font-size: 0.9rem;
-    }
-
-    .habits-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-        gap: 1rem;
-    }
-
-    .grid-card {
-        aspect-ratio: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 1rem;
-        cursor: pointer;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .grid-icon-container {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-    }
-
-    .grid-card-footer {
-        width: 100%;
-        text-align: center;
+    .grid-header {
+        margin-bottom: 1.5rem;
         padding-top: 0.5rem;
     }
 
-    .grid-habit-title {
-        font-size: 0.85rem;
-        font-weight: 600;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        display: block;
+    .grid-title {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 800;
     }
 
-    .add-card {
-        border: 2px dashed var(--card-border);
-        background: transparent;
-        opacity: 0.7;
-    }
-
-    .pastel-card {
-        border-width: 2px !important;
-    }
-
-    .plus-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(255,255,255,0.1);
+    .grid-subtitle {
+        margin: 0.35rem 0 0;
         color: var(--text-muted);
     }
 
-    /* Pastel Theme Override */
-    .view-container :global(.pastel-icon) {
-        width: 60px !important;
-        height: 60px !important;
+    .loading-state {
+        height: 220px;
+    }
+
+    .grid-empty {
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .habit-card-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 0.8rem;
+    }
+
+    .grid-habit-card {
+        width: 100%;
+        border: var(--outline-width, 1px) solid var(--card-border);
+        background: var(--card-bg);
+        color: var(--text-color);
+        text-align: left;
+        padding: 0.8rem;
+        border-radius: 20px;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        gap: 0.65rem;
+        min-height: 190px;
+        box-shadow: var(--card-shadow);
+    }
+
+    .pastel-card {
+        border-width: 2px;
+    }
+
+    .grid-card-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.55rem;
+        align-items: flex-start;
+    }
+
+    .grid-habit-copy {
+        display: flex;
+        gap: 0.6rem;
+        min-width: 0;
+        align-items: flex-start;
+    }
+
+    .grid-icon-ring {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        border: 2px solid color-mix(in srgb, var(--habit-color) 45%, var(--card-border));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: color-mix(in srgb, var(--habit-color) 12%, transparent);
+        flex-shrink: 0;
+    }
+
+    .grid-copy-text {
+        min-width: 0;
+    }
+
+    .grid-copy-text h3 {
+        font-size: 0.98rem;
+        line-height: 1.15;
+        margin: 0;
+        word-break: break-word;
+    }
+
+    .grid-copy-text p {
+        margin: 0.2rem 0 0;
+        font-size: 0.75rem;
+        line-height: 1.2;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .grid-status-badge {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        border: 2px solid color-mix(in srgb, var(--habit-color) 40%, var(--card-border));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.68rem;
+        font-weight: 700;
+        flex-shrink: 0;
+        color: var(--text-color);
+        background: rgba(255, 255, 255, 0.18);
+    }
+
+    .grid-status-badge.complete {
+        background: color-mix(in srgb, var(--habit-color) 84%, white 16%);
+        color: white;
+        border-color: transparent;
+    }
+
+    .grid-status-badge.partial {
+        color: var(--habit-color);
+    }
+
+    .grid-status-badge.empty {
+        color: var(--text-muted);
+    }
+
+    .grid-contribution-wrap {
+        padding: 0.1rem 0 0;
+    }
+
+    .add-habit-card {
+        justify-content: center;
+        align-items: flex-start;
+        border-style: dashed;
+        background: transparent;
+    }
+
+    .add-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--primary-color);
+    }
+
+    .add-copy h3 {
+        margin: 0.55rem 0 0;
+        font-size: 1rem;
+    }
+
+    .add-copy p {
+        margin: 0.25rem 0 0;
+        font-size: 0.75rem;
+    }
+
+    @@media (max-width: 900px) {
+        .habit-card-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+    }
+
+    @@media (max-width: 640px) {
+        .grid-view {
+            padding: 1rem;
+        }
+
+        .habit-card-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.75rem;
+        }
+
+        .grid-habit-card {
+            min-height: 176px;
+            padding: 0.75rem;
+            border-radius: 18px;
+        }
+
+        .grid-copy-text h3 {
+            font-size: 0.9rem;
+        }
+
+        .grid-status-badge {
+            width: 38px;
+            height: 38px;
+            font-size: 0.62rem;
+        }
+
+        .grid-icon-ring {
+            width: 38px;
+            height: 38px;
+        }
     }
 </style>
 
 @code {
+    private readonly record struct HabitProgressState(string Label, string CssClass, bool IsComplete);
+
     private List<Habit> habits = new();
+    private List<HabitLog> logs = new();
     private bool isLoading = true;
 
     protected override async Task OnInitializedAsync()
@@ -152,6 +314,25 @@
     {
         isLoading = true;
         habits = await DbService.GetAllHabitsAsync();
+        logs = await DbService.GetLogsAsync();
         isLoading = false;
+    }
+
+    private static HabitProgressState GetTodayProgress(Habit habit, List<HabitLog> habitLogs)
+    {
+        var todayKey = DateTime.Today.ToString("yyyy-MM-dd");
+        var completedCount = habitLogs.FirstOrDefault(log => log.Date == todayKey)?.CompletedCount ?? 0;
+
+        if (completedCount >= habit.TargetCount)
+        {
+            return new HabitProgressState($"{completedCount}/{habit.TargetCount}", "complete", true);
+        }
+
+        if (completedCount > 0)
+        {
+            return new HabitProgressState($"{completedCount}/{habit.TargetCount}", "partial", false);
+        }
+
+        return new HabitProgressState($"0/{habit.TargetCount}", "empty", false);
     }
 }

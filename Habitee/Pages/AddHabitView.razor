@@ -56,7 +56,7 @@
     </div>
 
     <div class="fixed-bottom">
-        <button class="primary-btn glass-button" @onclick='() => NavManager.NavigateTo("/new-habit")'>
+        <button class="primary-btn glass-button" @onclick='() => NavManager.NavigateTo("/new-habit?reset=true")'>
             Create Custom Habit
         </button>
     </div>
@@ -239,7 +239,7 @@
     private void SelectTemplate(HabitTemplate template)
     {
         // Pass parameters to new-habit form via query string
-        NavManager.NavigateTo($"/new-habit?title={Uri.EscapeDataString(template.Title)}&desc={Uri.EscapeDataString(template.Description)}&icon={template.Icon}&color={Uri.EscapeDataString(template.Color)}");
+        NavManager.NavigateTo($"/new-habit?reset=true&title={Uri.EscapeDataString(template.Title)}&desc={Uri.EscapeDataString(template.Description)}&icon={template.Icon}&color={Uri.EscapeDataString(template.Color)}");
     }
 
     private class HabitCategory

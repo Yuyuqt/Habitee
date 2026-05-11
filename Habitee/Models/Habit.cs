@@ -8,5 +8,11 @@ public class Habit
     public string Icon { get; set; } = "check"; // svg name or path
     public string Color { get; set; } = "var(--primary-color)";
     public int TargetCount { get; set; } = 1; // e.g. drink 8 glasses of water
+    public string TrackingMode { get; set; } = "StepByStep";
+    public string Frequency { get; set; } = "Daily";
+    public string WeeklyDay { get; set; } = "Mon";
+    public int MonthlyDay { get; set; } = 1;
+    public string WeeklyDaysCsv { get; set; } = "Mon";
+    public string MonthlyDaysCsv { get; set; } = "1";
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

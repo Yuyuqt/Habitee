@@ -1,8 +1,7 @@
 @using Habitee.Services
 @inject ThemeService ThemeService
 
-<div class="habit-icon-wrapper @(ThemeService.CurrentTheme == "pastel" ? "pastel-icon" : "")" 
-     style="background-color: @(Color)20; border: @(ThemeService.CurrentTheme == "pastel" ? "2.5px solid var(--card-border)" : "1px solid " + Color);">
+<div class="habit-icon-wrapper">
     <svg width="@Size" height="@Size" viewBox="0 0 24 24" fill="none" 
          stroke="@(ThemeService.CurrentTheme == "pastel" ? "#705246" : Color)" 
          stroke-width="@(ThemeService.CurrentTheme == "pastel" ? "2.5" : "2")" 
@@ -16,12 +15,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 50%;
         flex-shrink: 0;
-    }
-
-    .pastel-icon {
-        border-radius: 40% !important; /* Squircle for pastel */
     }
 </style>
 

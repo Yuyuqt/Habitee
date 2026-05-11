@@ -2,125 +2,550 @@
 @using Habitee.Models
 @using Habitee.Services
 @inject DatabaseService DbService
+@inject NavigationManager NavManager
+@inject ThemeService ThemeService
 
-<div class="container">
-    <header class="view-header">
-        <h1 class="view-title">Year in Review</h1>
+<div class="calendar-view">
+    <header class="calendar-header">
+        <h1 class="calendar-title">Weekly</h1>
+        <p class="calendar-subtitle">Recent progress across your habits</p>
     </header>
 
     @if (isLoading)
     {
-        <div class="flex-center" style="height: 200px;">
+        <div class="flex-center loading-state">
             <p>Loading data...</p>
+        </div>
+    }
+    else if (!habits.Any())
+    {
+        <div class="empty-state glass-panel">
+            <h2>No habits yet</h2>
+            <p>Add a habit to see your weekly progress view.</p>
         </div>
     }
     else
     {
-        <div class="glass-panel" style="padding: 2rem; overflow-x: auto;">
-            <div class="heatmap-container">
-                @for (int w = 0; w < 52; w++)
+        <div class="range-toolbar">
+            <div class="range-select-wrap glass-panel">
+                <span>Range</span>
+                <button type="button" class="range-select" @onclick="ToggleRangeMenu">
+                    <span>@GetSelectedRangeLabel()</span>
+                    <svg class="range-chevron @(isRangeMenuOpen ? "open" : "")" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+
+                @if (isRangeMenuOpen)
                 {
-                    <div class="heatmap-column">
-                        @for (int d = 0; d < 7; d++)
+                    <div class="range-menu glass-panel">
+                        @foreach (var option in rangeOptions)
                         {
-                            var date = startDate.AddDays(w * 7 + d);
-                            if (date <= DateTime.Today)
-                            {
-                                var dateStr = date.ToString("yyyy-MM-dd");
-                                var completions = logs.Where(l => l.Date == dateStr).Sum(l => l.CompletedCount);
-                                var intensityClass = GetIntensityClass(completions);
-                                
-                                <div class="heatmap-box @intensityClass" title="@($"{dateStr}: {completions} completions")"></div>
-                            }
+                            <button type="button"
+                                    class="range-menu-item @(selectedRange == option ? "active" : "")"
+                                    @onclick="() => SelectRange(option)">
+                                @($"Last {option} {(option == 1 ? "day" : "days")}")
+                            </button>
                         }
                     </div>
                 }
             </div>
         </div>
+
+        <div class="day-header">
+            <div class="day-header-spacer"></div>
+            <div class="day-header-grid">
+                @foreach (var item in GetDisplayDays())
+                {
+                    if (item == null)
+                    {
+                        <div class="day-chip placeholder"></div>
+                    }
+                    else
+                    {
+                        var day = item.Value;
+                        var isToday = day.Date == DateTime.Today;
+                        <div class="day-chip @(isToday ? "today" : "")">
+                            <span>@day.ToString("ddd")</span>
+                            <strong>@day.Day</strong>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+
+        <div class="habit-rows">
+            @foreach (var habit in habits)
+            {
+                var habitLogs = logs.Where(log => log.HabitId == habit.Id).ToList();
+
+                <button class="habit-row glass-panel @(ThemeService.CurrentTheme == "pastel" ? "pastel-row" : "")"
+                        @onclick='() => NavManager.NavigateTo($"/habit/{habit.Id}")'>
+                    <div class="habit-row-info">
+                        <div class="habit-icon-shell" style="@($"--habit-color: {habit.Color};")">
+                            <HabitIcon Name="@habit.Icon" Color="@habit.Color" Size="26" />
+                        </div>
+                        <div class="habit-row-copy">
+                            <h3>@habit.Title</h3>
+                            @if (!string.IsNullOrWhiteSpace(habit.Description))
+                            {
+                                <p>@habit.Description</p>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="habit-row-days">
+                        @foreach (var item in GetDisplayDays())
+                        {
+                            if (item == null)
+                            {
+                                <div class="day-status placeholder"></div>
+                            }
+                            else
+                            {
+                                var day = item.Value;
+                                var state = GetDayState(habit, habitLogs, day);
+
+                                <div class="day-status @state.CssClass"
+                                     style="@($"--habit-color: {habit.Color};")"
+                                     title="@($"{habit.Title} - {day:yyyy-MM-dd}: {state.Title}")">
+                                    @if (state.ShowCheck)
+                                    {
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="20 6 9 17 4 12"></polyline>
+                                        </svg>
+                                    }
+                                    else if (!string.IsNullOrEmpty(state.DisplayText))
+                                    {
+                                        <span>@state.DisplayText</span>
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+                </button>
+            }
+        </div>
     }
 </div>
 
 <style>
-    .view-header {
-        margin-bottom: 2rem;
-        padding-top: 2rem;
+    .calendar-view {
+        padding: 1.5rem;
+        max-width: 980px;
+        margin: 0 auto;
     }
 
-    .view-title {
-        font-size: 2.5rem;
-        font-weight: 700;
+    .calendar-header {
+        padding-top: 0.5rem;
+        margin-bottom: 1.35rem;
+    }
+
+    .calendar-title {
         margin: 0;
-        background: linear-gradient(to right, var(--text-color), var(--primary-color));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        font-size: 2rem;
+        font-weight: 800;
     }
 
-    .heatmap-container {
+    .calendar-subtitle {
+        margin: 0.35rem 0 0;
+        color: var(--text-muted);
+    }
+
+    .loading-state {
+        height: 220px;
+    }
+
+    .empty-state {
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .range-toolbar {
         display: flex;
-        gap: 4px;
-        align-items: flex-start;
+        margin-bottom: 1rem;
+        position: relative;
+        z-index: 5;
     }
 
-    .heatmap-column {
+    .range-select-wrap {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.65rem;
+        padding: 0.55rem 0.8rem;
+        border-radius: 18px;
+        position: relative;
+    }
+
+    .range-select-wrap span {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: var(--text-muted);
+    }
+
+    .range-select {
+        border: none;
+        background: transparent;
+        color: var(--text-color);
+        font: inherit;
+        font-weight: 700;
+        font-size: 0.95rem;
+        padding: 0;
+        cursor: pointer;
+        outline: none;
+        min-width: 128px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+    }
+
+    .range-select span {
+        white-space: nowrap;
+    }
+
+    .range-chevron {
+        color: var(--text-muted);
+        transition: transform 0.2s ease;
+        flex-shrink: 0;
+    }
+
+    .range-chevron.open {
+        transform: rotate(180deg);
+    }
+
+    .range-menu {
+        position: absolute;
+        top: calc(100% + 0.55rem);
+        left: 0;
+        min-width: 100%;
+        padding: 0.4rem;
+        border-radius: 18px;
         display: flex;
         flex-direction: column;
-        gap: 4px;
+        gap: 0.2rem;
+        background: color-mix(in srgb, var(--card-bg) 92%, var(--bg-color));
+        box-shadow: 0 18px 36px rgba(0, 0, 0, 0.22);
     }
 
-    .heatmap-box {
-        width: 14px;
-        height: 14px;
-        border-radius: 3px;
-        background-color: var(--card-border);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    .range-menu-item {
+        border: none;
+        background: transparent;
+        color: var(--text-color);
+        text-align: left;
+        border-radius: 14px;
+        padding: 0.7rem 0.85rem;
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.18s ease, color 0.18s ease;
     }
 
-    .heatmap-box:hover {
-        transform: scale(1.2);
-        box-shadow: 0 0 8px var(--primary-color);
-        z-index: 2;
+    .range-menu-item:hover {
+        background: rgba(255, 255, 255, 0.08);
     }
 
-    .level-1 { background-color: rgba(16, 185, 129, 0.3); }
-    .level-2 { background-color: rgba(16, 185, 129, 0.6); }
-    .level-3 { background-color: rgba(16, 185, 129, 0.8); }
-    .level-4 { background-color: rgba(16, 185, 129, 1); box-shadow: 0 0 5px rgba(16, 185, 129, 0.5); }
-    
-    [data-theme="pastel"] .level-1 { background-color: rgba(167, 139, 250, 0.3); }
-    [data-theme="pastel"] .level-2 { background-color: rgba(167, 139, 250, 0.6); }
-    [data-theme="pastel"] .level-3 { background-color: rgba(167, 139, 250, 0.8); }
-    [data-theme="pastel"] .level-4 { background-color: rgba(167, 139, 250, 1); }
+    .range-menu-item.active {
+        background: color-mix(in srgb, var(--primary-color) 18%, transparent);
+        color: var(--primary-color);
+    }
+
+    .day-header {
+        display: grid;
+        grid-template-columns: minmax(180px, 1.3fr) minmax(0, 2fr);
+        gap: 1rem;
+        align-items: end;
+        margin-bottom: 0.8rem;
+    }
+
+    .day-header-grid {
+        display: grid;
+        grid-template-columns: repeat(10, minmax(0, 1fr));
+        gap: 0.5rem;
+        justify-content: end;
+        justify-items: center;
+    }
+
+    .day-chip {
+        text-align: center;
+        color: var(--text-muted);
+        padding: 0.3rem 0.2rem;
+        border-radius: 18px;
+        width: 100%;
+        max-width: 56px;
+    }
+
+    .day-chip span {
+        display: block;
+        font-size: clamp(0.68rem, 0.55rem + 0.35vw, 0.86rem);
+    }
+
+    .day-chip strong {
+        display: block;
+        margin-top: 0.15rem;
+        font-size: clamp(0.98rem, 0.72rem + 0.7vw, 1.4rem);
+        color: var(--text-color);
+        font-weight: 700;
+    }
+
+    .day-chip.today {
+        background: rgba(255, 255, 255, 0.55);
+        border: 1px solid var(--card-border);
+    }
+
+    .day-chip.placeholder {
+        background: transparent;
+        border: none;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .habit-rows {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .habit-row {
+        width: 100%;
+        padding: 0.95rem 1rem;
+        border-radius: 28px;
+        border: var(--outline-width, 1px) solid var(--card-border);
+        background: var(--card-bg);
+        color: var(--text-color);
+        display: grid;
+        grid-template-columns: minmax(180px, 1.3fr) minmax(0, 2fr);
+        gap: 0.8rem;
+        align-items: center;
+        text-align: left;
+        cursor: pointer;
+    }
+
+    .pastel-row {
+        border-width: 2px;
+    }
+
+    .habit-row-info {
+        display: flex;
+        align-items: center;
+        gap: 0.9rem;
+        min-width: 0;
+    }
+
+    .habit-icon-shell {
+        width: 62px;
+        height: 62px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid color-mix(in srgb, var(--habit-color) 45%, var(--card-border));
+        background: color-mix(in srgb, var(--habit-color) 10%, transparent);
+        flex-shrink: 0;
+    }
+
+    .habit-row-copy {
+        min-width: 0;
+    }
+
+    .habit-row-copy h3 {
+        margin: 0;
+        font-size: 1rem;
+        line-height: 1.1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .habit-row-copy p {
+        margin: 0.25rem 0 0;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .habit-row-days {
+        display: grid;
+        grid-template-columns: repeat(10, minmax(0, 1fr));
+        gap: 0.5rem;
+        justify-content: end;
+        justify-items: center;
+    }
+
+    .day-status {
+        width: 100%;
+        aspect-ratio: 1;
+        max-width: 56px;
+        border-radius: 999px;
+        border: 2px solid rgba(148, 163, 184, 0.6);
+        background: rgba(255, 255, 255, 0.22);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-muted);
+        font-weight: 700;
+        position: relative;
+    }
+
+    .day-status.complete {
+        background: color-mix(in srgb, var(--habit-color) 84%, white 16%);
+        border-color: transparent;
+        color: white;
+    }
+
+    .day-status.partial {
+        color: var(--habit-color);
+        border-color: color-mix(in srgb, var(--habit-color) 45%, rgba(148, 163, 184, 0.6));
+    }
+
+    .day-status.empty {
+        background: rgba(255, 255, 255, 0.14);
+    }
+
+    .day-status span {
+        font-size: clamp(0.65rem, 0.5rem + 0.35vw, 0.82rem);
+    }
+
+    .day-status.placeholder {
+        background: transparent;
+        border: none;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    @@media (max-width: 720px) {
+        .calendar-view {
+            padding: 1rem;
+        }
+
+        .day-header {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+
+        .day-header-spacer {
+            display: none;
+        }
+
+        .habit-row {
+            grid-template-columns: 1fr;
+            gap: 0.9rem;
+            padding: 0.95rem;
+        }
+
+        .habit-row-copy h3 {
+            white-space: normal;
+        }
+
+        .day-header,
+        .habit-row {
+            gap: 0.7rem;
+        }
+
+        .day-header-grid,
+        .habit-row-days {
+            gap: 0.4rem;
+        }
+
+        .range-select-wrap {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .range-menu {
+            width: 100%;
+        }
+
+        .day-chip {
+            max-width: 48px;
+        }
+
+        .day-status {
+            max-width: 48px;
+        }
+
+        .habit-icon-shell {
+            width: 56px;
+            height: 56px;
+        }
+    }
 </style>
 
 @code {
+    private readonly record struct DayState(string CssClass, string Title, string DisplayText, bool ShowCheck);
+
+    private readonly int[] rangeOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    private List<Habit> habits = new();
     private List<HabitLog> logs = new();
+    private List<DateTime> visibleDates = new();
     private bool isLoading = true;
-    private DateTime startDate = DateTime.Today.AddDays(-364); // 52 weeks
+    private bool isRangeMenuOpen;
+    private int selectedRange = 5;
 
     protected override async Task OnInitializedAsync()
     {
-        // Align to Sunday
-        while (startDate.DayOfWeek != DayOfWeek.Sunday)
-        {
-            startDate = startDate.AddDays(-1);
-        }
-        
         await LoadData();
+        RebuildVisibleDates();
     }
 
     private async Task LoadData()
     {
         isLoading = true;
+        habits = await DbService.GetAllHabitsAsync();
         logs = await DbService.GetLogsAsync();
         isLoading = false;
     }
 
-    private string GetIntensityClass(int completions)
+    private void SelectRange(int range)
     {
-        if (completions == 0) return "";
-        if (completions == 1) return "level-1";
-        if (completions == 2) return "level-2";
-        if (completions == 3) return "level-3";
-        return "level-4";
+        selectedRange = range;
+        isRangeMenuOpen = false;
+        RebuildVisibleDates();
+    }
+
+    private void ToggleRangeMenu()
+    {
+        isRangeMenuOpen = !isRangeMenuOpen;
+    }
+
+    private void RebuildVisibleDates()
+    {
+        visibleDates = Enumerable.Range(0, selectedRange)
+            .Select(offset => DateTime.Today.AddDays(offset - (selectedRange - 1)))
+            .ToList();
+    }
+
+    private List<DateTime?> GetDisplayDays()
+    {
+        var placeholders = Enumerable.Repeat<DateTime?>(null, Math.Max(0, 10 - visibleDates.Count));
+        return placeholders.Concat(visibleDates.Select(day => (DateTime?)day)).ToList();
+    }
+
+    private string GetSelectedRangeLabel()
+    {
+        return $"Last {selectedRange} {(selectedRange == 1 ? "day" : "days")}";
+    }
+
+    private static DayState GetDayState(Habit habit, List<HabitLog> habitLogs, DateTime day)
+    {
+        var dateKey = day.ToString("yyyy-MM-dd");
+        var completedCount = habitLogs.FirstOrDefault(log => log.Date == dateKey)?.CompletedCount ?? 0;
+
+        if (completedCount >= habit.TargetCount)
+        {
+            var title = completedCount == habit.TargetCount
+                ? $"{completedCount}/{habit.TargetCount} complete"
+                : $"{completedCount}/{habit.TargetCount} complete (over target)";
+
+            return new DayState("complete", title, string.Empty, true);
+        }
+
+        if (completedCount > 0)
+        {
+            return new DayState("partial", $"{completedCount}/{habit.TargetCount} progress", $"{completedCount}/{habit.TargetCount}", false);
+        }
+
+        return new DayState("empty", $"0/{habit.TargetCount} progress", habit.TargetCount > 1 ? $"0/{habit.TargetCount}" : string.Empty, false);
     }
 }

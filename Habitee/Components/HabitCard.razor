@@ -6,7 +6,7 @@
 
 <div class="habit-card glass-panel card-hover-lift @(ThemeService.CurrentTheme == "pastel" ? "pastel-card" : "")" @onclick="GoToDetail">
     <div class="habit-header">
-        <div class="@(isPopping ? "animate-pop" : "")" style="display: flex;">
+        <div class="habit-icon-shell @(isPopping ? "animate-pop" : "")" style="@($"--habit-color: {Habit.Color};")">
             <HabitIcon Name="@Habit.Icon" Color="@Habit.Color" Size="28" />
         </div>
         
@@ -65,7 +65,17 @@
         border-width: 2px !important;
     }
 
-
+    .habit-icon-shell {
+        width: 62px;
+        height: 62px;
+        border-radius: 50%;
+        border: 2px solid color-mix(in srgb, var(--habit-color) 45%, var(--card-border));
+        background: color-mix(in srgb, var(--habit-color) 10%, transparent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
 
     .habit-details {
         flex: 1;
@@ -166,6 +176,4 @@
             ConfettiService.TriggerBurst();
         }
     }
-
-}
 }
