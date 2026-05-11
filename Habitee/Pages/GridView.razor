@@ -1,17 +1,21 @@
 @page "/grid"
 @using Habitee.Models
 @using Habitee.Services
+@using Habitee.Components
 @inject DatabaseService DbService
+@inject NavigationManager NavManager
+@inject ThemeService ThemeService
 
-<div class="container">
+<div class="view-container fade-in">
     <header class="view-header">
-        <h1 class="view-title">Grid View</h1>
+        <h1 class="view-title">All Habits</h1>
+        <p class="view-subtitle">Grid View</p>
     </header>
 
     @if (isLoading)
     {
         <div class="flex-center" style="height: 200px;">
-            <p>Loading habits...</p>
+            <div class="loading-spinner"></div>
         </div>
     }
     else
@@ -19,79 +23,124 @@
         <div class="habits-grid">
             @foreach (var habit in habits)
             {
-                var habitLogs = logs.Where(l => l.HabitId == habit.Id).ToList();
-                <div class="grid-card glass-panel card-hover-lift">
-                    <div class="grid-card-header">
-                        <div class="habit-icon-wrapper" style="background-color: @(habit.Color)20; border: 1px solid @(habit.Color);">
-                            <div style="width:16px; height:16px; background-color:@(habit.Color); border-radius:50%;"></div>
-                        </div>
-                        <h3 class="grid-title">@habit.Title</h3>
+                <div class="grid-card glass-panel card-hover-lift @(ThemeService.CurrentTheme == "pastel" ? "pastel-card" : "")" @onclick='() => NavManager.NavigateTo($"/habit/{habit.Id}")'>
+                    <div class="grid-icon-container">
+                        <HabitIcon Name="@habit.Icon" Color="@habit.Color" Size="32" />
                     </div>
-                    <div class="grid-card-body">
-                        <MiniHeatmap Logs="habitLogs" TargetCount="habit.TargetCount" />
+                    <div class="grid-card-footer">
+                        <span class="grid-habit-title">@habit.Title</span>
                     </div>
                 </div>
             }
+            
+            <div class="grid-card add-card glass-panel card-hover-lift @(ThemeService.CurrentTheme == "pastel" ? "pastel-card" : "")" @onclick='() => NavManager.NavigateTo("/add-habit")'>
+                <div class="grid-icon-container">
+                    <div class="plus-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"></line><line x1="5" x2="19" y1="12" y2="12"></line></svg>
+                    </div>
+                </div>
+                <div class="grid-card-footer">
+                    <span class="grid-habit-title">New Habit</span>
+                </div>
+            </div>
         </div>
     }
 </div>
 
 <style>
+    .view-container {
+        padding: 1.5rem;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
     .view-header {
         margin-bottom: 2rem;
-        padding-top: 2rem;
     }
 
     .view-title {
-        font-size: 2.5rem;
-        font-weight: 700;
+        font-size: 2rem;
+        font-weight: 800;
         margin: 0;
-        background: linear-gradient(to right, var(--text-color), var(--primary-color));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+    }
+
+    .view-subtitle {
+        color: var(--text-muted);
+        margin: 0;
+        font-size: 0.9rem;
     }
 
     .habits-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 1.5rem;
-    }
-
-    .grid-card {
-        padding: 1.5rem;
-        display: flex;
-        flex-direction: column;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
         gap: 1rem;
     }
 
-    .grid-card-header {
+    .grid-card {
+        aspect-ratio: 1;
         display: flex;
+        flex-direction: column;
         align-items: center;
-        gap: 0.75rem;
+        justify-content: center;
+        padding: 1rem;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
     }
 
-    .habit-icon-wrapper {
-        width: 32px;
-        height: 32px;
+    .grid-icon-container {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .grid-card-footer {
+        width: 100%;
+        text-align: center;
+        padding-top: 0.5rem;
+    }
+
+    .grid-habit-title {
+        font-size: 0.85rem;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+    }
+
+    .add-card {
+        border: 2px dashed var(--card-border);
+        background: transparent;
+        opacity: 0.7;
+    }
+
+    .pastel-card {
+        border-width: 2px !important;
+    }
+
+    .plus-icon {
+        width: 48px;
+        height: 48px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        flex-shrink: 0;
+        background: rgba(255,255,255,0.1);
+        color: var(--text-muted);
     }
 
-    .grid-title {
-        font-size: 1rem;
-        margin: 0;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+    /* Pastel Theme Override */
+    .view-container :global(.pastel-icon) {
+        width: 60px !important;
+        height: 60px !important;
     }
 </style>
 
 @code {
     private List<Habit> habits = new();
-    private List<HabitLog> logs = new();
     private bool isLoading = true;
 
     protected override async Task OnInitializedAsync()
@@ -103,7 +152,6 @@
     {
         isLoading = true;
         habits = await DbService.GetAllHabitsAsync();
-        logs = await DbService.GetLogsAsync();
         isLoading = false;
     }
 }

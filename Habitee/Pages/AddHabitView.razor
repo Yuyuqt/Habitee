@@ -32,14 +32,7 @@
                         @foreach (var template in category.Items)
                         {
                             <div class="template-card glass-panel" @onclick="() => SelectTemplate(template)">
-                                <div class="template-icon" style="background-color: @(template.Color)33; color: @template.Color;">
-                                    <!-- Here we would ideally render the specific icon SVG based on template.Icon -->
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <circle cx="12" cy="12" r="10"></circle>
-                                        <path d="M12 8v8"></path>
-                                        <path d="M8 12h8"></path>
-                                    </svg>
-                                </div>
+                                <HabitIcon Name="@template.Icon" Color="@template.Color" Size="24" />
                                 <div class="template-info">
                                     <h4>@template.Title</h4>
                                     <p>@template.Description</p>
@@ -183,15 +176,7 @@
         transform: scale(0.98);
     }
 
-    .template-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
+
 
     .template-info {
         flex: 1;
