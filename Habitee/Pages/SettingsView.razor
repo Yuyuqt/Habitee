@@ -1,5 +1,7 @@
 @page "/settings"
 @using Habitee.Services
+@using System.Text.Json
+@implements IDisposable
 @inject ThemeService ThemeService
 @inject DatabaseService DbService
 @inject IJSRuntime JSRuntime
@@ -49,11 +51,11 @@
                     Export JSON
                 </button>
                 
-                <label class="glass-button action-btn import">
+                <InputFile OnChange="ImportData" id="fileInput" accept=".json" style="display:none;" />
+                <button class="glass-button action-btn import" onclick="document.getElementById('fileInput').click()">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" x2="12" y1="3" y2="15"></line></svg>
                     Import JSON
-                    <input type="file" style="display:none;" accept=".json" @onchange="ImportData" />
-                </label>
+                </button>
             </div>
             
             @if (!string.IsNullOrEmpty(statusMessage))
@@ -207,26 +209,30 @@
     private async Task ExportData()
     {
         var json = await DbService.ExportDataAsync();
+        var fileName = $"habitee-backup-{DateTime.Now:yyyyMMdd}.json";
         
-        // Use JS interop to trigger download
         await JSRuntime.InvokeVoidAsync("eval", $@"
-            const blob = new Blob([{System.Text.Json.JsonSerializer.Serialize(json)}], {{ type: 'application/json' }});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'habitee-backup-{DateTime.Now.ToString("yyyyMMdd")}.json';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            (function() {{
+                const blob = new Blob([{JsonSerializer.Serialize(json)}], {{ type: 'application/json' }});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = '{fileName}';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }})();
         ");
         
         statusMessage = "Data exported successfully!";
+        StateHasChanged();
         await Task.Delay(3000);
         statusMessage = "";
+        StateHasChanged();
     }
 
-    private async Task ImportData(Microsoft.AspNetCore.Components.Forms.InputFileChangeEventArgs e)
+    private async Task ImportData(InputFileChangeEventArgs e)
     {
         try
         {
@@ -252,7 +258,9 @@
             statusMessage = $"Error: {ex.Message}";
         }
         
+        StateHasChanged();
         await Task.Delay(3000);
         statusMessage = "";
+        StateHasChanged();
     }
 }
