@@ -156,6 +156,41 @@
         opacity: 0.9;
         box-shadow: none;
     }
+
+    [data-theme="pastel"][data-theme-mode="light"] .monthly-graph.compact .day-cell {
+        background-color: rgba(255, 255, 255, 0.96);
+        opacity: 1;
+    }
+
+    [data-theme="pastel"][data-theme-mode="light"] .monthly-graph.compact .month-block {
+        padding: 0.34rem 0.46rem 0.48rem;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.72);
+        box-shadow: 0 8px 16px rgba(255, 244, 246, 0.52);
+    }
+
+    [data-theme="pastel"][data-theme-mode="light"] .monthly-graph.compact .weekdays,
+    [data-theme="pastel"][data-theme-mode="light"] .monthly-graph.compact .days-grid {
+        background: rgba(255, 255, 255, 0.72);
+        border-radius: 11px;
+        padding: 0.18rem;
+    }
+
+    [data-theme="pastel"][data-theme-mode="light"] .monthly-graph.compact .weekdays span {
+        color: color-mix(in srgb, var(--text-color) 84%, white);
+        opacity: 0.92;
+    }
+
+    [data-theme="pastel"][data-theme-mode="light"] .monthly-graph.compact .day-cell.future {
+        background-color: transparent;
+        border-color: rgba(255, 255, 255, 1);
+        opacity: 0.78;
+    }
+
+    [data-theme="pastel"][data-theme-mode="light"] .monthly-graph.compact .day-cell.completed {
+        opacity: 1;
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.82);
+    }
 </style>
 
 @code {
