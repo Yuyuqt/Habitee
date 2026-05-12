@@ -12,5 +12,6 @@ builder.Services.AddScoped<DatabaseService>();
 builder.Services.AddScoped<ThemeService>();
 builder.Services.AddScoped<ConfettiService>();
 builder.Services.AddScoped<HabitDraftService>();
+builder.Services.AddScoped<NotificationService>();
 
 await builder.Build().RunAsync();

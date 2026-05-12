@@ -90,7 +90,7 @@
         isLoading = true;
         StateHasChanged();
         
-        habits = await DbService.GetAllHabitsAsync();
+        habits = await DbService.GetActiveHabitsAsync();
         logs = await DbService.GetLogsAsync();
         
         isLoading = false;

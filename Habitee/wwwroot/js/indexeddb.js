@@ -1,5 +1,5 @@
 const DB_NAME = 'HabiteeDB';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 let dbInstance = null;
 
@@ -33,6 +33,10 @@ function getDB() {
                 const logsStore = db.createObjectStore('Logs', { keyPath: 'id' });
                 logsStore.createIndex('habitId', 'habitId', { unique: false });
                 logsStore.createIndex('date', 'date', { unique: false });
+            }
+
+            if (!db.objectStoreNames.contains('SentReminders')) {
+                db.createObjectStore('SentReminders', { keyPath: 'id' });
             }
         };
     });
@@ -71,7 +75,7 @@ window.habiteeDb = {
     deleteHabit: async function(id) {
         const db = await getDB();
         return new Promise((resolve, reject) => {
-            const transaction = db.transaction(['Habits', 'Logs'], 'readwrite');
+            const transaction = db.transaction(['Habits', 'Logs', 'SentReminders'], 'readwrite');
             
             // Delete habit
             const habitStore = transaction.objectStore('Habits');
@@ -87,6 +91,19 @@ window.habiteeDb = {
                 const cursor = event.target.result;
                 if (cursor) {
                     cursor.delete();
+                    cursor.continue();
+                }
+            };
+
+            const sentStore = transaction.objectStore('SentReminders');
+            const sentRequest = sentStore.openCursor();
+
+            sentRequest.onsuccess = (event) => {
+                const cursor = event.target.result;
+                if (cursor) {
+                    if (cursor.value?.HabitId === id) {
+                        cursor.delete();
+                    }
                     cursor.continue();
                 }
             };
@@ -132,13 +149,15 @@ window.habiteeDb = {
             const db = await getDB();
             
             return new Promise((resolve, reject) => {
-                const transaction = db.transaction(['Habits', 'Logs'], 'readwrite');
+                const transaction = db.transaction(['Habits', 'Logs', 'SentReminders'], 'readwrite');
                 const habitStore = transaction.objectStore('Habits');
                 const logStore = transaction.objectStore('Logs');
+                const sentStore = transaction.objectStore('SentReminders');
                 
                 // Clear existing
                 habitStore.clear();
                 logStore.clear();
+                sentStore.clear();
                 
                 // Add new
                 if (data.habits) {
@@ -155,5 +174,36 @@ window.habiteeDb = {
             console.error("Invalid JSON format");
             return false;
         }
+    },
+
+    wasReminderSent: async function(habitId, reminderId, date) {
+        const db = await getDB();
+        const id = `${habitId}|${reminderId}|${date}`;
+
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction(['SentReminders'], 'readonly');
+            const store = transaction.objectStore('SentReminders');
+            const request = store.get(id);
+
+            request.onsuccess = () => resolve(!!request.result);
+            request.onerror = () => reject("Error checking sent reminder");
+        });
+    },
+
+    markReminderSent: async function(sentReminder) {
+        const db = await getDB();
+        const reminderToSave = {
+            ...sentReminder,
+            id: sentReminder.id || `${sentReminder.habitId}|${sentReminder.reminderId}|${sentReminder.date}`
+        };
+
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction(['SentReminders'], 'readwrite');
+            const store = transaction.objectStore('SentReminders');
+            const request = store.put(reminderToSave);
+
+            request.onsuccess = () => resolve(true);
+            request.onerror = () => reject("Error saving sent reminder");
+        });
     }
 };

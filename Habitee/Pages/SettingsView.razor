@@ -5,6 +5,7 @@
 @inject ThemeService ThemeService
 @inject DatabaseService DbService
 @inject IJSRuntime JSRuntime
+@inject NotificationService NotificationService
 
 <div class="container">
     <header class="view-header">
@@ -12,10 +13,9 @@
     </header>
 
     <div class="settings-grid">
-        <!-- Appearance Section -->
         <section class="settings-section glass-panel">
             <h2>Appearance</h2>
-            
+
             <div class="setting-item">
                 <div class="setting-info">
                     <h3>Dark Mode</h3>
@@ -26,7 +26,7 @@
                 </button>
             </div>
 
-            <div class="setting-item" style="flex-direction: column; align-items: flex-start; gap: 1rem;">
+            <div class="setting-item setting-stack">
                 <div class="setting-info">
                     <h3>Theme</h3>
                     <p>Choose your aesthetic</p>
@@ -40,24 +40,112 @@
             </div>
         </section>
 
-        <!-- Data Management Section -->
+        <section class="settings-section glass-panel">
+            <h2>Notifications</h2>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <h3>Habit Reminders</h3>
+                    <p>@GetNotificationStatusDescription()</p>
+                </div>
+                <span class="status-pill @GetNotificationStatusClass()">@GetNotificationStatusLabel()</span>
+            </div>
+
+            <div class="notification-actions">
+                @if (NotificationService.Permission == "denied")
+                {
+                    <div class="notification-hint blocked-hint">
+                        Notifications are blocked in your browser settings. Re-enable them there, then come back to Habitee.
+                    </div>
+                }
+                else if (!NotificationService.IsSupported)
+                {
+                    <div class="notification-hint">
+                        This browser cannot show notifications for Habitee.
+                    </div>
+                }
+                else
+                {
+                    <button class="glass-button notification-toggle @(NotificationService.AppNotificationsEnabled ? "active" : "")"
+                            @onclick="ToggleNotifications">
+                        @(NotificationService.AppNotificationsEnabled ? "Disable Notifications" : "Enable Notifications")
+                    </button>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(notificationMessage))
+                {
+                    <div class="notification-feedback fade-in">@notificationMessage</div>
+                }
+            </div>
+        </section>
+
+        <section class="settings-section glass-panel">
+            <h2>Archived Habits</h2>
+            <p class="section-copy">Archived habits stay out of your active views, but you can restore or permanently delete them here.</p>
+
+            @if (isArchivedLoading)
+            {
+                <div class="archived-empty">
+                    <p>Loading archived habits...</p>
+                </div>
+            }
+            else if (!archivedHabits.Any())
+            {
+                <div class="archived-empty">
+                    <p>No archived habits yet.</p>
+                </div>
+            }
+            else
+            {
+                <div class="archived-list">
+                    @foreach (var habit in archivedHabits)
+                    {
+                        <div class="archived-card">
+                            <div class="archived-copy">
+                                <h3>@habit.Title</h3>
+                                @if (!string.IsNullOrWhiteSpace(habit.Description))
+                                {
+                                    <p>@habit.Description</p>
+                                }
+                                <span>Archived @GetArchivedLabel(habit)</span>
+                            </div>
+
+                            <div class="archived-actions">
+                                <button class="glass-button archived-action restore" @onclick="() => RestoreHabit(habit.Id)">
+                                    Unarchive
+                                </button>
+                                <button class="glass-button archived-action delete" @onclick="() => DeleteHabitPermanently(habit.Id)">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(archiveMessage))
+            {
+                <div class="status-message fade-in">@archiveMessage</div>
+            }
+        </section>
+
         <section class="settings-section glass-panel">
             <h2>Data Management</h2>
-            <p style="margin-bottom: 1.5rem;">Habitee is local-first. Your data never leaves your device. Export your data to back it up or move to another device.</p>
-            
+            <p class="section-copy">Habitee is local-first. Your data never leaves your device. Export your data to back it up or move to another device.</p>
+
             <div class="data-actions">
                 <button class="glass-button action-btn export" @onclick="ExportData">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>
                     Export JSON
                 </button>
-                
+
                 <InputFile OnChange="ImportData" id="fileInput" accept=".json" style="display:none;" />
                 <button class="glass-button action-btn import" onclick="document.getElementById('fileInput').click()">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" x2="12" y1="3" y2="15"></line></svg>
                     Import JSON
                 </button>
             </div>
-            
+
             @if (!string.IsNullOrEmpty(statusMessage))
             {
                 <div class="status-message fade-in">@statusMessage</div>
@@ -97,17 +185,28 @@
         font-size: 1.5rem;
     }
 
+    .section-copy {
+        margin-bottom: 1.5rem;
+    }
+
     .setting-item {
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding: 1rem 0;
         border-bottom: 1px solid var(--card-border);
+        gap: 1rem;
     }
-    
+
     .setting-item:last-child {
         border-bottom: none;
         padding-bottom: 0;
+    }
+
+    .setting-stack {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
     }
 
     .setting-info h3 {
@@ -123,10 +222,39 @@
     .toggle-btn {
         min-width: 80px;
     }
-    
-    .toggle-btn.active {
+
+    .toggle-btn.active,
+    .notification-toggle.active {
         background: var(--primary-color);
         color: white;
+    }
+
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 96px;
+        padding: 0.65rem 0.9rem;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    .status-pill.enabled {
+        background: color-mix(in srgb, var(--success-color) 88%, transparent);
+        color: white;
+    }
+
+    .status-pill.blocked {
+        background: rgba(244, 63, 94, 0.12);
+        color: #f43f5e;
+    }
+
+    .status-pill.pending,
+    .status-pill.unsupported {
+        background: var(--card-border);
+        color: var(--text-color);
     }
 
     .theme-selector {
@@ -157,6 +285,105 @@
     .theme-btn.galaxy { border-left: 4px solid #8b5cf6; }
     .theme-btn.cyberpunk { border-left: 4px solid #f43f5e; font-family: 'JetBrains Mono', monospace; }
 
+    .notification-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        padding-top: 1rem;
+    }
+
+    .notification-toggle,
+    .action-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 1rem;
+    }
+
+    .notification-hint,
+    .notification-feedback,
+    .status-message {
+        padding: 1rem;
+        border-radius: 12px;
+        font-size: 0.92rem;
+    }
+
+    .notification-hint,
+    .notification-feedback,
+    .status-message {
+        background-color: var(--card-border);
+    }
+
+    .blocked-hint {
+        color: #f43f5e;
+        background: rgba(244, 63, 94, 0.12);
+    }
+
+    .notification-feedback {
+        color: var(--success-color);
+    }
+
+    .archived-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .archived-card {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 1rem 0;
+        border-top: 1px solid var(--card-border);
+    }
+
+    .archived-list .archived-card:first-child {
+        border-top: none;
+        padding-top: 0;
+    }
+
+    .archived-copy h3 {
+        margin: 0;
+        font-size: 1.05rem;
+    }
+
+    .archived-copy p {
+        margin: 0.35rem 0;
+        color: var(--text-muted);
+    }
+
+    .archived-copy span {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+
+    .archived-actions {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        flex-shrink: 0;
+    }
+
+    .archived-action {
+        padding: 0.9rem 1rem;
+    }
+
+    .archived-action.restore {
+        color: var(--primary-color);
+    }
+
+    .archived-action.delete {
+        color: #f43f5e;
+        border-color: rgba(244, 63, 94, 0.25);
+        background: rgba(244, 63, 94, 0.08);
+    }
+
+    .archived-empty {
+        padding: 0.5rem 0 0;
+        color: var(--text-muted);
+    }
+
     .data-actions {
         display: flex;
         gap: 1rem;
@@ -164,36 +391,51 @@
     }
 
     .action-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
         flex: 1;
         min-width: 150px;
-        padding: 1rem;
     }
-    
-    .status-message {
-        margin-top: 1rem;
-        padding: 1rem;
-        border-radius: 8px;
-        background-color: var(--card-border);
-        text-align: center;
-        color: var(--success-color);
+
+    @@media (max-width: 720px) {
+        .setting-item {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .archived-card,
+        .archived-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .archived-action,
+        .status-pill,
+        .notification-toggle {
+            align-self: stretch;
+            width: 100%;
+        }
     }
 </style>
 
 @code {
     private string statusMessage = "";
+    private string notificationMessage = "";
+    private string archiveMessage = "";
+    private List<Habitee.Models.Habit> archivedHabits = new();
+    private bool isArchivedLoading = true;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         ThemeService.OnThemeChanged += StateHasChanged;
+        NotificationService.StatusChanged += HandleNotificationStatusChanged;
+        DbService.DataChanged += HandleDatabaseChanged;
+        await LoadArchivedHabitsAsync();
     }
 
     public void Dispose()
     {
         ThemeService.OnThemeChanged -= StateHasChanged;
+        NotificationService.StatusChanged -= HandleNotificationStatusChanged;
+        DbService.DataChanged -= HandleDatabaseChanged;
     }
 
     private async Task ToggleMode()
@@ -206,11 +448,29 @@
         await ThemeService.SetThemeAsync(theme);
     }
 
+    private async Task ToggleNotifications()
+    {
+        if (NotificationService.AppNotificationsEnabled)
+        {
+            await NotificationService.DisableNotificationsAsync();
+            notificationMessage = "Notifications are off for this device.";
+        }
+        else
+        {
+            await NotificationService.EnableNotificationsAsync();
+            notificationMessage = NotificationService.AppNotificationsEnabled
+                ? "Notifications are enabled for this device."
+                : "Notifications could not be enabled. Check your browser permission settings.";
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+
     private async Task ExportData()
     {
         var json = await DbService.ExportDataAsync();
         var fileName = $"habitee-backup-{DateTime.Now:yyyyMMdd}.json";
-        
+
         await JSRuntime.InvokeVoidAsync("eval", $@"
             (function() {{
                 const blob = new Blob([{JsonSerializer.Serialize(json)}], {{ type: 'application/json' }});
@@ -224,7 +484,7 @@
                 URL.revokeObjectURL(url);
             }})();
         ");
-        
+
         statusMessage = "Data exported successfully!";
         StateHasChanged();
         await Task.Delay(3000);
@@ -237,30 +497,110 @@
         try
         {
             var file = e.File;
-            if (file == null) return;
-            
-            using var stream = file.OpenReadStream(maxAllowedSize: 1024 * 1024 * 5); // 5MB limit
+            if (file == null)
+            {
+                return;
+            }
+
+            using var stream = file.OpenReadStream(maxAllowedSize: 1024 * 1024 * 5);
             using var reader = new StreamReader(stream);
             var json = await reader.ReadToEndAsync();
-            
+
             var success = await DbService.ImportDataAsync(json);
-            if (success)
-            {
-                statusMessage = "Data imported successfully!";
-            }
-            else
-            {
-                statusMessage = "Failed to import data. Invalid format.";
-            }
+            statusMessage = success
+                ? "Data imported successfully!"
+                : "Failed to import data. Invalid format.";
         }
         catch (Exception ex)
         {
             statusMessage = $"Error: {ex.Message}";
         }
-        
+
         StateHasChanged();
         await Task.Delay(3000);
         statusMessage = "";
         StateHasChanged();
+    }
+
+    private string GetNotificationStatusLabel()
+    {
+        return NotificationService.Permission switch
+        {
+            "denied" => "Blocked",
+            "unsupported" => "Unavailable",
+            _ when NotificationService.AppNotificationsEnabled => "Enabled",
+            _ => "Off"
+        };
+    }
+
+    private string GetNotificationStatusDescription()
+    {
+        return NotificationService.Permission switch
+        {
+            "denied" => "Notifications are blocked in your browser settings for this site.",
+            "unsupported" => "This browser cannot show Habitee notifications.",
+            _ when NotificationService.AppNotificationsEnabled => "Habit reminders and updates are on for this device.",
+            _ => "Turn notifications on to receive habit reminders and updates."
+        };
+    }
+
+    private string GetNotificationStatusClass()
+    {
+        return NotificationService.Permission switch
+        {
+            "denied" => "blocked",
+            "unsupported" => "unsupported",
+            _ when NotificationService.AppNotificationsEnabled => "enabled",
+            _ => "pending"
+        };
+    }
+
+    private async Task LoadArchivedHabitsAsync()
+    {
+        isArchivedLoading = true;
+        archivedHabits = (await DbService.GetArchivedHabitsAsync())
+            .OrderByDescending(habit => ParseArchivedAt(habit))
+            .ThenBy(habit => habit.Title)
+            .ToList();
+        isArchivedLoading = false;
+    }
+
+    private async Task RestoreHabit(string habitId)
+    {
+        await DbService.RestoreHabitAsync(habitId);
+        archiveMessage = "Habit restored to your active list.";
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task DeleteHabitPermanently(string habitId)
+    {
+        await DbService.DeleteHabitAsync(habitId);
+        archiveMessage = "Archived habit deleted permanently.";
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private static string GetArchivedLabel(Habitee.Models.Habit habit)
+    {
+        var archivedAt = ParseArchivedAt(habit);
+        return archivedAt?.ToLocalTime().ToString("MMM d, yyyy") ?? "recently";
+    }
+
+    private static DateTimeOffset? ParseArchivedAt(Habitee.Models.Habit habit)
+    {
+        return DateTimeOffset.TryParse(habit.ArchivedAt, out var parsed) ? parsed : null;
+    }
+
+    private void HandleNotificationStatusChanged()
+    {
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void HandleDatabaseChanged()
+    {
+        _ = InvokeAsync(async () =>
+        {
+            await LoadArchivedHabitsAsync();
+            StateHasChanged();
+        });
     }
 }

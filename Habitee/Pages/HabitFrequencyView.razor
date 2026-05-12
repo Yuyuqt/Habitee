@@ -1,7 +1,10 @@
 @page "/habit-frequency"
+@using Habitee.Models
 @using Habitee.Services
+@implements IDisposable
 @inject HabitDraftService DraftService
 @inject NavigationManager NavManager
+@inject NotificationService NotificationService
 
 <div class="view-container slide-in">
     <header class="app-header">
@@ -52,10 +55,63 @@
         }
 
         <section class="section-block">
-            <label>REMINDERS 0 / 5</label>
-            <button type="button" class="reminder-btn glass-panel">
-                Add Reminder
-            </button>
+            <label>NOTIFICATION PERMISSION</label>
+            <div class="permission-panel glass-panel">
+                <div class="permission-copy">
+                    <h3>@GetPermissionTitle()</h3>
+                    <p>@GetPermissionDescription()</p>
+                </div>
+
+                @if (NotificationService.IsSupported && NotificationService.Permission != "denied" && !NotificationService.AppNotificationsEnabled)
+                {
+                    <button type="button" class="permission-btn glass-button" @onclick="EnableNotifications">
+                        Enable Reminders
+                    </button>
+                }
+            </div>
+        </section>
+
+        <section class="section-block">
+            <div class="reminders-header">
+                <label>REMINDERS @draft.Reminders.Count / @Habit.MaxReminders</label>
+                <button type="button"
+                        class="add-reminder-btn glass-button"
+                        disabled="@(draft.Reminders.Count >= Habit.MaxReminders)"
+                        @onclick="AddReminder">
+                    Add Reminder
+                </button>
+            </div>
+
+            @if (draft.Reminders.Count == 0)
+            {
+                <div class="empty-reminder glass-panel">
+                    <p>No reminders yet. Add up to five daily reminder times for this habit.</p>
+                </div>
+            }
+            else
+            {
+                <div class="reminder-list">
+                    @foreach (var reminder in draft.Reminders.OrderBy(reminder => reminder.TimeLocal))
+                    {
+                        <div class="reminder-row glass-panel">
+                            <input type="time"
+                                   class="glass-input reminder-time"
+                                   value="@reminder.TimeLocal"
+                                   @onchange="eventArgs => UpdateReminderTime(reminder, eventArgs.Value?.ToString())" />
+
+                            <button type="button"
+                                    class="toggle-pill @(reminder.Enabled ? "enabled" : "disabled")"
+                                    @onclick="() => ToggleReminder(reminder)">
+                                @(reminder.Enabled ? "On" : "Off")
+                            </button>
+
+                            <button type="button" class="remove-reminder-btn" @onclick="() => RemoveReminder(reminder.Id)">
+                                Remove
+                            </button>
+                        </div>
+                    }
+                </div>
+            }
         </section>
 
         <div style="height: 110px;"></div>
@@ -174,17 +230,83 @@
         border-color: transparent;
     }
 
-    .reminder-btn {
-        width: 100%;
+    .permission-panel,
+    .empty-reminder,
+    .reminder-row {
         border-radius: 18px;
-        padding: 1.1rem;
-        border: var(--outline-width, 1px) solid color-mix(in srgb, var(--primary-color) 35%, var(--card-border));
-        background: color-mix(in srgb, var(--primary-color) 88%, transparent);
-        color: white;
+        padding: 1rem;
+    }
+
+    .permission-panel {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .permission-copy h3,
+    .empty-reminder p {
+        margin: 0;
+    }
+
+    .permission-copy p {
+        margin: 0.35rem 0 0;
+        color: var(--text-muted);
+        line-height: 1.4;
+    }
+
+    .permission-btn,
+    .add-reminder-btn {
+        white-space: nowrap;
+    }
+
+    .reminders-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .reminder-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    .reminder-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        gap: 0.75rem;
+        align-items: center;
+    }
+
+    .reminder-time {
+        min-width: 0;
+    }
+
+    .toggle-pill,
+    .remove-reminder-btn {
+        border: none;
+        border-radius: 14px;
         font: inherit;
-        font-size: 1rem;
         font-weight: 700;
-        cursor: default;
+        cursor: pointer;
+        padding: 0.85rem 1rem;
+    }
+
+    .toggle-pill.enabled {
+        background: color-mix(in srgb, var(--success-color) 88%, transparent);
+        color: white;
+    }
+
+    .toggle-pill.disabled {
+        background: color-mix(in srgb, var(--card-border) 75%, transparent);
+        color: var(--text-muted);
+    }
+
+    .remove-reminder-btn {
+        background: rgba(244, 63, 94, 0.12);
+        color: #f43f5e;
     }
 
     @@media (max-width: 720px) {
@@ -201,6 +323,20 @@
             font-size: 0.92rem;
             border-radius: 14px;
         }
+
+        .permission-panel,
+        .reminders-header,
+        .reminder-row {
+            grid-template-columns: 1fr;
+            display: grid;
+        }
+
+        .permission-btn,
+        .add-reminder-btn,
+        .toggle-pill,
+        .remove-reminder-btn {
+            width: 100%;
+        }
     }
 </style>
 
@@ -213,6 +349,83 @@
     protected override void OnInitialized()
     {
         draft = DraftService.Draft;
+        NotificationService.StatusChanged += HandleNotificationStatusChanged;
+    }
+
+    public void Dispose()
+    {
+        NotificationService.StatusChanged -= HandleNotificationStatusChanged;
+    }
+
+    private async Task EnableNotifications()
+    {
+        await NotificationService.EnableNotificationsAsync();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void AddReminder()
+    {
+        if (draft.Reminders.Count >= Habit.MaxReminders)
+        {
+            return;
+        }
+
+        draft.Reminders.Add(new HabitReminder
+        {
+            Id = GetNextReminderId(),
+            TimeLocal = "09:00",
+            Enabled = true
+        });
+    }
+
+    private void RemoveReminder(int reminderId)
+    {
+        var reminder = draft.Reminders.FirstOrDefault(item => item.Id == reminderId);
+
+        if (reminder != null)
+        {
+            draft.Reminders.Remove(reminder);
+        }
+    }
+
+    private void ToggleReminder(HabitReminder reminder)
+    {
+        reminder.Enabled = !reminder.Enabled;
+    }
+
+    private void UpdateReminderTime(HabitReminder reminder, string? timeLocal)
+    {
+        if (TimeOnly.TryParse(timeLocal, out var parsedTime))
+        {
+            reminder.TimeLocal = parsedTime.ToString("HH:mm");
+        }
+    }
+
+    private int GetNextReminderId()
+    {
+        return draft.Reminders.Count == 0 ? 1 : draft.Reminders.Max(reminder => reminder.Id) + 1;
+    }
+
+    private string GetPermissionTitle()
+    {
+        return NotificationService.Permission switch
+        {
+            "unsupported" => "Notifications are not supported on this browser.",
+            "denied" => "Notifications are blocked.",
+            _ when NotificationService.AppNotificationsEnabled => "Reminders are enabled.",
+            _ => "Enable notifications for reminders."
+        };
+    }
+
+    private string GetPermissionDescription()
+    {
+        return NotificationService.Permission switch
+        {
+            "unsupported" => "Habitee can still save reminders, but this browser cannot show system notifications.",
+            "denied" => "Allow notifications again in your browser settings if you want Habitee to alert you.",
+            _ when NotificationService.AppNotificationsEnabled => "Habitee can send best-effort reminders on this device while the app is active or recently resumed.",
+            _ => "The browser will only ask after you click the button below."
+        };
     }
 
     private void SetFrequency(string frequency)
@@ -355,5 +568,10 @@
             3 => $"{number}RD",
             _ => $"{number}TH"
         };
+    }
+
+    private void HandleNotificationStatusChanged()
+    {
+        _ = InvokeAsync(StateHasChanged);
     }
 }

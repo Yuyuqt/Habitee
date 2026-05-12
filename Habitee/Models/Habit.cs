@@ -2,6 +2,8 @@ namespace Habitee.Models;
 
 public class Habit
 {
+    public const int MaxReminders = 5;
+
     public string Id { get; set; } = Guid.NewGuid().ToString();
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
@@ -14,5 +16,8 @@ public class Habit
     public int MonthlyDay { get; set; } = 1;
     public string WeeklyDaysCsv { get; set; } = "Mon";
     public string MonthlyDaysCsv { get; set; } = "1";
+    public List<HabitReminder> Reminders { get; set; } = new();
+    public bool IsArchived { get; set; }
+    public string? ArchivedAt { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

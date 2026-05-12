@@ -33,15 +33,16 @@
         bottom: 2rem;
         left: 50%;
         transform: translateX(-50%);
-        padding: 0.5rem 1rem;
+        padding: 0.65rem 1rem 0.85rem;
         z-index: 100;
         border-radius: 2rem;
+        overflow: visible;
     }
 
     .dock-nav ul {
         display: flex;
         list-style: none;
-        gap: 1.5rem;
+        gap: 1rem;
         margin: 0;
         padding: 0;
     }
@@ -50,21 +51,24 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        justify-content: center;
         text-decoration: none;
         color: var(--text-muted);
-        padding: 0.5rem;
-        border-radius: 12px;
+        padding: 0.7rem 0.9rem 0.55rem;
+        border-radius: 16px;
         transition: all 0.2s ease;
         position: relative;
+        min-width: 72px;
+        gap: 0.35rem;
     }
 
     .nav-item span {
-        font-size: 0.75rem;
-        margin-top: 0.25rem;
-        opacity: 0;
-        position: absolute;
-        bottom: -20px;
-        transition: all 0.2s ease;
+        font-size: 0.78rem;
+        line-height: 1;
+        font-weight: 700;
+        opacity: 0.9;
+        position: static;
+        transition: color 0.2s ease, opacity 0.2s ease;
     }
 
     .nav-item:hover, .nav-item.active {
@@ -76,22 +80,41 @@
         background: rgba(0, 0, 0, 0.2);
     }
 
-    .nav-item:hover span {
+    .nav-item:hover span,
+    .nav-item.active span {
         opacity: 1;
-        bottom: -15px;
-    }
-    
-    .nav-item.active {
-        transform: translateY(-4px);
     }
     
     .nav-item.active::after {
         content: '';
         position: absolute;
-        bottom: -5px;
+        bottom: -0.2rem;
         width: 4px;
         height: 4px;
         border-radius: 50%;
         background-color: var(--primary-color);
+    }
+
+    @@media (max-width: 720px) {
+        .dock-nav {
+            width: min(calc(100vw - 1.5rem), 560px);
+            padding: 0.6rem 0.75rem 0.8rem;
+            bottom: 1rem;
+        }
+
+        .dock-nav ul {
+            justify-content: space-between;
+            gap: 0.4rem;
+        }
+
+        .nav-item {
+            min-width: 0;
+            flex: 1;
+            padding: 0.65rem 0.4rem 0.5rem;
+        }
+
+        .nav-item span {
+            font-size: 0.72rem;
+        }
     }
 </style>

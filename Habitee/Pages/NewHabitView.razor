@@ -7,10 +7,10 @@
 
 <div class="view-container slide-in">
     <header class="app-header">
-        <button class="icon-btn" @onclick='() => NavManager.NavigateTo("/add-habit")'>
+        <button class="icon-btn" @onclick="NavigateBack">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
-        <h1 class="header-title">New Habit</h1>
+        <h1 class="header-title">@(isEditing ? "Edit Habit" : "New Habit")</h1>
         <div style="width: 24px;"></div>
     </header>
 
@@ -89,7 +89,7 @@
 
     <div class="fixed-bottom">
         <button class="primary-btn glass-button" disabled="@string.IsNullOrWhiteSpace(habit.Title)" @onclick="SaveHabit">
-            Save
+            @(isEditing ? "Save Changes" : "Save")
         </button>
     </div>
 </div>
@@ -458,20 +458,48 @@
     [SupplyParameterFromQuery]
     public string? Color { get; set; }
 
+    [SupplyParameterFromQuery(Name = "editId")]
+    public string? EditId { get; set; }
+
     [SupplyParameterFromQuery(Name = "reset")]
     public string? ResetToken { get; set; }
 
     private readonly string[] frequencyOptions = ["Daily", "Weekly", "Monthly"];
     private Habit habit = new();
+    private bool isEditing;
+    private string? loadedEditId;
     private bool isIconPickerOpen;
     private bool isColorPickerOpen;
     private bool isCountEditorOpen;
     private string editCountText = "1";
     private string countEditorError = string.Empty;
 
-    protected override void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
     {
-        DraftService.Initialize(Title, Desc, Icon, Color, ShouldReset());
+        isEditing = !string.IsNullOrWhiteSpace(EditId);
+
+        if (isEditing)
+        {
+            if (loadedEditId != EditId)
+            {
+                var existingHabit = await DbService.GetHabitByIdAsync(EditId!);
+
+                if (existingHabit == null)
+                {
+                    NavManager.NavigateTo("/");
+                    return;
+                }
+
+                DraftService.LoadFromHabit(existingHabit);
+                loadedEditId = EditId;
+            }
+        }
+        else
+        {
+            DraftService.Initialize(Title, Desc, Icon, Color, ShouldReset());
+            loadedEditId = null;
+        }
+
         habit = DraftService.Draft;
     }
 
@@ -619,7 +647,13 @@
         }
 
         await DbService.SaveHabitAsync(habit);
+        var habitId = habit.Id;
         DraftService.Reset();
-        NavManager.NavigateTo("/");
+        NavManager.NavigateTo(isEditing ? $"/habit/{habitId}" : "/");
+    }
+
+    private void NavigateBack()
+    {
+        NavManager.NavigateTo(isEditing ? $"/habit/{EditId}" : "/add-habit");
     }
 }

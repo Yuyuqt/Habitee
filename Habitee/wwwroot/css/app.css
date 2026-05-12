@@ -13,6 +13,26 @@ body {
     overflow-x: hidden;
 }
 
+#blazor-error-ui {
+    display: none;
+    position: fixed;
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 2000;
+    padding: 0.85rem 1rem;
+    border-radius: 14px;
+    background: rgba(36, 41, 47, 0.94);
+    color: white;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.24);
+}
+
+#blazor-error-ui .reload,
+#blazor-error-ui .dismiss {
+    color: white;
+    margin-left: 0.75rem;
+}
+
 /* Glassmorphism Utilities */
 .glass-panel {
     background-color: var(--card-bg);

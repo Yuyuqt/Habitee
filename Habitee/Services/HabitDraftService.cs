@@ -47,6 +47,13 @@ public class HabitDraftService
         IsInitialized = false;
     }
 
+    public void LoadFromHabit(Habit source)
+    {
+        Draft = CloneHabit(source);
+        NormalizeSelections(Draft);
+        IsInitialized = true;
+    }
+
     private static Habit CreateDefaultDraft()
     {
         return new Habit
@@ -58,7 +65,38 @@ public class HabitDraftService
             WeeklyDay = "Mon",
             MonthlyDay = 1,
             WeeklyDaysCsv = "Mon",
-            MonthlyDaysCsv = "1"
+            MonthlyDaysCsv = "1",
+            Reminders = new List<HabitReminder>()
+        };
+    }
+
+    private static Habit CloneHabit(Habit source)
+    {
+        return new Habit
+        {
+            Id = source.Id,
+            Title = source.Title,
+            Description = source.Description,
+            Icon = source.Icon,
+            Color = source.Color,
+            TargetCount = source.TargetCount,
+            TrackingMode = source.TrackingMode,
+            Frequency = source.Frequency,
+            WeeklyDay = source.WeeklyDay,
+            MonthlyDay = source.MonthlyDay,
+            WeeklyDaysCsv = source.WeeklyDaysCsv,
+            MonthlyDaysCsv = source.MonthlyDaysCsv,
+            Reminders = source.Reminders
+                .Select(reminder => new HabitReminder
+                {
+                    Id = reminder.Id,
+                    TimeLocal = reminder.TimeLocal,
+                    Enabled = reminder.Enabled
+                })
+                .ToList(),
+            IsArchived = source.IsArchived,
+            ArchivedAt = source.ArchivedAt,
+            CreatedAt = source.CreatedAt
         };
     }
 
@@ -83,5 +121,15 @@ public class HabitDraftService
             .Where(value => value >= 1 && value <= 31)
             .DefaultIfEmpty(1)
             .Min();
+
+        draft.Reminders ??= new List<HabitReminder>();
+        draft.Reminders = draft.Reminders
+            .Take(Habit.MaxReminders)
+            .Select(reminder =>
+            {
+                reminder.TimeLocal = TimeOnly.TryParse(reminder.TimeLocal, out _) ? reminder.TimeLocal : "09:00";
+                return reminder;
+            })
+            .ToList();
     }
 }

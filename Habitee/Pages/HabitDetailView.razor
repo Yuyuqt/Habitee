@@ -146,9 +146,8 @@
     {
         isLoading = true;
         StateHasChanged();
-        
-        var allHabits = await DbService.GetAllHabitsAsync();
-        habit = allHabits.FirstOrDefault(h => h.Id == Id);
+
+        habit = await DbService.GetHabitByIdAsync(Id);
         
         if (habit != null)
         {
@@ -162,14 +161,17 @@
 
     private void EditHabit()
     {
-        // Coming soon
+        if (habit != null)
+        {
+            NavManager.NavigateTo($"/new-habit?editId={habit.Id}");
+        }
     }
 
     private async Task ArchiveHabit()
     {
         if (habit != null)
         {
-            await DbService.DeleteHabitAsync(habit.Id);
+            await DbService.ArchiveHabitAsync(habit.Id);
             NavManager.NavigateTo("/");
         }
     }

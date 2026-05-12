@@ -2,6 +2,7 @@
 @using Habitee.Services
 @inject ThemeService ThemeService
 @inject DatabaseService DbService
+@inject NotificationService NotificationService
 
 <BackgroundLayer />
 
@@ -36,5 +37,13 @@
     {
         await ThemeService.InitializeAsync();
         await DbService.InitializeAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await NotificationService.InitializeAsync();
+        }
     }
 }
