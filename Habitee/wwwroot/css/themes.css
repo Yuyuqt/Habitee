@@ -4,8 +4,8 @@
     --text-color: #212529;
     --text-muted: #6c757d;
     --card-bg: rgba(255, 255, 255, 0.6);
-    --card-border: rgba(255, 255, 255, 0.4);
-    --card-shadow: rgba(0, 0, 0, 0.05);
+    --card-border: rgba(0, 0, 0, 0.08);
+    --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
     
     --primary-color: #0d6efd;
     --success-color: #198754;
