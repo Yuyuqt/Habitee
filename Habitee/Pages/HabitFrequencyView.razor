@@ -131,14 +131,20 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 1.5rem;
+        padding: 2rem 1.5rem 1.5rem;
     }
 
     .header-title {
-        font-size: 1.2rem;
-        font-weight: 700;
+        font-size: var(--font-size-page-title);
+        font-weight: 800;
+        line-height: var(--line-height-title);
         margin: 0;
         text-align: center;
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding: 0 1rem;
     }
 
     .icon-btn {
@@ -166,7 +172,7 @@
     }
 
     .section-block label {
-        font-size: 0.78rem;
+        font-size: var(--font-size-label);
         font-weight: 700;
         color: var(--text-muted);
         letter-spacing: 1px;
@@ -190,12 +196,18 @@
         font-weight: 700;
         cursor: pointer;
         transition: background-color 0.2s ease, color 0.2s ease;
+        font-size: var(--font-size-body-sm);
     }
 
     .segment.active {
         background: var(--primary-color);
-        color: white;
+        color: var(--primary-contrast);
         box-shadow: 0 10px 22px color-mix(in srgb, var(--primary-color) 28%, transparent);
+    }
+
+    .segment:hover:not(.active) {
+        background: color-mix(in srgb, var(--button-hover-surface) 86%, transparent);
+        color: var(--text-color);
     }
 
     .choice-grid {
@@ -218,7 +230,7 @@
         background: color-mix(in srgb, var(--card-bg) 85%, transparent);
         color: var(--text-color);
         font: inherit;
-        font-size: 1rem;
+        font-size: var(--font-size-body);
         font-weight: 700;
         cursor: pointer;
         transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
@@ -226,8 +238,14 @@
 
     .choice-cell.active {
         background: var(--primary-color);
-        color: white;
+        color: var(--primary-contrast);
         border-color: transparent;
+    }
+
+    .choice-cell:hover:not(.active) {
+        background: color-mix(in srgb, var(--button-hover-surface) 86%, transparent);
+        color: var(--text-color);
+        border-color: color-mix(in srgb, var(--primary-color) 24%, var(--button-hover-border));
     }
 
     .permission-panel,
@@ -296,7 +314,7 @@
 
     .toggle-pill.enabled {
         background: color-mix(in srgb, var(--success-color) 88%, transparent);
-        color: white;
+        color: color-mix(in srgb, var(--success-color) 16%, #12222a 84%);
     }
 
     .toggle-pill.disabled {

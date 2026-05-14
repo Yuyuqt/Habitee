@@ -63,12 +63,13 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 1.5rem;
+        padding: 2rem 1.5rem 1.5rem;
     }
 
     .header-title {
-        font-size: 1.2rem;
-        font-weight: 700;
+        font-size: var(--font-size-page-title);
+        font-weight: 800;
+        line-height: var(--line-height-title);
         margin: 0;
         text-align: center;
         flex: 1;
@@ -115,7 +116,7 @@
         color: #f43f5e;
         border: var(--outline-width, 1px) solid rgba(244, 63, 94, 0.3);
         padding: 1rem;
-        font-size: 1.1rem;
+        font-size: var(--font-size-card-title);
         font-weight: 600;
         border-radius: 16px;
         display: flex;
@@ -129,6 +130,7 @@
     
     .archive-btn:hover {
         background: rgba(244, 63, 94, 0.2);
+        color: #c81e4c;
     }
 
     .archive-btn.restore-mode {
@@ -139,6 +141,7 @@
 
     .archive-btn.restore-mode:hover {
         background: rgba(59, 130, 246, 0.18);
+        color: color-mix(in srgb, var(--primary-color) 84%, black 16%);
     }
 
     @@media (max-width: 720px) {

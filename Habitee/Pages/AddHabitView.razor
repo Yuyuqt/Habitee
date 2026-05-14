@@ -76,13 +76,20 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 1.5rem;
+        padding: 2rem 1.5rem 1.5rem;
     }
 
     .header-title {
-        font-size: 1.2rem;
-        font-weight: 700;
+        font-size: var(--font-size-page-title);
+        font-weight: 800;
+        line-height: var(--line-height-title);
         margin: 0;
+        text-align: center;
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding: 0 1rem;
     }
 
     .icon-btn {
@@ -117,11 +124,17 @@
         border-radius: 8px;
         cursor: pointer;
         transition: all 0.2s;
+        font-size: var(--font-size-body-sm);
     }
 
     .tab-btn.active {
         background: var(--primary-color);
-        color: white;
+        color: var(--primary-contrast);
+    }
+
+    .tab-btn:hover:not(.active) {
+        background: color-mix(in srgb, var(--button-hover-surface) 86%, transparent);
+        color: var(--text-color);
     }
 
     .search-container {
@@ -137,7 +150,7 @@
         color: var(--text-color);
         backdrop-filter: blur(10px);
         font-family: inherit;
-        font-size: 1rem;
+        font-size: var(--font-size-body);
     }
 
     .content-scroll {
@@ -152,7 +165,7 @@
     }
 
     .category-title {
-        font-size: 0.85rem;
+        font-size: var(--font-size-body-xs);
         color: var(--text-muted);
         margin-bottom: 1rem;
         letter-spacing: 1px;
@@ -185,12 +198,12 @@
 
     .template-info h4 {
         margin: 0 0 0.25rem 0;
-        font-size: 1.1rem;
+        font-size: var(--font-size-card-title);
     }
 
     .template-info p {
         margin: 0;
-        font-size: 0.85rem;
+        font-size: var(--font-size-body-xs);
         color: var(--text-muted);
     }
 
@@ -217,13 +230,13 @@
         width: 100%;
         max-width: 400px;
         background: var(--primary-color);
-        color: white;
         border-color: var(--primary-color);
         padding: 1rem;
-        font-size: 1.1rem;
+        font-size: var(--font-size-card-title);
         border-radius: 16px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         pointer-events: auto;
+        color: var(--primary-contrast);
     }
 
     @@media (max-width: 720px) {

@@ -6,10 +6,26 @@
     --card-bg: rgba(255, 255, 255, 0.6);
     --card-border: rgba(0, 0, 0, 0.08);
     --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    --button-hover-surface: rgba(255, 255, 255, 0.82);
+    --button-hover-border: rgba(13, 110, 253, 0.28);
+    --button-hover-text: var(--text-color);
     
     --primary-color: #0d6efd;
+    --primary-contrast: #ffffff;
     --success-color: #198754;
     --accent-color: #cfe2ff;
+
+    --font-size-page-title: 2rem;
+    --font-size-section-title: 1.5rem;
+    --font-size-card-title: 1.05rem;
+    --font-size-body: 1rem;
+    --font-size-body-sm: 0.92rem;
+    --font-size-body-xs: 0.85rem;
+    --font-size-label: 0.78rem;
+    --font-size-badge: 0.82rem;
+    --font-size-micro: 0.72rem;
+    --line-height-title: 1.1;
+    --line-height-copy: 1.4;
     
     --font-family: 'Inter', sans-serif;
     --font-weight-title: 600;
@@ -28,6 +44,8 @@
     --card-bg: rgba(30, 30, 30, 0.5);
     --card-border: rgba(255, 255, 255, 0.1);
     --card-shadow: rgba(0, 0, 0, 0.3);
+    --button-hover-surface: rgba(255, 255, 255, 0.08);
+    --button-hover-border: rgba(255, 255, 255, 0.18);
 }
 
 /* Theme A: Habitee+ (Clean White/Gray base) */
@@ -50,6 +68,7 @@
     --card-shadow: 8px 8px 0 rgba(202, 166, 183, 0.28);
 
     --primary-color: #9ed9df;
+    --primary-contrast: #5c4f67;
     --success-color: #73ccd0;
     --accent-color: #fff7b0;
 
@@ -77,6 +96,7 @@
     --card-shadow: 8px 8px 0 rgba(24, 13, 33, 0.34);
 
     --primary-color: #9ed9df;
+    --primary-contrast: #4f345c;
     --success-color: #73ccd0;
     --accent-color: #fff0ad;
 

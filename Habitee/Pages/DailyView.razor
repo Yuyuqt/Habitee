@@ -44,23 +44,23 @@
     .view-header {
         display: flex;
         justify-content: space-between;
-        align-items: center;
+        align-items: flex-start;
         margin-bottom: 2rem;
         padding-top: 2rem;
     }
 
     .view-title {
-        font-size: 2.5rem;
-        font-weight: 700;
+        font-size: var(--font-size-page-title);
+        font-weight: 800;
+        line-height: var(--line-height-title);
         margin: 0;
-        background: linear-gradient(to right, var(--text-color), var(--primary-color));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: var(--text-color);
     }
 
     .view-subtitle {
-        font-size: 1.1rem;
-        margin-top: 0.25rem;
+        font-size: var(--font-size-body);
+        margin-top: 0.35rem;
+        color: var(--text-muted);
     }
 
     .habits-list {

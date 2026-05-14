@@ -150,13 +150,20 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 1.5rem;
+        padding: 2rem 1.5rem 1.5rem;
     }
 
     .header-title {
-        font-size: 1.2rem;
-        font-weight: 700;
+        font-size: var(--font-size-page-title);
+        font-weight: 800;
+        line-height: var(--line-height-title);
         margin: 0;
+        text-align: center;
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding: 0 1rem;
     }
 
     .icon-btn {
@@ -196,7 +203,7 @@
     }
 
     .input-group label {
-        font-size: 0.75rem;
+        font-size: var(--font-size-label);
         font-weight: 700;
         color: var(--text-muted);
         letter-spacing: 1px;
@@ -212,7 +219,7 @@
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
         font-family: inherit;
-        font-size: 1rem;
+        font-size: var(--font-size-body);
     }
 
     .top-row {
@@ -284,12 +291,18 @@
         border-radius: 14px;
         cursor: pointer;
         transition: background-color 0.2s ease, color 0.2s ease;
+        font-size: var(--font-size-body-sm);
     }
 
     .segment.active {
         background: var(--primary-color);
-        color: white;
+        color: var(--primary-contrast);
         box-shadow: 0 10px 22px color-mix(in srgb, var(--primary-color) 28%, transparent);
+    }
+
+    .segment:hover:not(.active) {
+        background: color-mix(in srgb, var(--button-hover-surface) 86%, transparent);
+        color: var(--text-color);
     }
 
     .frequency-choice-row {
@@ -309,12 +322,19 @@
         font-weight: 700;
         cursor: pointer;
         transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        font-size: var(--font-size-body-sm);
     }
 
     .mini-choice.active {
         background: color-mix(in srgb, var(--primary-color) 18%, transparent);
         color: var(--primary-color);
         border-color: color-mix(in srgb, var(--primary-color) 45%, var(--card-border));
+    }
+
+    .mini-choice:hover:not(.active) {
+        background: color-mix(in srgb, var(--button-hover-surface) 86%, transparent);
+        color: var(--text-color);
+        border-color: color-mix(in srgb, var(--primary-color) 24%, var(--button-hover-border));
     }
 
     .picker-dropdown {
@@ -341,14 +361,14 @@
         width: 100%;
         max-width: 400px;
         background: var(--primary-color);
-        color: white;
         border-color: transparent;
         padding: 1rem;
-        font-size: 1.1rem;
+        font-size: var(--font-size-card-title);
         border-radius: 18px;
         opacity: 1;
         transition: opacity 0.2s;
         pointer-events: auto;
+        color: var(--primary-contrast);
     }
 
     .primary-btn:disabled {
@@ -379,7 +399,7 @@
 
     .count-modal-copy h3 {
         margin: 0;
-        font-size: 1.1rem;
+        font-size: var(--font-size-card-title);
     }
 
     .count-modal-copy p {
@@ -388,13 +408,13 @@
 
     .count-input {
         text-align: center;
-        font-size: 1.25rem;
+        font-size: calc(var(--font-size-card-title) + 0.2rem);
         font-weight: 700;
     }
 
     .error-text {
         color: #ef4444;
-        font-size: 0.85rem;
+        font-size: var(--font-size-body-xs);
         margin: 0;
     }
 
@@ -417,7 +437,7 @@
 
     .modal-primary {
         background: var(--primary-color);
-        color: white;
+        color: var(--primary-contrast);
         border-color: transparent;
     }
 

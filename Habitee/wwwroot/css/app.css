@@ -27,6 +27,7 @@ body {
     background-color: var(--bg-color);
     color: var(--text-color);
     font-family: var(--font-family);
+    line-height: var(--line-height-copy, 1.4);
     min-height: 100vh;
     overflow-x: hidden;
 }
@@ -119,8 +120,20 @@ body {
 }
 
 .glass-button:hover {
-    background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05));
-    border-color: var(--primary-color);
+    background:
+        linear-gradient(180deg,
+            color-mix(in srgb, var(--button-hover-surface) 84%, white 16%) 0%,
+            color-mix(in srgb, var(--button-hover-surface) 96%, transparent) 100%);
+    border-color: color-mix(in srgb, var(--primary-color) 34%, var(--button-hover-border));
+    color: var(--button-hover-text);
+    box-shadow:
+        0 12px 24px rgba(0, 0, 0, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.glass-button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
 }
 
 [data-theme="pastel"] h1,
@@ -150,6 +163,7 @@ body {
 [data-theme="pastel"] .theme-btn:hover {
     background: linear-gradient(180deg, rgba(255, 252, 247, 0.96) 0%, rgba(255, 232, 239, 0.88) 100%);
     border-color: color-mix(in srgb, var(--primary-color) 38%, white);
+    color: var(--text-color);
 }
 
 [data-theme="sakura"] h1,
@@ -215,12 +229,14 @@ body {
     background:
         linear-gradient(180deg, rgba(255, 248, 252, 0.98) 0%, rgba(249, 215, 230, 0.92) 100%);
     border-color: color-mix(in srgb, var(--primary-color) 55%, white 45%);
+    color: var(--text-color);
 }
 
 [data-theme="sakura"][data-theme-mode="dark"] .glass-button:hover,
 [data-theme="sakura"][data-theme-mode="dark"] .theme-btn:hover {
     background:
         linear-gradient(180deg, rgba(88, 58, 93, 0.94) 0%, rgba(63, 43, 70, 0.88) 100%);
+    color: var(--text-color);
 }
 
 [data-theme="sakura"] .glass-button,
@@ -359,6 +375,7 @@ body {
     border-color: color-mix(in srgb, var(--primary-color) 38%, white);
     background:
         linear-gradient(180deg, color-mix(in srgb, var(--matcha-paper) 88%, white 12%) 0%, color-mix(in srgb, var(--card-bg) 95%, transparent) 100%);
+    color: var(--text-color);
 }
 
 [data-theme="matcha"] .primary-btn {
@@ -388,7 +405,6 @@ body {
 [data-theme="retro"] h2,
 [data-theme="retro"] .glass-button,
 [data-theme="retro"] .primary-btn,
-[data-theme="retro"] .theme-btn,
 [data-theme="retro"] .theme-btn.retro,
 [data-theme="retro"] .nav-item span,
 [data-theme="retro"] .status-pill,
@@ -417,6 +433,7 @@ body {
     box-shadow:
         var(--card-shadow),
         6px 6px 0 var(--retro-shadow-step);
+    animation: retroPanelJitter 5.8s steps(2, end) infinite;
 }
 
 [data-theme="retro"] .glass-panel::after {
@@ -427,6 +444,7 @@ body {
     border-radius: 2px;
     pointer-events: none;
     z-index: 0;
+    animation: retroScanJitter 2.6s steps(2, end) infinite;
 }
 
 [data-theme="retro"] .glass-button,
@@ -437,11 +455,13 @@ body {
     box-shadow:
         4px 4px 0 var(--retro-shadow-step),
         0 0 14px color-mix(in srgb, var(--primary-color) 24%, transparent);
+    animation: retroUiJitter 3.8s steps(2, end) infinite;
 }
 
 [data-theme="retro"] .glass-button:hover,
 [data-theme="retro"] .theme-btn:hover {
     border-color: var(--success-color);
+    color: var(--text-color);
     box-shadow:
         4px 4px 0 color-mix(in srgb, var(--success-color) 42%, transparent),
         0 0 18px color-mix(in srgb, var(--accent-color) 30%, transparent);
@@ -457,6 +477,18 @@ body {
 [data-theme="retro"] .nav-item.active {
     background: color-mix(in srgb, var(--primary-color) 18%, transparent);
     box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-color) 34%, transparent);
+    animation: retroUiJitter 1.4s steps(2, end) infinite;
+}
+
+[data-theme="retro"] .dock-nav .nav-item {
+    gap: 0.6rem;
+    padding: 0.82rem 0.72rem 0.82rem 0.9rem;
+}
+
+[data-theme="retro"] .dock-nav .nav-item span {
+    font-size: 0.68rem;
+    line-height: 1.2;
+    letter-spacing: 0;
 }
 
 [data-theme="retro"] .habit-icon-shell,
@@ -467,6 +499,7 @@ body {
     box-shadow:
         inset 0 0 0 1px color-mix(in srgb, var(--accent-color) 30%, transparent),
         4px 4px 0 color-mix(in srgb, var(--accent-color) 18%, transparent);
+    animation: retroUiJitter 4.2s steps(2, end) infinite;
 }
 
 [data-theme="ocean"] h1,
@@ -512,6 +545,7 @@ body {
 [data-theme="ocean"] .glass-button:hover,
 [data-theme="ocean"] .theme-btn:hover {
     border-color: color-mix(in srgb, var(--accent-color) 56%, white 12%);
+    color: var(--text-color);
     box-shadow:
         0 16px 26px var(--ocean-depth),
         0 0 18px color-mix(in srgb, var(--accent-color) 18%, transparent);
@@ -587,6 +621,7 @@ body {
     border-color: color-mix(in srgb, var(--primary-color) 52%, var(--paper-ink-strong));
     background:
         linear-gradient(180deg, color-mix(in srgb, var(--card-bg) 88%, white 12%) 0%, color-mix(in srgb, var(--card-bg) 98%, transparent) 100%);
+    color: var(--text-color);
 }
 
 [data-theme="paper"] .dock-nav {
@@ -674,11 +709,49 @@ p {
     }
 }
 
+@keyframes retroPanelJitter {
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    8% { transform: translate3d(1px, 0, 0); }
+    10% { transform: translate3d(-1px, 0, 0); }
+    18% { transform: translate3d(0, 1px, 0); }
+    20% { transform: translate3d(0, -1px, 0); }
+    52% { transform: translate3d(1px, 1px, 0); }
+    54% { transform: translate3d(-1px, 0, 0); }
+    78% { transform: translate3d(0, -1px, 0); }
+}
+
+@keyframes retroUiJitter {
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    16% { transform: translate3d(1px, 0, 0); }
+    18% { transform: translate3d(-1px, 0, 0); }
+    48% { transform: translate3d(0, 1px, 0); }
+    50% { transform: translate3d(1px, -1px, 0); }
+    82% { transform: translate3d(-1px, 1px, 0); }
+}
+
+@keyframes retroScanJitter {
+    0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.92; }
+    14% { transform: translate3d(1px, 0, 0); opacity: 0.84; }
+    16% { transform: translate3d(-1px, 0, 0); opacity: 0.96; }
+    46% { transform: translate3d(0, 1px, 0); opacity: 0.88; }
+    48% { transform: translate3d(0, -1px, 0); opacity: 0.98; }
+    76% { transform: translate3d(1px, 1px, 0); opacity: 0.86; }
+}
+
 @media (prefers-reduced-motion: reduce) {
     .fade-in,
     .background-layer .particle,
     .background-layer .cyber-grid,
-    [data-theme="galaxy"] .glass-panel::before {
+    [data-theme="galaxy"] .glass-panel::before,
+    [data-theme="retro"] .glass-panel,
+    [data-theme="retro"] .glass-panel::after,
+    [data-theme="retro"] .glass-button,
+    [data-theme="retro"] .theme-btn,
+    [data-theme="retro"] .nav-item.active,
+    [data-theme="retro"] .nav-item:hover,
+    [data-theme="retro"] .habit-icon-shell,
+    [data-theme="retro"] .grid-icon-ring,
+    [data-theme="retro"] .library-icon-ring {
         animation: none !important;
     }
 
@@ -701,5 +774,9 @@ p {
         --app-nav-clearance: var(--dock-clearance);
         --page-action-offset: calc(var(--dock-clearance) + var(--bottom-action-gap));
         --page-action-clearance: calc(var(--page-action-height) + var(--page-action-offset));
+    }
+
+    [data-theme="retro"] .dock-nav .nav-item span {
+        font-size: 0.56rem;
     }
 }

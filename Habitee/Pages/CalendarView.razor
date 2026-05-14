@@ -177,19 +177,21 @@
     }
 
     .calendar-header {
-        padding-top: 0.5rem;
-        margin-bottom: 1.35rem;
+        padding-top: 2rem;
+        margin-bottom: 2rem;
     }
 
     .calendar-title {
         margin: 0;
-        font-size: 2rem;
+        font-size: var(--font-size-page-title);
         font-weight: 800;
+        line-height: var(--line-height-title);
     }
 
     .calendar-subtitle {
         margin: 0.35rem 0 0;
         color: var(--text-muted);
+        font-size: var(--font-size-body);
     }
 
     .loading-state {
@@ -220,7 +222,7 @@
     }
 
     .range-select-wrap span {
-        font-size: 0.82rem;
+        font-size: var(--font-size-badge);
         font-weight: 700;
         color: var(--text-muted);
     }
@@ -231,7 +233,7 @@
         color: var(--text-color);
         font: inherit;
         font-weight: 700;
-        font-size: 0.95rem;
+        font-size: var(--font-size-body-sm);
         padding: 0;
         cursor: pointer;
         outline: none;
@@ -285,7 +287,8 @@
     }
 
     .range-menu-item:hover {
-        background: rgba(255, 255, 255, 0.08);
+        background: color-mix(in srgb, var(--button-hover-surface) 84%, transparent);
+        color: var(--text-color);
     }
 
     .range-menu-item.active {
@@ -404,8 +407,8 @@
 
     .habit-row-copy h3 {
         margin: 0;
-        font-size: 1rem;
-        line-height: 1.1;
+        font-size: var(--font-size-body);
+        line-height: 1.2;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -413,7 +416,7 @@
 
     .habit-row-copy p {
         margin: 0.25rem 0 0;
-        font-size: 0.85rem;
+        font-size: var(--font-size-body-xs);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -433,14 +436,15 @@
         padding: 0;
         cursor: pointer;
         font: inherit;
-        font-size: 0.72rem;
+        font-size: var(--font-size-micro);
         font-weight: 700;
+        transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
     }
 
     .habit-row-action.complete {
         background: color-mix(in srgb, var(--habit-color) 84%, white 16%);
         border-color: transparent;
-        color: white;
+        color: var(--primary-contrast);
     }
 
     .habit-row-action.partial {
@@ -449,6 +453,18 @@
 
     .habit-row-action.empty {
         color: var(--text-muted);
+    }
+
+    .habit-row-action:hover {
+        background: color-mix(in srgb, var(--button-hover-surface) 86%, transparent);
+        border-color: color-mix(in srgb, var(--habit-color) 52%, var(--button-hover-border));
+        color: var(--text-color);
+    }
+
+    .habit-row-action.complete:hover {
+        background: color-mix(in srgb, var(--habit-color) 84%, white 16%);
+        border-color: transparent;
+        color: var(--primary-contrast);
     }
 
     .habit-row-days {
@@ -478,12 +494,25 @@
 
     .day-status.clickable {
         cursor: pointer;
+        transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .day-status.clickable:hover {
+        background: color-mix(in srgb, var(--button-hover-surface) 84%, transparent);
+        border-color: color-mix(in srgb, var(--habit-color) 48%, var(--button-hover-border));
+        color: var(--text-color);
+    }
+
+    .day-status.complete.clickable:hover {
+        background: color-mix(in srgb, var(--habit-color) 84%, white 16%);
+        border-color: transparent;
+        color: var(--primary-contrast);
     }
 
     .day-status.complete {
         background: color-mix(in srgb, var(--habit-color) 84%, white 16%);
         border-color: transparent;
-        color: white;
+        color: var(--primary-contrast);
     }
 
     [data-theme="sakura"] .day-status {

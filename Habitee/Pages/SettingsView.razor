@@ -18,16 +18,6 @@
         <section class="settings-section glass-panel">
             <h2>Appearance</h2>
 
-            <div class="setting-item">
-                <div class="setting-info">
-                    <h3>Dark Mode</h3>
-                    <p>Toggle between light and dark themes</p>
-                </div>
-                <button class="glass-button toggle-btn @(ThemeService.CurrentMode == "dark" ? "active" : "")" @onclick="ToggleMode">
-                    @(ThemeService.CurrentMode == "dark" ? "On" : "Off")
-                </button>
-            </div>
-
             <div class="setting-item setting-stack">
                 <div class="setting-info">
                     <h3>Theme</h3>
@@ -159,12 +149,11 @@
     }
 
     .view-title {
-        font-size: 2.5rem;
-        font-weight: 700;
+        font-size: var(--font-size-page-title);
+        font-weight: 800;
+        line-height: var(--line-height-title);
         margin: 0;
-        background: linear-gradient(to right, var(--text-color), var(--primary-color));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: var(--text-color);
     }
 
     .settings-grid {
@@ -180,11 +169,13 @@
     .settings-section h2 {
         margin-top: 0;
         margin-bottom: 1.5rem;
-        font-size: 1.5rem;
+        font-size: var(--font-size-section-title);
     }
 
     .section-copy {
         margin-bottom: 1.5rem;
+        font-size: var(--font-size-body-sm);
+        color: var(--text-muted);
     }
 
     .setting-item {
@@ -209,22 +200,18 @@
 
     .setting-info h3 {
         margin: 0;
-        font-size: 1.1rem;
+        font-size: var(--font-size-card-title);
     }
 
     .setting-info p {
         margin: 0;
-        font-size: 0.9rem;
+        font-size: var(--font-size-body-sm);
+        color: var(--text-muted);
     }
 
-    .toggle-btn {
-        min-width: 80px;
-    }
-
-    .toggle-btn.active,
     .notification-toggle.active {
         background: var(--primary-color);
-        color: white;
+        color: var(--primary-contrast);
     }
 
     .status-pill {
@@ -234,14 +221,14 @@
         min-width: 96px;
         padding: 0.65rem 0.9rem;
         border-radius: 999px;
-        font-size: 0.85rem;
+        font-size: var(--font-size-badge);
         font-weight: 700;
         text-align: center;
     }
 
     .status-pill.enabled {
         background: color-mix(in srgb, var(--success-color) 88%, transparent);
-        color: white;
+        color: color-mix(in srgb, var(--success-color) 16%, #12222a 84%);
     }
 
     .status-pill.blocked {
@@ -271,6 +258,7 @@
         cursor: pointer;
         font-weight: 600;
         transition: all 0.2s ease;
+        font-size: var(--font-size-body-sm);
     }
 
     .theme-btn.selected {
@@ -278,10 +266,10 @@
         box-shadow: 0 0 15px color-mix(in srgb, var(--primary-color) 28%, transparent);
     }
 
-    .theme-btn.habitee { border-left: 4px solid #3b82f6; }
+    .theme-btn.habitee { border-left: 4px solid #3b82f6; font-family: 'Inter', sans-serif; }
     .theme-btn.pastel { border-left: 4px solid #a0dee6; font-family: 'Comfortaa', cursive; }
     .theme-btn.sakura { border-left: 4px solid #df7fa3; font-family: 'Quicksand', 'Nunito', sans-serif; }
-    .theme-btn.galaxy { border-left: 4px solid #8b5cf6; }
+    .theme-btn.galaxy { border-left: 4px solid #8b5cf6; font-family: 'Inter', sans-serif; }
     .theme-btn.cyberpunk { border-left: 4px solid #f43f5e; font-family: 'JetBrains Mono', monospace; }
     .theme-btn.matcha { border-left: 4px solid #7b9165; font-family: 'Nunito', 'Quicksand', sans-serif; }
     .theme-btn.retro { border-left: 4px solid #ff4fd8; font-family: 'Press Start 2P', 'JetBrains Mono', monospace; font-size: 0.7rem; line-height: 1.4; }
@@ -309,7 +297,7 @@
     .status-message {
         padding: 1rem;
         border-radius: 12px;
-        font-size: 0.92rem;
+        font-size: var(--font-size-body-sm);
     }
 
     .notification-hint,
@@ -359,13 +347,13 @@
 
     .settings-link-copy h3 {
         margin: 0;
-        font-size: 1.05rem;
+        font-size: var(--font-size-card-title);
     }
 
     .settings-link-copy p {
         margin: 0.3rem 0 0;
         color: var(--text-muted);
-        font-size: 0.92rem;
+        font-size: var(--font-size-body-sm);
     }
 
     .settings-link-meta {
@@ -382,12 +370,12 @@
         background: var(--card-border);
         color: var(--text-color);
         text-align: center;
-        font-size: 0.85rem;
+        font-size: var(--font-size-badge);
         font-weight: 700;
     }
 
     .settings-chevron {
-        font-size: 1.7rem;
+        font-size: calc(var(--font-size-section-title) + 0.2rem);
         line-height: 1;
         color: var(--text-muted);
     }
@@ -447,11 +435,6 @@
         ThemeService.OnThemeChanged -= StateHasChanged;
         NotificationService.StatusChanged -= HandleNotificationStatusChanged;
         DbService.DataChanged -= HandleDatabaseChanged;
-    }
-
-    private async Task ToggleMode()
-    {
-        await ThemeService.ToggleModeAsync();
     }
 
     private async Task SetTheme(string theme)
