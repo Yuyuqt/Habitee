@@ -22,7 +22,7 @@
     </div>
 
     <div class="content-scroll">
-        @if (currentTab == "positive")
+        @if (FilteredCategories.Any())
         {
             @foreach (var category in FilteredCategories)
             {
@@ -47,7 +47,7 @@
         else
         {
             <div class="empty-state">
-                <p>Negative habits tracking coming soon!</p>
+                <p>No templates match your search.</p>
             </div>
         }
         
@@ -228,11 +228,17 @@
     private string currentTab = "positive";
     private string searchQuery = "";
 
-    private IEnumerable<HabitCategory> FilteredCategories => positiveTemplates
+    private List<HabitCategory> CurrentTemplates => currentTab == "positive" ? positiveTemplates : negativeTemplates;
+
+    private IEnumerable<HabitCategory> FilteredCategories => CurrentTemplates
         .Select(c => new HabitCategory 
         { 
             CategoryName = c.CategoryName, 
-            Items = c.Items.Where(i => string.IsNullOrEmpty(searchQuery) || i.Title.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList() 
+            Items = c.Items.Where(i =>
+                    string.IsNullOrEmpty(searchQuery)
+                    || i.Title.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
+                    || i.Description.Contains(searchQuery, StringComparison.OrdinalIgnoreCase))
+                .ToList()
         })
         .Where(c => c.Items.Any());
 
@@ -256,7 +262,6 @@
         public string Color { get; set; } = "#3b82f6";
     }
 
-    // Hardcoded templates based on screenshots
     private List<HabitCategory> positiveTemplates = new()
     {
         new HabitCategory
@@ -264,10 +269,11 @@
             CategoryName = "Diet & Nutrition",
             Items = new()
             {
-                new HabitTemplate { Title = "Stop Skipping Meals", Description = "Eat regular meals every day", Icon = "cutlery", Color = "#f97316" },
-                new HabitTemplate { Title = "No Junk Food", Description = "Avoid processed junk food", Icon = "burger", Color = "#f97316" },
-                new HabitTemplate { Title = "No Soda", Description = "Cut out sugary soft drinks", Icon = "soda", Color = "#f97316" },
-                new HabitTemplate { Title = "No Sugar", Description = "Cut added sugar from your diet", Icon = "sugar", Color = "#f97316" }
+                new HabitTemplate { Title = "Drink Water", Description = "Stay hydrated throughout the day", Icon = "water", Color = "#0ea5e9" },
+                new HabitTemplate { Title = "Eat Breakfast", Description = "Start the day with a proper meal", Icon = "cutlery", Color = "#f97316" },
+                new HabitTemplate { Title = "Eat Fruit", Description = "Add at least one fruit serving daily", Icon = "apple", Color = "#ef4444" },
+                new HabitTemplate { Title = "Eat Vegetables", Description = "Include veggies with your meals", Icon = "carrot", Color = "#f59e0b" },
+                new HabitTemplate { Title = "Cook at Home", Description = "Prepare a homemade meal today", Icon = "bowl", Color = "#fb923c" }
             }
         },
         new HabitCategory
@@ -276,9 +282,86 @@
             Items = new()
             {
                 new HabitTemplate { Title = "Meditate", Description = "Practice mindfulness daily", Icon = "meditate", Color = "#10b981" },
-                new HabitTemplate { Title = "Drink Water", Description = "Stay hydrated throughout the day", Icon = "water", Color = "#10b981" },
                 new HabitTemplate { Title = "Take Vitamins", Description = "Take your daily supplements", Icon = "pill", Color = "#10b981" },
-                new HabitTemplate { Title = "Floss", Description = "Floss your teeth daily", Icon = "tooth", Color = "#10b981" }
+                new HabitTemplate { Title = "Floss", Description = "Floss your teeth daily", Icon = "tooth", Color = "#10b981" },
+                new HabitTemplate { Title = "Sleep 8 Hours", Description = "Aim for a full night of sleep", Icon = "sleep", Color = "#8b5cf6" },
+                new HabitTemplate { Title = "Stretch", Description = "Loosen up with a quick stretch session", Icon = "stretch", Color = "#14b8a6" }
+            }
+        },
+        new HabitCategory
+        {
+            CategoryName = "Fitness & Movement",
+            Items = new()
+            {
+                new HabitTemplate { Title = "Morning Walk", Description = "Take a refreshing walk outside", Icon = "walk", Color = "#22c55e" },
+                new HabitTemplate { Title = "Go for a Run", Description = "Get your heart rate up with a run", Icon = "run", Color = "#f43f5e" },
+                new HabitTemplate { Title = "Workout", Description = "Complete a strength training session", Icon = "dumbbell", Color = "#3b82f6" },
+                new HabitTemplate { Title = "Yoga Session", Description = "Flow through a short yoga practice", Icon = "yoga", Color = "#a855f7" },
+                new HabitTemplate { Title = "Ride a Bike", Description = "Cycle for movement or fun", Icon = "bike", Color = "#06b6d4" }
+            }
+        },
+        new HabitCategory
+        {
+            CategoryName = "Learning & Focus",
+            Items = new()
+            {
+                new HabitTemplate { Title = "Read 20 Pages", Description = "Make progress on your current book", Icon = "book", Color = "#6366f1" },
+                new HabitTemplate { Title = "Study", Description = "Review notes or learn something new", Icon = "laptop", Color = "#2563eb" },
+                new HabitTemplate { Title = "Practice Coding", Description = "Ship a little code every day", Icon = "code", Color = "#0f766e" },
+                new HabitTemplate { Title = "Journal", Description = "Reflect on your day in writing", Icon = "journal", Color = "#f59e0b" },
+                new HabitTemplate { Title = "Plan Tomorrow", Description = "Set your priorities for the next day", Icon = "calendar", Color = "#ec4899" }
+            }
+        }
+    };
+
+    private List<HabitCategory> negativeTemplates = new()
+    {
+        new HabitCategory
+        {
+            CategoryName = "Diet & Nutrition",
+            Items = new()
+            {
+                new HabitTemplate { Title = "No Junk Food", Description = "Avoid processed junk food", Icon = "burger", Color = "#f97316" },
+                new HabitTemplate { Title = "No Soda", Description = "Cut out sugary soft drinks", Icon = "soda", Color = "#f97316" },
+                new HabitTemplate { Title = "No Sugar", Description = "Cut added sugar from your diet", Icon = "sugar", Color = "#f97316" },
+                new HabitTemplate { Title = "Skip Late Night Snacks", Description = "Avoid eating too close to bedtime", Icon = "bowl", Color = "#f59e0b" },
+                new HabitTemplate { Title = "Less Fast Food", Description = "Say no to drive-thru meals today", Icon = "cutlery", Color = "#ef4444" }
+            }
+        },
+        new HabitCategory
+        {
+            CategoryName = "Focus & Screen Time",
+            Items = new()
+            {
+                new HabitTemplate { Title = "No Doomscrolling", Description = "Stop endless scrolling loops", Icon = "phone", Color = "#8b5cf6" },
+                new HabitTemplate { Title = "Less Social Media", Description = "Reduce time spent on social apps", Icon = "chat", Color = "#06b6d4" },
+                new HabitTemplate { Title = "No Gaming Binge", Description = "Keep gaming sessions under control", Icon = "gamepad", Color = "#6366f1" },
+                new HabitTemplate { Title = "No Distracting Videos", Description = "Skip random video rabbit holes", Icon = "film", Color = "#ec4899" },
+                new HabitTemplate { Title = "Avoid Multitasking", Description = "Stick to one task at a time", Icon = "target", Color = "#3b82f6" }
+            }
+        },
+        new HabitCategory
+        {
+            CategoryName = "Lifestyle & Routine",
+            Items = new()
+            {
+                new HabitTemplate { Title = "Stop Skipping Meals", Description = "Eat regular meals every day", Icon = "cutlery", Color = "#f97316" },
+                new HabitTemplate { Title = "No Oversleeping", Description = "Get out of bed on time", Icon = "bed", Color = "#64748b" },
+                new HabitTemplate { Title = "No Snoozing", Description = "Wake up without hitting snooze", Icon = "stopwatch", Color = "#22c55e" },
+                new HabitTemplate { Title = "Skip Caffeine After Lunch", Description = "Cut late-day coffee or tea", Icon = "coffee", Color = "#a16207" },
+                new HabitTemplate { Title = "No Procrastinating", Description = "Start the task instead of delaying it", Icon = "briefcase", Color = "#14b8a6" }
+            }
+        },
+        new HabitCategory
+        {
+            CategoryName = "Mindset & Social",
+            Items = new()
+            {
+                new HabitTemplate { Title = "No Negative Self-Talk", Description = "Catch harsh thoughts and reframe them", Icon = "smile", Color = "#f43f5e" },
+                new HabitTemplate { Title = "No Complaining", Description = "Pause before venting unnecessarily", Icon = "sparkles", Color = "#a855f7" },
+                new HabitTemplate { Title = "Avoid Gossip", Description = "Keep conversations kind and clean", Icon = "users", Color = "#10b981" },
+                new HabitTemplate { Title = "No Impulse Spending", Description = "Skip unplanned purchases today", Icon = "shopping", Color = "#eab308" },
+                new HabitTemplate { Title = "No Smoking", Description = "Stay away from cigarettes or vapes", Icon = "leaf", Color = "#22c55e" }
             }
         }
     };
