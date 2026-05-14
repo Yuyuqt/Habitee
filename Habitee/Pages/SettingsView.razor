@@ -36,6 +36,7 @@
                 <div class="theme-selector">
                     <button class="theme-btn habitee @(ThemeService.CurrentTheme == "habitee" ? "selected" : "")" @onclick="@(() => SetTheme("habitee"))">Habitee+</button>
                     <button class="theme-btn pastel @(ThemeService.CurrentTheme == "pastel" ? "selected" : "")" @onclick="@(() => SetTheme("pastel"))">Pastel Dream</button>
+                    <button class="theme-btn sakura @(ThemeService.CurrentTheme == "sakura" ? "selected" : "")" @onclick="@(() => SetTheme("sakura"))">Sakura</button>
                     <button class="theme-btn galaxy @(ThemeService.CurrentTheme == "galaxy" ? "selected" : "")" @onclick="@(() => SetTheme("galaxy"))">Starry Galaxy</button>
                     <button class="theme-btn cyberpunk @(ThemeService.CurrentTheme == "cyberpunk" ? "selected" : "")" @onclick="@(() => SetTheme("cyberpunk"))">Cyberpunk</button>
                 </div>
@@ -270,11 +271,12 @@
 
     .theme-btn.selected {
         border-color: var(--primary-color);
-        box-shadow: 0 0 15px rgba(var(--primary-color), 0.3);
+        box-shadow: 0 0 15px color-mix(in srgb, var(--primary-color) 28%, transparent);
     }
 
     .theme-btn.habitee { border-left: 4px solid #3b82f6; }
     .theme-btn.pastel { border-left: 4px solid #a0dee6; font-family: 'Comfortaa', cursive; }
+    .theme-btn.sakura { border-left: 4px solid #df7fa3; font-family: 'Quicksand', 'Nunito', sans-serif; }
     .theme-btn.galaxy { border-left: 4px solid #8b5cf6; }
     .theme-btn.cyberpunk { border-left: 4px solid #f43f5e; font-family: 'JetBrains Mono', monospace; }
 

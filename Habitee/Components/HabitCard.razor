@@ -65,6 +65,10 @@
         border-width: 2px !important;
     }
 
+    [data-theme="sakura"] .habit-card {
+        border-width: 1.5px;
+    }
+
     .habit-icon-shell {
         width: 62px;
         height: 62px;
@@ -134,6 +138,18 @@
 
     .pastel-action {
         border-width: 2px !important;
+    }
+
+    [data-theme="sakura"] .habit-action {
+        border-color: color-mix(in srgb, var(--sakura-frame-strong) 65%, white 35%);
+    }
+
+    [data-theme="sakura"][data-theme-mode="light"] .habit-action {
+        background: linear-gradient(180deg, rgba(255, 241, 247, 0.96) 0%, rgba(248, 221, 233, 0.9) 100%);
+        border-color: color-mix(in srgb, var(--sakura-frame-strong) 78%, white 22%);
+        box-shadow:
+            0 8px 18px rgba(197, 121, 160, 0.14),
+            inset 0 1px 0 rgba(255, 255, 255, 0.82);
     }
 </style>
 

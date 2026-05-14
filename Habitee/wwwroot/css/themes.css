@@ -78,7 +78,67 @@
     --theme-btn-text: #4f345c;
 }
 
-/* Theme C: Starry Galaxy (Deep blue/purple) */
+/* Theme C: Sakura Mist (Elegant blossom glass) */
+[data-theme="sakura"] {
+    --bg-color: #fdf0f5;
+    --bg-gradient:
+        radial-gradient(circle at 18% 14%, rgba(255, 206, 224, 0.88) 0%, rgba(255, 206, 224, 0) 26%),
+        radial-gradient(circle at 82% 22%, rgba(228, 199, 241, 0.58) 0%, rgba(228, 199, 241, 0) 30%),
+        radial-gradient(circle at 50% 84%, rgba(196, 177, 228, 0.34) 0%, rgba(196, 177, 228, 0) 25%),
+        linear-gradient(180deg, #fff5fa 0%, #ffe6f0 28%, #f6dfef 56%, #e8d9f0 82%, #d9d3eb 100%);
+    --text-color: #634255;
+    --text-muted: #8d677d;
+    --card-bg: rgba(255, 241, 247, 0.74);
+    --card-border: rgba(235, 196, 216, 0.96);
+    --card-shadow:
+        0 20px 45px rgba(173, 116, 150, 0.16),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+
+    --primary-color: #d86b96;
+    --success-color: #6f9aa8;
+    --accent-color: #f4c7d7;
+
+    --font-family: 'Quicksand', 'Nunito', sans-serif;
+    --font-weight-title: 700;
+    --font-weight-desc: 500;
+
+    --border-radius: 28px;
+    --outline-width: 1.5px;
+
+    --theme-btn-bg: rgba(255, 239, 246, 0.96);
+    --theme-btn-text: #634255;
+    --sakura-frame-soft: rgba(224, 164, 196, 0.7);
+    --sakura-frame-strong: rgba(208, 119, 166, 0.52);
+    --sakura-glow: rgba(243, 187, 214, 0.4);
+}
+
+[data-theme="sakura"][data-theme-mode="dark"] {
+    --bg-color: #221825;
+    --bg-gradient:
+        radial-gradient(circle at 18% 14%, rgba(232, 135, 182, 0.28) 0%, rgba(232, 135, 182, 0) 24%),
+        radial-gradient(circle at 82% 20%, rgba(193, 150, 228, 0.24) 0%, rgba(193, 150, 228, 0) 26%),
+        radial-gradient(circle at 50% 88%, rgba(108, 102, 166, 0.18) 0%, rgba(108, 102, 166, 0) 24%),
+        linear-gradient(180deg, #1d1420 0%, #2a192d 28%, #3b213b 58%, #432a51 82%, #2f3a56 100%);
+    --text-color: #fdeef5;
+    --text-muted: #ddb7cc;
+    --card-bg: rgba(46, 29, 49, 0.6);
+    --card-border: rgba(244, 214, 232, 0.22);
+    --card-shadow:
+        0 20px 42px rgba(10, 6, 19, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+    --primary-color: #f2a7c8;
+    --success-color: #91bfcd;
+    --accent-color: #8b6eac;
+
+    --theme-btn-bg: rgba(60, 38, 63, 0.9);
+    --theme-btn-text: #fdeef5;
+    --sakura-frame-soft: rgba(242, 177, 213, 0.28);
+    --sakura-frame-strong: rgba(242, 167, 200, 0.38);
+    --sakura-glow: rgba(179, 120, 177, 0.22);
+}
+
+/* Theme D: Starry Galaxy (Deep blue/purple) */
 [data-theme="galaxy"] {
     --primary-color: #9b8cff;
     --success-color: #38bdf8;
@@ -114,7 +174,7 @@
     --galaxy-border-soft: rgba(2, 132, 199, 0.35);
 }
 
-/* Theme D: Cyberpunk (High-contrast black/neon) */
+/* Theme E: Cyberpunk (High-contrast black/neon) */
 [data-theme="cyberpunk"] {
     --primary-color: #f43f5e; /* Neon pink */
     --success-color: #06b6d4; /* Neon cyan */

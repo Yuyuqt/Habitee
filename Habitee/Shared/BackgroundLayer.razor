@@ -29,6 +29,26 @@
             </div>
         }
     }
+    else if (ThemeService.CurrentTheme == "sakura")
+    {
+        <div class="sakura-haze sakura-haze-one"></div>
+        <div class="sakura-haze sakura-haze-two"></div>
+
+        @for (int i = 0; i < 24; i++)
+        {
+            var color = sakuraPetalColors[RandomNumber(0, sakuraPetalColors.Length)];
+            var edge = sakuraPetalEdges[RandomNumber(0, sakuraPetalEdges.Length)];
+            var variant = RandomNumber(0, 3);
+            var width = RandomNumber(16, 30);
+            var height = RandomNumber(20, 38);
+            <div class="particle sakura-petal"
+                 style="left: @(RandomNumber(0, 100))vw; top: -@(RandomNumber(8, 32))vh; width: @(width)px; height: @(height)px; animation-duration: @(RandomNumber(18, 34))s; animation-delay: -@(RandomNumber(0, 34))s; --petal-drift: @(RandomNumber(-18, 18))vw; --petal-mid-drift: @(RandomNumber(-10, 10))vw; --petal-rotate: @(RandomNumber(180, 380))deg; --petal-start-rotate: @(RandomNumber(-65, 65))deg; --petal-opacity: @(RandomOpacity(0.3, 0.78));">
+                <div class="petal-svg-wrap" style="animation-duration: @(RandomNumber(5, 10))s; animation-delay: -@(RandomNumber(0, 10))s; --petal-scale-x: @(VariantScaleX(variant)); --petal-scale-y: @(VariantScaleY(variant));">
+                    @PetalSVG(color, edge, variant)
+                </div>
+            </div>
+        }
+    }
     else if (ThemeService.CurrentTheme == "galaxy")
     {
         for (int i = 0; i < 30; i++)
@@ -96,6 +116,82 @@
         100% { transform: translate(var(--tx), var(--ty)) scale(1.2) rotate(var(--tr)); opacity: 0; }
     }
 
+    /* Sakura Petals */
+    .sakura-haze {
+        position: absolute;
+        left: -10%;
+        width: 120%;
+        border-radius: 50%;
+        opacity: 0.62;
+        filter: blur(14px);
+        background: linear-gradient(180deg, rgba(255, 230, 239, 0.38) 0%, rgba(219, 204, 239, 0.18) 100%);
+    }
+
+    .sakura-haze-one {
+        bottom: -14vh;
+        height: 34vh;
+    }
+
+    .sakura-haze-two {
+        bottom: -20vh;
+        height: 26vh;
+        opacity: 0.42;
+        background: linear-gradient(180deg, rgba(232, 212, 239, 0.3) 0%, rgba(181, 170, 213, 0.2) 100%);
+    }
+
+    .sakura-petal {
+        animation: fallPetal linear infinite;
+        opacity: 0;
+        will-change: transform, opacity;
+        transform-origin: center;
+    }
+
+    .petal-svg-wrap {
+        width: 100%;
+        height: 100%;
+        filter: drop-shadow(0 10px 12px rgba(173, 110, 146, 0.16));
+        animation: petalFlutter ease-in-out infinite;
+        transform-origin: center;
+    }
+
+    @@keyframes fallPetal {
+        0% {
+            transform: translate3d(0, -12vh, 0) rotate(var(--petal-start-rotate));
+            opacity: 0;
+        }
+
+        12% {
+            opacity: var(--petal-opacity);
+        }
+
+        34% {
+            transform: translate3d(var(--petal-mid-drift), 30vh, 0) rotate(calc(var(--petal-start-rotate) + 80deg));
+        }
+
+        68% {
+            transform: translate3d(calc(var(--petal-drift) * 0.45), 74vh, 0) rotate(calc(var(--petal-start-rotate) + 175deg));
+        }
+
+        88% {
+            opacity: var(--petal-opacity);
+        }
+
+        100% {
+            transform: translate3d(var(--petal-drift), 122vh, 0) rotate(var(--petal-rotate));
+            opacity: 0;
+        }
+    }
+
+    @@keyframes petalFlutter {
+        0%, 100% {
+            transform: rotate(-14deg) scale(var(--petal-scale-x), var(--petal-scale-y)) translateX(-1px);
+        }
+
+        50% {
+            transform: rotate(16deg) scale(calc(var(--petal-scale-x) * 1.02), calc(var(--petal-scale-y) * 1.02)) translateX(2px);
+        }
+    }
+
     /* Sparkles */
     .sparkle {
         width: 4px;
@@ -138,6 +234,8 @@
     private List<ConfettiItem> activeConfetti = new();
 
     private string[] pastelColors = new[] { "#FDE8C0", "#A7D8F5", "#FFC0CB", "#A7EBDC", "#E0BBE4" };
+    private string[] sakuraPetalColors = new[] { "#FFE6EF", "#FFD7E5", "#FBC6D8", "#F6DCEC", "#F9EAF1" };
+    private string[] sakuraPetalEdges = new[] { "#E7A6C0", "#DE94B1", "#D78AAA", "#C889B5" };
 
     private RenderFragment StarSVG(string color) => __builder => {
         <svg viewBox="0 0 100 100" width="100%" height="100%">
@@ -156,6 +254,24 @@
                   stroke-width="9"
                   stroke-linejoin="round"
                   stroke-linecap="round" />
+        </svg>
+    };
+
+    private RenderFragment PetalSVG(string color, string edgeColor, int variant) => __builder => {
+        <svg viewBox="0 0 100 120" width="100%" height="100%" aria-hidden="true">
+            <path d="@GetPetalPath(variant)"
+                  fill="@color"
+                  stroke="@edgeColor"
+                  stroke-width="6"
+                  stroke-linejoin="round" />
+            <path d="@GetPetalHighlightPath(variant)"
+                  fill="rgba(255,255,255,0.35)" />
+            <path d="@GetPetalVeinPath(variant)"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.4)"
+                  stroke-width="3.2"
+                  stroke-linecap="round"
+                  opacity="0.7" />
         </svg>
     };
 
@@ -197,6 +313,63 @@
     }
 
     private int RandomNumber(int min, int max) => rnd.Next(min, max);
+
+    private string RandomOpacity(double min, double max) => (min + (rnd.NextDouble() * (max - min))).ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
+
+    private static string VariantScaleX(int variant) => variant switch
+    {
+        1 => "0.90",
+        2 => "1.08",
+        _ => "1.00"
+    };
+
+    private static string VariantScaleY(int variant) => variant switch
+    {
+        2 => "0.96",
+        _ => "1.00"
+    };
+
+    private static string GetPetalPath(int variant) => variant switch
+    {
+        0 => @"M50 10
+               C59 7 66 12 69 20
+               C77 21 84 30 82 41
+               C80 61 65 79 50 108
+               C34 80 20 61 18 41
+               C16 30 23 21 31 20
+               C34 12 41 7 50 10 Z",
+        1 => @"M54 12
+               C67 14 76 24 78 38
+               C80 54 72 72 54 106
+               C36 82 24 62 22 44
+               C20 26 30 14 45 12
+               C48 18 51 19 54 12 Z",
+        _ => @"M50 12
+               C62 6 74 15 77 30
+               C81 49 72 69 50 106
+               C28 69 19 49 23 30
+               C26 15 38 6 50 12 Z"
+    };
+
+    private static string GetPetalHighlightPath(int variant) => variant switch
+    {
+        0 => @"M50 22
+               C57 31 58 51 50 84
+               C42 51 43 31 50 22 Z",
+        1 => @"M48 22
+               C58 30 61 48 53 79
+               C44 54 41 35 48 22 Z",
+        _ => @"M50 24
+               C60 33 59 52 50 82
+               C41 52 40 33 50 24 Z"
+    };
+
+    private static string GetPetalVeinPath(int variant) => variant switch
+    {
+        0 => @"M50 22 C51 40 51 58 50 86",
+        1 => @"M48 24 C52 42 53 58 52 82",
+        _ => @"M50 24 C49 43 50 60 50 84"
+    };
 
     private class ConfettiItem {
         public double X { get; set; }

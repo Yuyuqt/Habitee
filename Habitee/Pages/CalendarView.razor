@@ -293,6 +293,12 @@
         border: 1px solid var(--card-border);
     }
 
+    [data-theme="sakura"] .day-chip.today {
+        background: color-mix(in srgb, var(--card-bg) 84%, white 16%);
+        border-color: color-mix(in srgb, var(--sakura-frame-soft) 80%, white 20%);
+        box-shadow: 0 10px 18px rgba(184, 126, 154, 0.08);
+    }
+
     .day-chip.placeholder {
         background: transparent;
         border: none;
@@ -323,6 +329,10 @@
 
     .pastel-row {
         border-width: 2px;
+    }
+
+    [data-theme="sakura"] .habit-row {
+        border-width: 1.5px;
     }
 
     .habit-row-info {
@@ -392,6 +402,19 @@
         background: color-mix(in srgb, var(--habit-color) 84%, white 16%);
         border-color: transparent;
         color: white;
+    }
+
+    [data-theme="sakura"] .day-status {
+        background: color-mix(in srgb, var(--card-bg) 88%, white 12%);
+        border-color: color-mix(in srgb, var(--habit-color) 22%, var(--sakura-frame-soft));
+    }
+
+    [data-theme="sakura"][data-theme-mode="light"] .day-status {
+        background: linear-gradient(180deg, rgba(255, 241, 247, 0.96) 0%, rgba(247, 223, 233, 0.92) 100%);
+        border-color: color-mix(in srgb, var(--habit-color) 34%, var(--sakura-frame-strong));
+        box-shadow:
+            0 8px 16px rgba(193, 122, 158, 0.12),
+            inset 0 1px 0 rgba(255, 255, 255, 0.82);
     }
 
     .day-status.partial {

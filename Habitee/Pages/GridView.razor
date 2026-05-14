@@ -153,6 +153,13 @@
         border-width: 2px;
     }
 
+    [data-theme="sakura"] .grid-habit-card {
+        border-width: 1.5px;
+        box-shadow:
+            var(--card-shadow),
+            inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    }
+
     .grid-card-top {
         display: flex;
         justify-content: space-between;
@@ -221,6 +228,19 @@
         border-color: transparent;
     }
 
+    [data-theme="sakura"] .grid-status-badge {
+        background: color-mix(in srgb, var(--card-bg) 88%, white 12%);
+        border-color: color-mix(in srgb, var(--habit-color) 34%, var(--sakura-frame-soft));
+    }
+
+    [data-theme="sakura"][data-theme-mode="light"] .grid-status-badge {
+        background: linear-gradient(180deg, rgba(255, 241, 247, 0.96) 0%, rgba(247, 223, 233, 0.92) 100%);
+        border-color: color-mix(in srgb, var(--habit-color) 44%, var(--sakura-frame-strong));
+        box-shadow:
+            0 8px 16px rgba(193, 122, 158, 0.12),
+            inset 0 1px 0 rgba(255, 255, 255, 0.82);
+    }
+
     .grid-status-badge.partial {
         color: var(--habit-color);
     }
@@ -249,6 +269,10 @@
         justify-content: center;
         background: rgba(255, 255, 255, 0.1);
         color: var(--primary-color);
+    }
+
+    [data-theme="sakura"] .add-icon {
+        background: linear-gradient(180deg, rgba(255, 247, 250, 0.84) 0%, rgba(248, 229, 238, 0.74) 100%);
     }
 
     .add-copy h3 {

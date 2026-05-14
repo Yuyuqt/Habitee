@@ -191,6 +191,42 @@
         opacity: 1;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
+
+    [data-theme="sakura"][data-theme-mode="light"] .monthly-graph.compact .day-cell {
+        background-color: color-mix(in srgb, var(--accent-color) 26%, white 18%);
+        opacity: 0.42;
+        box-shadow: none;
+    }
+
+    [data-theme="sakura"][data-theme-mode="light"] .monthly-graph.compact .month-block {
+        padding: 0.34rem 0.46rem 0.48rem;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 240, 246, 0.42);
+        box-shadow: 0 6px 14px rgba(188, 121, 157, 0.08);
+    }
+
+    [data-theme="sakura"][data-theme-mode="light"] .monthly-graph.compact .weekdays,
+    [data-theme="sakura"][data-theme-mode="light"] .monthly-graph.compact .days-grid {
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 11px;
+        padding: 0.18rem;
+    }
+
+    [data-theme="sakura"][data-theme-mode="light"] .monthly-graph.compact .weekdays span {
+        color: var(--text-color);
+        opacity: 0.72;
+    }
+
+    [data-theme="sakura"][data-theme-mode="light"] .monthly-graph.compact .day-cell.future {
+        background-color: transparent;
+        border-color: rgba(255, 237, 244, 0.9);
+    }
+
+    [data-theme="sakura"][data-theme-mode="light"] .monthly-graph.compact .day-cell.completed {
+        opacity: 1;
+        box-shadow: 0 2px 6px rgba(200, 128, 165, 0.14);
+    }
 </style>
 
 @code {
