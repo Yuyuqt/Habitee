@@ -144,6 +144,7 @@
         flex: 1;
         overflow-y: auto;
         padding: 0 1.5rem;
+        padding-bottom: calc(var(--bottom-action-offset) + 5rem);
     }
 
     .category-section {
@@ -202,7 +203,7 @@
 
     .fixed-bottom {
         position: absolute;
-        bottom: 0;
+        bottom: var(--bottom-action-offset);
         left: 0;
         right: 0;
         padding: 1.5rem;
