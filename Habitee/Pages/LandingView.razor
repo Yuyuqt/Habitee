@@ -30,7 +30,7 @@
 
     <!-- Showcase Section (Live Preview) -->
     <div class="showcase-section">
-        <div class="app-frame glass-panel card-hover-lift">
+        <div class="app-frame glass-panel">
             <div class="frame-header">
                 <div class="traffic-lights">
                     <span></span><span></span><span></span>
@@ -133,7 +133,6 @@
 
     /* App Frame (Showcase) */
     .showcase-section {
-        perspective: 1000px;
         z-index: 2;
     }
 
@@ -145,13 +144,7 @@
         -webkit-backdrop-filter: blur(16px);
         border: 1px solid var(--card-border);
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
-        transform: rotateY(-5deg) rotateX(5deg);
-        transition: transform 0.3s ease;
         padding: 0.5rem; /* slight horizontal padding around inner frame */
-    }
-
-    .app-frame:hover {
-        transform: rotateY(0) rotateX(0);
     }
 
     .frame-header {
@@ -248,9 +241,6 @@
             width: 100%;
         }
 
-        .app-frame {
-            transform: none;
-        }
     }
 </style>
 
