@@ -6,6 +6,8 @@
 @inject DatabaseService DbService
 @inject IJSRuntime JSRuntime
 @inject NotificationService NotificationService
+@inject NavigationManager NavManager
+@inject AuthService AuthService
 
 <div class="container">
     <header class="view-header">
@@ -37,6 +39,20 @@
                     <button class="theme-btn galaxy @(ThemeService.CurrentTheme == "galaxy" ? "selected" : "")" @onclick="@(() => SetTheme("galaxy"))">Starry Galaxy</button>
                     <button class="theme-btn cyberpunk @(ThemeService.CurrentTheme == "cyberpunk" ? "selected" : "")" @onclick="@(() => SetTheme("cyberpunk"))">Cyberpunk</button>
                 </div>
+            </div>
+        </section>
+
+        <section class="settings-section glass-panel">
+            <h2>Account</h2>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <h3>@(AuthService.CurrentUser?.DisplayName ?? "Local account")</h3>
+                    <p>@(AuthService.CurrentUser?.Email ?? "Signed in on this device")</p>
+                </div>
+                <button class="glass-button logout-btn" @onclick="Logout">
+                    Log Out
+                </button>
             </div>
         </section>
 
@@ -80,53 +96,30 @@
         </section>
 
         <section class="settings-section glass-panel">
-            <h2>Archived Habits</h2>
-            <p class="section-copy">Archived habits stay out of your active views, but you can restore or permanently delete them here.</p>
+            <h2>Habit Library</h2>
+            <p class="section-copy">Peek into your reminder-ready and archived habits without crowding the main settings page.</p>
 
-            @if (isArchivedLoading)
-            {
-                <div class="archived-empty">
-                    <p>Loading archived habits...</p>
+            <button class="settings-link-card" @onclick='() => NavManager.NavigateTo("/settings/active-reminders")'>
+                <div class="settings-link-copy">
+                    <h3>Active Reminders</h3>
+                    <p>See every active habit with at least one enabled reminder.</p>
                 </div>
-            }
-            else if (!archivedHabits.Any())
-            {
-                <div class="archived-empty">
-                    <p>No archived habits yet.</p>
+                <div class="settings-link-meta">
+                    <span class="settings-count-pill">@(isCollectionsLoading ? "..." : activeReminderHabitCount.ToString())</span>
+                    <span class="settings-chevron" aria-hidden="true">›</span>
                 </div>
-            }
-            else
-            {
-                <div class="archived-list">
-                    @foreach (var habit in archivedHabits)
-                    {
-                        <div class="archived-card">
-                            <div class="archived-copy">
-                                <h3>@habit.Title</h3>
-                                @if (!string.IsNullOrWhiteSpace(habit.Description))
-                                {
-                                    <p>@habit.Description</p>
-                                }
-                                <span>Archived @GetArchivedLabel(habit)</span>
-                            </div>
+            </button>
 
-                            <div class="archived-actions">
-                                <button class="glass-button archived-action restore" @onclick="() => RestoreHabit(habit.Id)">
-                                    Unarchive
-                                </button>
-                                <button class="glass-button archived-action delete" @onclick="() => DeleteHabitPermanently(habit.Id)">
-                                    Delete
-                                </button>
-                            </div>
-                        </div>
-                    }
+            <button class="settings-link-card" @onclick='() => NavManager.NavigateTo("/settings/archived-habits")'>
+                <div class="settings-link-copy">
+                    <h3>Archived Habits</h3>
+                    <p>Review hidden habits, then restore or delete them from a dedicated page.</p>
                 </div>
-            }
-
-            @if (!string.IsNullOrWhiteSpace(archiveMessage))
-            {
-                <div class="status-message fade-in">@archiveMessage</div>
-            }
+                <div class="settings-link-meta">
+                    <span class="settings-count-pill">@(isCollectionsLoading ? "..." : archivedHabitCount.ToString())</span>
+                    <span class="settings-chevron" aria-hidden="true">›</span>
+                </div>
+            </button>
         </section>
 
         <section class="settings-section glass-panel">
@@ -324,64 +317,74 @@
         color: var(--success-color);
     }
 
-    .archived-list {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    .archived-card {
-        display: flex;
-        justify-content: space-between;
-        gap: 1rem;
-        padding: 1rem 0;
-        border-top: 1px solid var(--card-border);
-    }
-
-    .archived-list .archived-card:first-child {
-        border-top: none;
-        padding-top: 0;
-    }
-
-    .archived-copy h3 {
-        margin: 0;
-        font-size: 1.05rem;
-    }
-
-    .archived-copy p {
-        margin: 0.35rem 0;
-        color: var(--text-muted);
-    }
-
-    .archived-copy span {
-        font-size: 0.85rem;
-        color: var(--text-muted);
-    }
-
-    .archived-actions {
-        display: flex;
-        gap: 0.75rem;
-        align-items: center;
-        flex-shrink: 0;
-    }
-
-    .archived-action {
-        padding: 0.9rem 1rem;
-    }
-
-    .archived-action.restore {
-        color: var(--primary-color);
-    }
-
-    .archived-action.delete {
+    .logout-btn {
         color: #f43f5e;
         border-color: rgba(244, 63, 94, 0.25);
         background: rgba(244, 63, 94, 0.08);
     }
 
-    .archived-empty {
-        padding: 0.5rem 0 0;
+    .settings-link-card {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        text-align: left;
+        padding: 1rem 0;
+        border: none;
+        border-top: 1px solid var(--card-border);
+        background: transparent;
+        color: var(--text-color);
+        cursor: pointer;
+    }
+
+    .settings-link-card:first-of-type {
+        border-top: none;
+        padding-top: 0;
+    }
+
+    .settings-link-card:last-of-type {
+        padding-bottom: 0;
+    }
+
+    .settings-link-copy h3 {
+        margin: 0;
+        font-size: 1.05rem;
+    }
+
+    .settings-link-copy p {
+        margin: 0.3rem 0 0;
         color: var(--text-muted);
+        font-size: 0.92rem;
+    }
+
+    .settings-link-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        flex-shrink: 0;
+    }
+
+    .settings-count-pill {
+        min-width: 44px;
+        padding: 0.45rem 0.75rem;
+        border-radius: 999px;
+        background: var(--card-border);
+        color: var(--text-color);
+        text-align: center;
+        font-size: 0.85rem;
+        font-weight: 700;
+    }
+
+    .settings-chevron {
+        font-size: 1.7rem;
+        line-height: 1;
+        color: var(--text-muted);
+    }
+
+    .settings-link-card:hover .settings-chevron,
+    .settings-link-card:hover .settings-link-copy h3 {
+        color: var(--primary-color);
     }
 
     .data-actions {
@@ -401,17 +404,15 @@
             align-items: flex-start;
         }
 
-        .archived-card,
-        .archived-actions {
-            flex-direction: column;
-            align-items: stretch;
-        }
-
-        .archived-action,
         .status-pill,
-        .notification-toggle {
+        .notification-toggle,
+        .settings-link-card {
             align-self: stretch;
             width: 100%;
+        }
+
+        .settings-link-card {
+            padding-right: 0;
         }
     }
 </style>
@@ -419,16 +420,16 @@
 @code {
     private string statusMessage = "";
     private string notificationMessage = "";
-    private string archiveMessage = "";
-    private List<Habitee.Models.Habit> archivedHabits = new();
-    private bool isArchivedLoading = true;
+    private int archivedHabitCount;
+    private int activeReminderHabitCount;
+    private bool isCollectionsLoading = true;
 
     protected override async Task OnInitializedAsync()
     {
         ThemeService.OnThemeChanged += StateHasChanged;
         NotificationService.StatusChanged += HandleNotificationStatusChanged;
         DbService.DataChanged += HandleDatabaseChanged;
-        await LoadArchivedHabitsAsync();
+        await LoadSettingsCollectionsAsync();
     }
 
     public void Dispose()
@@ -555,39 +556,12 @@
         };
     }
 
-    private async Task LoadArchivedHabitsAsync()
+    private async Task LoadSettingsCollectionsAsync()
     {
-        isArchivedLoading = true;
-        archivedHabits = (await DbService.GetArchivedHabitsAsync())
-            .OrderByDescending(habit => ParseArchivedAt(habit))
-            .ThenBy(habit => habit.Title)
-            .ToList();
-        isArchivedLoading = false;
-    }
-
-    private async Task RestoreHabit(string habitId)
-    {
-        await DbService.RestoreHabitAsync(habitId);
-        archiveMessage = "Habit restored to your active list.";
-        await InvokeAsync(StateHasChanged);
-    }
-
-    private async Task DeleteHabitPermanently(string habitId)
-    {
-        await DbService.DeleteHabitAsync(habitId);
-        archiveMessage = "Archived habit deleted permanently.";
-        await InvokeAsync(StateHasChanged);
-    }
-
-    private static string GetArchivedLabel(Habitee.Models.Habit habit)
-    {
-        var archivedAt = ParseArchivedAt(habit);
-        return archivedAt?.ToLocalTime().ToString("MMM d, yyyy") ?? "recently";
-    }
-
-    private static DateTimeOffset? ParseArchivedAt(Habitee.Models.Habit habit)
-    {
-        return DateTimeOffset.TryParse(habit.ArchivedAt, out var parsed) ? parsed : null;
+        isCollectionsLoading = true;
+        archivedHabitCount = (await DbService.GetArchivedHabitsAsync()).Count;
+        activeReminderHabitCount = (await DbService.GetHabitsWithActiveRemindersAsync()).Count;
+        isCollectionsLoading = false;
     }
 
     private void HandleNotificationStatusChanged()
@@ -599,8 +573,14 @@
     {
         _ = InvokeAsync(async () =>
         {
-            await LoadArchivedHabitsAsync();
+            await LoadSettingsCollectionsAsync();
             StateHasChanged();
         });
+    }
+
+    private async Task Logout()
+    {
+        await AuthService.LogoutAsync();
+        NavManager.NavigateTo("/");
     }
 }

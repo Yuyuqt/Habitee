@@ -5,6 +5,7 @@ public class Habit
     public const int MaxReminders = 5;
 
     public string Id { get; set; } = Guid.NewGuid().ToString();
+    public string? UserId { get; set; }
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string Icon { get; set; } = "check"; // svg name or path

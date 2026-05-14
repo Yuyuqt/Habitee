@@ -1,7 +1,4 @@
 @inherits LayoutComponentBase
-@using Habitee.Services
-@inject ThemeService ThemeService
-@inject DatabaseService DbService
 @inject NotificationService NotificationService
 
 <BackgroundLayer />
@@ -33,12 +30,6 @@
 </style>
 
 @code {
-    protected override async Task OnInitializedAsync()
-    {
-        await ThemeService.InitializeAsync();
-        await DbService.InitializeAsync();
-    }
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)

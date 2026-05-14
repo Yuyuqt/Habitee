@@ -30,7 +30,10 @@ public sealed class NotificationService : IAsyncDisposable
     public bool IsSupported { get; private set; }
     public string Permission { get; private set; } = "default";
     public bool AppNotificationsEnabled { get; private set; }
-    public bool CanNotify => IsSupported && Permission == "granted" && AppNotificationsEnabled;
+    public bool CanNotify => IsSupported
+        && Permission == "granted"
+        && AppNotificationsEnabled
+        && !string.IsNullOrWhiteSpace(_databaseService.CurrentUserId);
     public bool IsFirebasePushSupported { get; private set; }
     public string FcmTokenStatus { get; private set; } = "not-enabled";
     public string? FcmToken { get; private set; }
@@ -434,7 +437,7 @@ public sealed class NotificationService : IAsyncDisposable
                             body = "Time to work on this habit.",
                             icon = "/icon-192.png",
                             tag = $"habit-reminder-{habit.Id}-{reminder.Id}-{reminderDate}",
-                            url = "/"
+                            url = "/app"
                         });
 
                     if (!shown)
@@ -444,7 +447,8 @@ public sealed class NotificationService : IAsyncDisposable
 
                     await _databaseService.MarkReminderSentAsync(new SentReminder
                     {
-                        Id = BuildSentReminderId(habit.Id, reminder.Id, reminderDate),
+                        Id = BuildSentReminderId(_databaseService.CurrentUserId!, habit.Id, reminder.Id, reminderDate),
+                        UserId = _databaseService.CurrentUserId,
                         HabitId = habit.Id,
                         ReminderId = reminder.Id,
                         Date = reminderDate,
@@ -519,9 +523,9 @@ public sealed class NotificationService : IAsyncDisposable
         };
     }
 
-    private static string BuildSentReminderId(string habitId, int reminderId, string date)
+    private static string BuildSentReminderId(string userId, string habitId, int reminderId, string date)
     {
-        return $"{habitId}|{reminderId}|{date}";
+        return $"{userId}|{habitId}|{reminderId}|{date}";
     }
 
     private void NotifyStatusChanged()

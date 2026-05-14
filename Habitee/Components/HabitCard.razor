@@ -40,7 +40,7 @@
     </div>
     
     <div class="habit-graph-container">
-        <MonthlyContributionGraph Logs="Logs" TargetCount="Habit.TargetCount" Color="@Habit.Color" />
+        <MonthlyContributionGraph Logs="Logs" TargetCount="Habit.TargetCount" Color="@Habit.Color" MonthsToShow="@MonthsToShow" />
     </div>
 </div>
 
@@ -149,6 +149,9 @@
 
     [Parameter]
     public bool DisableNavigation { get; set; } = false;
+
+    [Parameter]
+    public int MonthsToShow { get; set; } = 4;
 
     private bool isPopping = false;
 

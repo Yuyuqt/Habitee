@@ -1,0 +1,15 @@
+@inherits LayoutComponentBase
+
+<BackgroundLayer />
+
+<div class="public-shell fade-in">
+    @Body
+</div>
+
+<style>
+    .public-shell {
+        min-height: 100vh;
+        position: relative;
+        z-index: 1;
+    }
+</style>

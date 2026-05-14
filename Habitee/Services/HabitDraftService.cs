@@ -75,6 +75,7 @@ public class HabitDraftService
         return new Habit
         {
             Id = source.Id,
+            UserId = source.UserId,
             Title = source.Title,
             Description = source.Description,
             Icon = source.Icon,

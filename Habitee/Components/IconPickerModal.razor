@@ -13,31 +13,42 @@
         </header>
 
         <div class="modal-body content-scroll">
-            <div class="icon-section">
-                <h3 class="section-title">ACTIVITIES</h3>
-                <div class="icon-grid">
-                    @foreach (var icon in activityIcons)
-                    {
-                        <button class="icon-swatch glass-panel @(SelectedIcon == icon ? "selected" : "")" 
-                                @onclick="() => SelectIcon(icon)">
-                            @RenderIcon(icon)
-                        </button>
-                    }
-                </div>
+            <div class="search-shell">
+                <input type="text"
+                       class="search-input glass-panel"
+                       placeholder="Search icons"
+                       @bind="searchQuery"
+                       @bind:event="oninput" />
             </div>
-            
-            <div class="icon-section">
-                <h3 class="section-title">SPORTS</h3>
-                <div class="icon-grid">
-                    @foreach (var icon in sportIcons)
-                    {
-                        <button class="icon-swatch glass-panel @(SelectedIcon == icon ? "selected" : "")" 
-                                @onclick="() => SelectIcon(icon)">
-                            @RenderIcon(icon)
-                        </button>
-                    }
+
+            @if (VisibleIconGroups.Any())
+            {
+                @foreach (var group in VisibleIconGroups)
+                {
+                    <div class="icon-section">
+                        <h3 class="section-title">@group.Key.ToUpperInvariant()</h3>
+                        <div class="icon-grid">
+                            @foreach (var icon in group)
+                            {
+                                <button class="icon-swatch glass-panel @(SelectedIcon == icon.Key ? "selected" : "")"
+                                        @onclick="() => SelectIcon(icon.Key)"
+                                        title="@icon.Label"
+                                        aria-label="@icon.Label">
+                                    <HabitIcon Name="@icon.Key" Color="currentColor" Size="24" />
+                                    <span class="icon-label">@icon.Label</span>
+                                </button>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="empty-state glass-panel">
+                    <h3>No icons found</h3>
+                    <p>Try a different word like health, work, travel, or focus.</p>
                 </div>
-            </div>
+            }
 
             <div style="height: 50px;"></div>
         </div>
@@ -45,7 +56,6 @@
 </div>
 
 <style>
-    /* Most styles shared with ColorPicker, but keeping scoped for clarity or move to global later */
     .modal-overlay {
         position: fixed;
         top: 0;
@@ -81,6 +91,7 @@
         justify-content: space-between;
         align-items: center;
         padding: 1.5rem;
+        gap: 1rem;
     }
 
     .modal-title {
@@ -104,6 +115,29 @@
         padding: 0 1.5rem;
     }
 
+    .search-shell {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        padding: 0.25rem 0 1rem;
+        background: linear-gradient(to bottom, var(--bg-color) 78%, transparent);
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 0.95rem 1rem;
+        border-radius: 16px;
+        border: var(--outline-width, 1px) solid var(--card-border);
+        background: var(--card-bg);
+        color: var(--text-color);
+        font-family: inherit;
+        font-size: 0.98rem;
+    }
+
+    .search-input::placeholder {
+        color: var(--text-muted);
+    }
+
     .icon-section {
         margin-bottom: 2rem;
     }
@@ -113,37 +147,81 @@
         font-weight: 600;
         color: var(--text-muted);
         letter-spacing: 1px;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.75rem;
         text-transform: uppercase;
     }
 
     .icon-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
         gap: 0.75rem;
     }
 
     .icon-swatch {
-        aspect-ratio: 1;
-        border-radius: 12px;
+        min-height: 88px;
+        padding: 0.85rem 0.5rem 0.65rem;
+        border-radius: 16px;
         border: var(--outline-width, 1px) solid var(--card-border);
         background: var(--card-bg);
         cursor: pointer;
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
-        transition: all 0.2s;
+        gap: 0.55rem;
+        transition: transform 0.2s, border-color 0.2s, background-color 0.2s, color 0.2s;
         color: var(--text-color);
+        text-align: center;
     }
-    
+
     .icon-swatch:active {
-        transform: scale(0.9);
+        transform: scale(0.95);
     }
 
     .icon-swatch.selected {
         border-color: var(--primary-color);
         color: var(--primary-color);
-        background: rgba(var(--primary-color), 0.1); /* Assuming primary-color can be rgba, if not just slightly tinted */
+        background: color-mix(in srgb, var(--primary-color) 12%, var(--card-bg));
+    }
+
+    .icon-label {
+        font-size: 0.72rem;
+        line-height: 1.15;
+    }
+
+    .empty-state {
+        padding: 1.25rem;
+        border-radius: 20px;
+        border: var(--outline-width, 1px) solid var(--card-border);
+        background: var(--card-bg);
+        text-align: center;
+        color: var(--text-muted);
+    }
+
+    .empty-state h3 {
+        margin: 0 0 0.35rem;
+        color: var(--text-color);
+        font-size: 1rem;
+    }
+
+    .empty-state p {
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+    @@media (max-width: 480px) {
+        .content-scroll {
+            padding: 0 1rem;
+        }
+
+        .icon-grid {
+            grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+        }
+
+        .icon-swatch {
+            min-height: 80px;
+            padding: 0.75rem 0.45rem 0.6rem;
+        }
     }
 </style>
 
@@ -157,43 +235,27 @@
     [Parameter]
     public EventCallback OnClose { get; set; }
 
+    private string searchQuery = string.Empty;
+
+    private List<IGrouping<string, HabitIconDefinition>> VisibleIconGroups => HabitIconCatalog.All
+        .Where(IsVisible)
+        .GroupBy(icon => icon.Category)
+        .ToList();
+
     private async Task SelectIcon(string icon)
     {
         SelectedIcon = icon;
         await OnIconSelected.InvokeAsync(icon);
     }
 
-    private string[] activityIcons = new[] { "target", "water", "book", "pill", "code", "heart" };
-    private string[] sportIcons = new[] { "dumbbell", "bike", "run" };
-
-    // A helper to map icon names to SVG strings (simplified for this demo)
-    private RenderFragment RenderIcon(string name) => builder =>
+    private bool IsVisible(HabitIconDefinition icon)
     {
-        // Simple fallback SVGs using Feather icons format
-        string svgPath = name switch
+        if (string.IsNullOrWhiteSpace(searchQuery))
         {
-            "target" => "<circle cx=\"12\" cy=\"12\" r=\"10\"></circle><circle cx=\"12\" cy=\"12\" r=\"6\"></circle><circle cx=\"12\" cy=\"12\" r=\"2\"></circle>",
-            "water" => "<path d=\"M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z\"></path>",
-            "book" => "<path d=\"M4 19.5A2.5 2.5 0 0 1 6.5 17H20\"></path><path d=\"M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z\"></path>",
-            "pill" => "<path d=\"M14 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6z\"></path><path d=\"M14 3v5h5M16 13H8M16 17H8\"></path>", // Note: this is actually a file icon, but we'll use it as placeholder
-            "code" => "<polyline points=\"16 18 22 12 16 6\"></polyline><polyline points=\"8 6 2 12 8 18\"></polyline>",
-            "heart" => "<path d=\"M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z\"></path>",
-            "dumbbell" => "<path d=\"M14.4 14.4l5.6-5.6\"></path><path d=\"M20 12l2 2\"></path><path d=\"M2 10l2 2\"></path><path d=\"M9.6 9.6l-5.6 5.6\"></path><path d=\"M14 2l8 8\"></path><path d=\"M2 14l8 8\"></path>",
-            "bike" => "<circle cx=\"5.5\" cy=\"17.5\" r=\"3.5\"></circle><circle cx=\"18.5\" cy=\"17.5\" r=\"3.5\"></circle><path d=\"M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5V14l-3-3 4-3 2 3h2\"></path>",
-            "run" => "<path d=\"M13 4v4l-4 2\"></path><path d=\"M13 14l4-4\"></path><path d=\"M13 18l-3-4\"></path><path d=\"M16 22l-3-4\"></path>",
-            _ => "<circle cx=\"12\" cy=\"12\" r=\"10\"></circle><path d=\"M12 8v8\"></path><path d=\"M8 12h8\"></path>" // check/plus fallback
-        };
+            return true;
+        }
 
-        builder.OpenElement(0, "svg");
-        builder.AddAttribute(1, "width", "24");
-        builder.AddAttribute(2, "height", "24");
-        builder.AddAttribute(3, "viewBox", "0 0 24 24");
-        builder.AddAttribute(4, "fill", "none");
-        builder.AddAttribute(5, "stroke", "currentColor");
-        builder.AddAttribute(6, "stroke-width", "2");
-        builder.AddAttribute(7, "stroke-linecap", "round");
-        builder.AddAttribute(8, "stroke-linejoin", "round");
-        builder.AddMarkupContent(9, svgPath);
-        builder.CloseElement();
-    };
+        return icon.Label.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
+            || icon.Category.Contains(searchQuery, StringComparison.OrdinalIgnoreCase);
+    }
 }

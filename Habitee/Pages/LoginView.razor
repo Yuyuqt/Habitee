@@ -1,0 +1,157 @@
+@page "/login"
+@layout Habitee.Layout.PublicLayout
+@inject AuthService AuthService
+@inject NavigationManager NavManager
+
+<PageTitle>Log In - Habitee</PageTitle>
+
+<div class="auth-page">
+    <div class="auth-card glass-panel">
+        <button class="back-link" @onclick='() => NavManager.NavigateTo("/")'>← Back to preview</button>
+        <h1>Welcome back</h1>
+        <p class="auth-subtitle">Log in to your local Habitee account on this device.</p>
+
+        <div class="auth-form">
+            <div class="input-group">
+                <label>Email</label>
+                <input class="glass-input" @bind="email" @bind:event="oninput" type="email" />
+            </div>
+
+            <div class="input-group">
+                <label>Password</label>
+                <input class="glass-input" @bind="password" @bind:event="oninput" type="password" />
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(errorMessage))
+            {
+                <div class="auth-error">@errorMessage</div>
+            }
+
+            <button class="glass-button auth-primary" @onclick="Login" disabled="@isSubmitting">
+                @(isSubmitting ? "Logging in..." : "Log In")
+            </button>
+
+            <p class="auth-footer">
+                Need an account?
+                <button class="inline-link" @onclick="GoToSignup">Create one here</button>
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .auth-page {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+    }
+
+    .auth-card {
+        width: 100%;
+        max-width: 460px;
+        padding: 2rem;
+    }
+
+    .back-link,
+    .inline-link {
+        border: none;
+        background: none;
+        color: var(--primary-color);
+        padding: 0;
+        cursor: pointer;
+        font: inherit;
+    }
+
+    .auth-card h1 {
+        margin-bottom: 0.4rem;
+    }
+
+    .auth-subtitle,
+    .auth-footer {
+        color: var(--text-muted);
+    }
+
+    .auth-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.45rem;
+    }
+
+    .input-group label {
+        font-weight: 700;
+        font-size: 0.85rem;
+    }
+
+    .glass-input {
+        width: 100%;
+        padding: 1rem;
+        border-radius: 16px;
+        border: var(--outline-width, 1px) solid var(--card-border);
+        background: var(--card-bg);
+        color: var(--text-color);
+        font: inherit;
+    }
+
+    .auth-primary {
+        background: var(--primary-color);
+        color: white;
+        border-color: transparent;
+        padding: 1rem;
+    }
+
+    .auth-error {
+        padding: 0.9rem 1rem;
+        border-radius: 14px;
+        background: rgba(244, 63, 94, 0.12);
+        color: #f43f5e;
+    }
+</style>
+
+@code {
+    [SupplyParameterFromQuery]
+    public string? ReturnUrl { get; set; }
+
+    private string email = string.Empty;
+    private string password = string.Empty;
+    private string errorMessage = string.Empty;
+    private bool isSubmitting;
+
+    private async Task Login()
+    {
+        errorMessage = string.Empty;
+        isSubmitting = true;
+
+        var result = await AuthService.LoginAsync(email, password);
+
+        isSubmitting = false;
+
+        if (!result.Success)
+        {
+            errorMessage = result.ErrorMessage ?? "Login failed.";
+            return;
+        }
+
+        NavManager.NavigateTo(GetSafeReturnUrl(), replace: true);
+    }
+
+    private void GoToSignup()
+    {
+        NavManager.NavigateTo($"/signup?returnUrl={Uri.EscapeDataString(GetSafeReturnUrl())}");
+    }
+
+    private string GetSafeReturnUrl()
+    {
+        return !string.IsNullOrWhiteSpace(ReturnUrl) && ReturnUrl.StartsWith("/") && !ReturnUrl.StartsWith("//")
+            ? ReturnUrl
+            : "/app";
+    }
+}

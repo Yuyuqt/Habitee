@@ -6,7 +6,7 @@
 
 <div class="view-container slide-in">
     <header class="app-header">
-        <button class="icon-btn" @onclick='() => NavManager.NavigateTo("/")'>
+        <button class="icon-btn" @onclick='() => NavManager.NavigateTo("/app")'>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
         <h1 class="header-title">@habit?.Title</h1>
@@ -34,9 +34,9 @@
         </div>
 
         <div class="fixed-bottom">
-            <button class="archive-btn glass-panel" @onclick="ArchiveHabit">
+            <button class="archive-btn glass-panel @(habit?.IsArchived == true ? "restore-mode" : "")" @onclick="ToggleArchiveState">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>
-                Archive
+                @(habit?.IsArchived == true ? "Unarchive" : "Archive")
             </button>
         </div>
     }
@@ -44,7 +44,7 @@
     {
         <div class="empty-state">
             <p>Habit not found.</p>
-            <button class="glass-button" @onclick='() => NavManager.NavigateTo("/")'>Go Back</button>
+            <button class="glass-button" @onclick='() => NavManager.NavigateTo("/app")'>Go Back</button>
         </div>
     }
 </div>
@@ -127,6 +127,16 @@
     .archive-btn:hover {
         background: rgba(244, 63, 94, 0.2);
     }
+
+    .archive-btn.restore-mode {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--primary-color);
+        border-color: color-mix(in srgb, var(--primary-color) 35%, transparent);
+    }
+
+    .archive-btn.restore-mode:hover {
+        background: rgba(59, 130, 246, 0.18);
+    }
 </style>
 
 @code {
@@ -167,12 +177,20 @@
         }
     }
 
-    private async Task ArchiveHabit()
+    private async Task ToggleArchiveState()
     {
         if (habit != null)
         {
-            await DbService.ArchiveHabitAsync(habit.Id);
-            NavManager.NavigateTo("/");
+            if (habit.IsArchived)
+            {
+                await DbService.RestoreHabitAsync(habit.Id);
+            }
+            else
+            {
+                await DbService.ArchiveHabitAsync(habit.Id);
+            }
+
+            NavManager.NavigateTo("/app");
         }
     }
 }

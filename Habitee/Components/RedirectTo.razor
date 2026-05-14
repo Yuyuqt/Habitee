@@ -1,0 +1,28 @@
+@inject NavigationManager NavManager
+
+<div class="redirect-shell">
+    <p>Redirecting...</p>
+</div>
+
+<style>
+    .redirect-shell {
+        min-height: 40vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-muted);
+    }
+</style>
+
+@code {
+    [Parameter]
+    public string Url { get; set; } = "/";
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            NavManager.NavigateTo(Url, replace: true);
+        }
+    }
+}

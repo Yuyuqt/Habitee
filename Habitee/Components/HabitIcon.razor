@@ -24,23 +24,5 @@
     [Parameter] public string Color { get; set; } = "var(--primary-color)";
     [Parameter] public int Size { get; set; } = 24;
 
-    private string GetIconPath(string name) => name switch
-    {
-        "target" => "<circle cx=\"12\" cy=\"12\" r=\"10\"></circle><circle cx=\"12\" cy=\"12\" r=\"6\"></circle><circle cx=\"12\" cy=\"12\" r=\"2\"></circle>",
-        "water" => "<path d=\"M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z\"></path>",
-        "book" => "<path d=\"M4 19.5A2.5 2.5 0 0 1 6.5 17H20\"></path><path d=\"M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z\"></path>",
-        "pill" => "<path d=\"M14 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6z\"></path><path d=\"M14 3v5h5M16 13H8M16 17H8\"></path>",
-        "code" => "<polyline points=\"16 18 22 12 16 6\"></polyline><polyline points=\"8 6 2 12 8 18\"></polyline>",
-        "heart" => "<path d=\"M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z\"></path>",
-        "dumbbell" => "<path d=\"M14.4 14.4l5.6-5.6\"></path><path d=\"M20 12l2 2\"></path><path d=\"M2 10l2 2\"></path><path d=\"M9.6 9.6l-5.6 5.6\"></path><path d=\"M14 2l8 8\"></path><path d=\"M2 14l8 8\"></path>",
-        "bike" => "<circle cx=\"5.5\" cy=\"17.5\" r=\"3.5\"></circle><circle cx=\"18.5\" cy=\"17.5\" r=\"3.5\"></circle><path d=\"M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5V14l-3-3 4-3 2 3h2\"></path>",
-        "run" => "<path d=\"M13 4v4l-4 2\"></path><path d=\"M13 14l4-4\"></path><path d=\"M13 18l-3-4\"></path><path d=\"M16 22l-3-4\"></path>",
-        "cutlery" => "<path d=\"M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2\"></path><path d=\"M7 2v20\"></path><path d=\"M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7\"></path>",
-        "burger" => "<path d=\"M3 11h18\"></path><path d=\"M4 11a8 8 0 0 1 16 0\"></path><path d=\"M4 17a4 4 0 0 0 4 4h8a4 4 0 0 0 4-4\"></path><path d=\"M3 14h18\"></path>",
-        "soda" => "<path d=\"M6 5h12\"></path><path d=\"M8 5v14a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V5\"></path><path d=\"M9 2l3 3 3-3\"></path>",
-        "sugar" => "<path d=\"M12 2v20\"></path><path d=\"M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6\"></path>",
-        "meditate" => "<circle cx=\"12\" cy=\"6\" r=\"2\"></circle><path d=\"M12 10v4\"></path><path d=\"M8 14h8\"></path><path d=\"M5 18l3-4\"></path><path d=\"M19 18l-3-4\"></path>",
-        "tooth" => "<path d=\"M12 21a3 3 0 0 1-3-3V6a3 3 0 0 1 6 0v12a3 3 0 0 1-3 3z\"></path><path d=\"M15 15H9\"></path>",
-        _ => "<polyline points=\"20 6 9 17 4 12\"></polyline>" // check
-    };
+    private string GetIconPath(string name) => HabitIconCatalog.GetSvgPath(name);
 }
