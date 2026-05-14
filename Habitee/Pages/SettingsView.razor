@@ -250,31 +250,34 @@
     }
 
     .theme-btn {
+        --theme-preview: var(--primary-color);
         padding: 1rem;
-        border-radius: 12px;
-        border: 2px solid transparent;
-        background: var(--theme-btn-bg, var(--card-border));
-        color: var(--theme-btn-text, var(--text-color));
+        border-radius: 14px;
+        border: 1px solid color-mix(in srgb, var(--theme-preview) 22%, var(--card-border));
+        background: color-mix(in srgb, var(--theme-preview) 8%, var(--card-bg));
+        color: var(--text-color);
         cursor: pointer;
         font-weight: 600;
-        transition: all 0.2s ease;
+        transition: background-color 0.16s ease, border-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease;
         font-size: var(--font-size-body-sm);
+        box-shadow: none;
+        text-align: left;
     }
 
     .theme-btn.selected {
         border-color: var(--primary-color);
-        box-shadow: 0 0 15px color-mix(in srgb, var(--primary-color) 28%, transparent);
+        box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary-color) 22%, transparent);
     }
 
-    .theme-btn.habitee { border-left: 4px solid #3b82f6; font-family: 'Inter', sans-serif; }
-    .theme-btn.pastel { border-left: 4px solid #a0dee6; font-family: 'Comfortaa', cursive; }
-    .theme-btn.sakura { border-left: 4px solid #df7fa3; font-family: 'Quicksand', 'Nunito', sans-serif; }
-    .theme-btn.galaxy { border-left: 4px solid #8b5cf6; font-family: 'Inter', sans-serif; }
-    .theme-btn.cyberpunk { border-left: 4px solid #f43f5e; font-family: 'JetBrains Mono', monospace; }
-    .theme-btn.matcha { border-left: 4px solid #7b9165; font-family: 'Nunito', 'Quicksand', sans-serif; }
-    .theme-btn.retro { border-left: 4px solid #ff4fd8; font-family: 'Press Start 2P', 'JetBrains Mono', monospace; font-size: 0.7rem; line-height: 1.4; }
-    .theme-btn.ocean { border-left: 4px solid #0c90b6; font-family: 'Nunito', 'Inter', sans-serif; }
-    .theme-btn.paper { border-left: 4px solid #2f76b8; font-family: 'Comfortaa', 'Nunito', sans-serif; }
+    .theme-btn.habitee { --theme-preview: #2563eb; }
+    .theme-btn.pastel { --theme-preview: #d98ca7; }
+    .theme-btn.sakura { --theme-preview: #d96b93; }
+    .theme-btn.galaxy { --theme-preview: #5b67d6; }
+    .theme-btn.cyberpunk { --theme-preview: #e11d48; }
+    .theme-btn.matcha { --theme-preview: #718355; }
+    .theme-btn.retro { --theme-preview: #c026d3; }
+    .theme-btn.ocean { --theme-preview: #0f7490; }
+    .theme-btn.paper { --theme-preview: #3b82f6; }
 
     .notification-actions {
         display: flex;

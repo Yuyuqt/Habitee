@@ -98,12 +98,8 @@
         justify-content: center;
         cursor: pointer;
         color: var(--text-color);
-        transition: transform 0.2s;
+        transition: background-color 0.16s ease, border-color 0.16s ease;
         border: var(--outline-width, 1px) solid var(--card-border);
-    }
-    
-    .nav-btn:active {
-        transform: scale(0.95);
     }
 
     .weekdays {
@@ -153,7 +149,7 @@
     }
 
     .day-cell.completed {
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        box-shadow: none;
         color: var(--primary-contrast); /* Fallback if inline style fails */
     }
 

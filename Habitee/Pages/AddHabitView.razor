@@ -192,11 +192,7 @@
         padding: 1rem;
         gap: 1rem;
         cursor: pointer;
-        transition: transform 0.2s;
-    }
-
-    .template-card:active {
-        transform: scale(0.98);
+        transition: border-color 0.16s ease, box-shadow 0.16s ease, background-color 0.16s ease;
     }
 
 
@@ -243,7 +239,7 @@
         padding: 1rem;
         font-size: var(--font-size-card-title);
         border-radius: 16px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        box-shadow: none;
         pointer-events: auto;
         color: var(--primary-contrast);
     }

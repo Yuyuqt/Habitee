@@ -1,12 +1,10 @@
 @using Habitee.Models
 @using Habitee.Services
-@inject ThemeService ThemeService
-@inject ConfettiService ConfettiService
 @inject NavigationManager NavManager
 
-<div class="habit-card glass-panel card-hover-lift @(ThemeService.CurrentTheme == "pastel" ? "pastel-card" : "")" @onclick="GoToDetail">
+<div class="habit-card glass-panel card-hover-lift" @onclick="GoToDetail">
     <div class="habit-header">
-        <div class="habit-icon-shell @(isPopping ? "animate-pop" : "")" style="@($"--habit-color: {Habit.Color};")">
+        <div class="habit-icon-shell" style="@($"--habit-color: {Habit.Color};")">
             <HabitIcon Name="@Habit.Icon" Color="@Habit.Color" Size="28" />
         </div>
         
@@ -22,7 +20,7 @@
             <span class="habit-streak">
                 @CurrentCount of @Habit.TargetCount
             </span>
-            <button class="habit-action glass-button @(ThemeService.CurrentTheme == "pastel" ? "pastel-action" : "")" @onclick="CompleteHabit" @onclick:stopPropagation="true">
+            <button class="habit-action glass-button" @onclick="CompleteHabit" @onclick:stopPropagation="true">
                 @if (IsCompletedToday)
                 {
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--success-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
@@ -59,14 +57,6 @@
         align-items: center;
         gap: 1rem;
         width: 100%;
-    }
-
-    .pastel-card {
-        border-width: 2px !important;
-    }
-
-    [data-theme="sakura"] .habit-card {
-        border-width: 1.5px;
     }
 
     .habit-icon-shell {
@@ -143,72 +133,6 @@
         color: var(--text-color);
     }
 
-    .pastel-action {
-        border-width: 2px !important;
-    }
-
-    [data-theme="sakura"] .habit-action {
-        border-color: color-mix(in srgb, var(--sakura-frame-strong) 65%, white 35%);
-    }
-
-    [data-theme="sakura"][data-theme-mode="light"] .habit-action {
-        background: linear-gradient(180deg, rgba(255, 241, 247, 0.96) 0%, rgba(248, 221, 233, 0.9) 100%);
-        border-color: color-mix(in srgb, var(--sakura-frame-strong) 78%, white 22%);
-        box-shadow:
-            0 8px 18px rgba(197, 121, 160, 0.14),
-            inset 0 1px 0 rgba(255, 255, 255, 0.82);
-    }
-
-    [data-theme="matcha"] .habit-card {
-        border-color: color-mix(in srgb, var(--primary-color) 24%, var(--card-border));
-    }
-
-    [data-theme="matcha"] .habit-action {
-        background: linear-gradient(180deg, rgba(255, 250, 239, 0.94) 0%, rgba(238, 233, 212, 0.82) 100%);
-        border-color: color-mix(in srgb, var(--primary-color) 36%, var(--card-border));
-    }
-
-    [data-theme="retro"] .habit-card,
-    [data-theme="retro"] .habit-action {
-        border-radius: 6px !important;
-    }
-
-    [data-theme="retro"] .habit-title,
-    [data-theme="retro"] .habit-streak,
-    [data-theme="retro"] .habit-action {
-        font-family: 'Press Start 2P', 'JetBrains Mono', monospace;
-    }
-
-    [data-theme="retro"] .habit-title {
-        font-size: 0.88rem;
-        line-height: 1.35;
-    }
-
-    [data-theme="retro"] .habit-streak {
-        font-size: 0.68rem;
-    }
-
-    [data-theme="retro"] .habit-action {
-        border-width: 2px;
-    }
-
-    [data-theme="ocean"] .habit-action {
-        background: linear-gradient(180deg, color-mix(in srgb, var(--card-bg) 88%, rgba(255, 255, 255, 0.12)) 0%, color-mix(in srgb, var(--card-bg) 96%, transparent) 100%);
-        border-color: color-mix(in srgb, var(--accent-color) 44%, var(--card-border));
-        box-shadow:
-            0 10px 20px rgba(3, 40, 52, 0.16),
-            inset 0 1px 0 rgba(255, 255, 255, 0.18);
-    }
-
-    [data-theme="paper"] .habit-card {
-        border-style: solid;
-    }
-
-    [data-theme="paper"] .habit-action {
-        border-radius: 18px !important;
-        border-color: var(--paper-ink-strong);
-        box-shadow: 2px 3px 0 rgba(0, 0, 0, 0.08);
-    }
 </style>
 
 @code {
@@ -227,8 +151,6 @@
     [Parameter]
     public int MonthsToShow { get; set; } = 4;
 
-    private bool isPopping = false;
-
     private HabitLog? TodayLog => Logs.FirstOrDefault(l => l.Date == DateTime.Today.ToString("yyyy-MM-dd"));
     private int CurrentCount => DatabaseService.NormalizeCompletedCount(TodayLog?.CompletedCount ?? 0, Habit.TargetCount);
     private bool IsCompletedToday => DatabaseService.IsCompleteForTarget(TodayLog?.CompletedCount ?? 0, Habit.TargetCount);
@@ -243,17 +165,6 @@
 
     private async Task CompleteHabit()
     {
-        var nextCount = DatabaseService.GetNextCompletedCount(TodayLog?.CompletedCount ?? 0, Habit.TargetCount);
-
-        isPopping = false;
-        await Task.Delay(10); // reset animation
-        isPopping = true;
-        
         await OnComplete.InvokeAsync(Habit);
-
-        if (nextCount == Math.Max(1, Habit.TargetCount))
-        {
-            ConfettiService.TriggerBurst();
-        }
     }
 }

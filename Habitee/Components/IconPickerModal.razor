@@ -1,6 +1,6 @@
 @using Microsoft.AspNetCore.Components
 
-<div class="modal-overlay slide-up">
+<div class="modal-overlay">
     <div class="modal-content">
         <header class="modal-header">
             <button class="icon-btn" @onclick="OnClose">
@@ -68,22 +68,13 @@
         justify-content: center;
     }
 
-    .slide-up {
-        animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-
-    @@keyframes slideUp {
-        from { transform: translateY(100%); }
-        to { transform: translateY(0); }
-    }
-
     .modal-content {
         width: 100%;
         max-width: 800px;
         height: 100%;
         display: flex;
         flex-direction: column;
-        background: var(--bg-gradient, var(--bg-color));
+        background: var(--bg-color);
     }
 
     .modal-header {
@@ -120,7 +111,7 @@
         top: 0;
         z-index: 2;
         padding: 0.25rem 0 1rem;
-        background: linear-gradient(to bottom, var(--bg-color) 78%, transparent);
+        background: linear-gradient(to bottom, var(--bg-color) 82%, transparent);
     }
 
     .search-input {
@@ -169,13 +160,9 @@
         align-items: center;
         justify-content: center;
         gap: 0.55rem;
-        transition: transform 0.2s, border-color 0.2s, background-color 0.2s, color 0.2s;
+        transition: border-color 0.16s ease, background-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease;
         color: var(--text-color);
         text-align: center;
-    }
-
-    .icon-swatch:active {
-        transform: scale(0.95);
     }
 
     .icon-swatch.selected {

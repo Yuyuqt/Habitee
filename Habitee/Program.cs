@@ -11,7 +11,6 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 builder.Services.AddScoped<DatabaseService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<ThemeService>();
-builder.Services.AddScoped<ConfettiService>();
 builder.Services.AddScoped<HabitDraftService>();
 builder.Services.AddScoped<NotificationService>();
 

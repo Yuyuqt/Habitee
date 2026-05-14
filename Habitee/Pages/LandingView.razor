@@ -11,7 +11,7 @@
     <div class="hero-section">
         <h1 class="hero-title">
             Your habits, <br/>
-            <span class="text-gradient">beautifully tracked.</span>
+            <span class="text-accent">beautifully tracked.</span>
         </h1>
         <p class="hero-subtitle">
             A minimalist, local-first habit tracker that respects your privacy. 
@@ -84,10 +84,8 @@
         letter-spacing: -0.02em;
     }
 
-    .text-gradient {
-        background: linear-gradient(to right, var(--primary-color), #8B5CF6);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+    .text-accent {
+        color: var(--primary-color);
     }
 
     .hero-subtitle {
@@ -109,26 +107,23 @@
         color: white;
         border: none;
         padding: 0.875rem 1.5rem;
-        border-radius: 9999px;
+        border-radius: 14px;
         font-size: 1.1rem;
         font-weight: 600;
         cursor: pointer;
-        transition: all 0.2s ease;
-        box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+        transition: background-color 0.16s ease, box-shadow 0.16s ease;
+        box-shadow: none;
     }
 
     .primary-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+        background: color-mix(in srgb, var(--primary-color) 92%, black 8%);
     }
 
     .secondary-btn {
         padding: 0.875rem 1.5rem;
-        border-radius: 9999px;
+        border-radius: 14px;
         font-size: 1.1rem;
         font-weight: 600;
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
     }
 
     /* App Frame (Showcase) */
@@ -137,13 +132,11 @@
     }
 
     .app-frame {
-        border-radius: 24px;
+        border-radius: var(--border-radius);
         overflow: hidden;
         background: var(--card-bg);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
         border: 1px solid var(--card-border);
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+        box-shadow: var(--card-shadow);
         padding: 0.5rem; /* slight horizontal padding around inner frame */
     }
 
@@ -199,8 +192,8 @@
 
     .graph-showcase {
         padding: 1.5rem;
-        border-radius: 16px;
-        background: color-mix(in srgb, var(--card-bg) 90%, white 2%);
+        border-radius: var(--border-radius);
+        background: var(--card-bg);
     }
 
     .graph-title {

@@ -4,7 +4,6 @@
 @using Habitee.Services
 @inject DatabaseService DbService
 @inject NavigationManager NavManager
-@inject ThemeService ThemeService
 
 <div class="grid-view fade-in">
     <header class="grid-header">
@@ -32,7 +31,7 @@
                 var habitLogs = logs.Where(log => log.HabitId == habit.Id).ToList();
                 var todayProgress = GetTodayProgress(habit, habitLogs);
 
-                <div class="grid-habit-card glass-panel @(ThemeService.CurrentTheme == "pastel" ? "pastel-card" : "")"
+                <div class="grid-habit-card glass-panel"
                      @onclick='() => NavManager.NavigateTo($"/habit/{habit.Id}")'>
                     <div class="grid-card-top">
                         <div class="grid-habit-copy">
@@ -78,7 +77,7 @@
                 </div>
             }
 
-            <button class="grid-habit-card add-habit-card glass-panel @(ThemeService.CurrentTheme == "pastel" ? "pastel-card" : "")"
+            <button class="grid-habit-card add-habit-card glass-panel"
                     @onclick='() => NavManager.NavigateTo("/add-habit")'>
                 <div class="add-icon">
                     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -151,17 +150,6 @@
         box-shadow: var(--card-shadow);
         position: relative;
         overflow: hidden;
-    }
-
-    .pastel-card {
-        border-width: 2px;
-    }
-
-    [data-theme="sakura"] .grid-habit-card {
-        border-width: 1.5px;
-        box-shadow:
-            var(--card-shadow),
-            inset 0 1px 0 rgba(255, 255, 255, 0.18);
     }
 
     .grid-card-top {
@@ -248,19 +236,6 @@
         border-color: transparent;
     }
 
-    [data-theme="sakura"] .grid-status-badge {
-        background: color-mix(in srgb, var(--card-bg) 88%, white 12%);
-        border-color: color-mix(in srgb, var(--habit-color) 34%, var(--sakura-frame-soft));
-    }
-
-    [data-theme="sakura"][data-theme-mode="light"] .grid-status-badge {
-        background: linear-gradient(180deg, rgba(255, 241, 247, 0.96) 0%, rgba(247, 223, 233, 0.92) 100%);
-        border-color: color-mix(in srgb, var(--habit-color) 44%, var(--sakura-frame-strong));
-        box-shadow:
-            0 8px 16px rgba(193, 122, 158, 0.12),
-            inset 0 1px 0 rgba(255, 255, 255, 0.82);
-    }
-
     .grid-status-badge.partial {
         color: var(--habit-color);
     }
@@ -289,62 +264,6 @@
         justify-content: center;
         background: rgba(255, 255, 255, 0.1);
         color: var(--primary-color);
-    }
-
-    [data-theme="sakura"] .add-icon {
-        background: linear-gradient(180deg, rgba(255, 247, 250, 0.84) 0%, rgba(248, 229, 238, 0.74) 100%);
-    }
-
-    [data-theme="matcha"] .grid-habit-card {
-        border-color: color-mix(in srgb, var(--primary-color) 24%, var(--card-border));
-    }
-
-    [data-theme="retro"] .grid-habit-card,
-    [data-theme="retro"] .grid-status-badge,
-    [data-theme="retro"] .add-icon {
-        border-radius: 6px !important;
-    }
-
-    [data-theme="retro"] .grid-copy-text h3,
-    [data-theme="retro"] .grid-status-badge,
-    [data-theme="retro"] .add-copy h3 {
-        font-family: 'Press Start 2P', 'JetBrains Mono', monospace;
-    }
-
-    [data-theme="retro"] .grid-copy-text h3 {
-        font-size: 0.72rem;
-        line-height: 1.45;
-    }
-
-    [data-theme="retro"] .grid-status-badge {
-        border-width: 2px;
-        box-shadow:
-            3px 3px 0 color-mix(in srgb, var(--accent-color) 30%, transparent),
-            0 0 12px color-mix(in srgb, var(--primary-color) 18%, transparent);
-    }
-
-    [data-theme="retro"] .add-icon {
-        background: color-mix(in srgb, var(--primary-color) 16%, var(--card-bg));
-        border: 2px solid color-mix(in srgb, var(--accent-color) 50%, transparent);
-    }
-
-    [data-theme="ocean"] .grid-status-badge {
-        background: linear-gradient(180deg, color-mix(in srgb, var(--card-bg) 88%, rgba(255, 255, 255, 0.14)) 0%, color-mix(in srgb, var(--card-bg) 96%, transparent) 100%);
-        border-color: color-mix(in srgb, var(--accent-color) 46%, var(--card-border));
-        box-shadow:
-            0 10px 18px rgba(2, 33, 44, 0.16),
-            inset 0 1px 0 rgba(255, 255, 255, 0.18);
-    }
-
-    [data-theme="paper"] .grid-habit-card {
-        border-style: solid;
-    }
-
-    [data-theme="paper"] .grid-status-badge,
-    [data-theme="paper"] .add-icon {
-        border-radius: 16px !important;
-        border-color: var(--paper-ink-strong);
-        box-shadow: 2px 3px 0 rgba(0, 0, 0, 0.08);
     }
 
     .add-copy h3 {

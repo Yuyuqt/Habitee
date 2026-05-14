@@ -10,7 +10,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;600&family=Nunito:wght@400;500;600;700;800&family=Press+Start+2P&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Custom Styles -->
     <link rel="stylesheet" href="css/themes.css" />
@@ -33,123 +33,54 @@
             align-items: center;
             justify-content: center;
             padding: 1.5rem;
-            background:
-                radial-gradient(circle at top, rgba(59, 130, 246, 0.20), transparent 38%),
-                linear-gradient(180deg, #f6fbff 0%, #eef7ff 48%, #f9fcff 100%);
-            color: #16314f;
-            font-family: 'Nunito', 'Inter', sans-serif;
+            background: #f5f7fb;
+            color: #1f2937;
+            font-family: 'Inter', sans-serif;
         }
 
         .boot-card {
             width: min(420px, 100%);
             padding: 2rem 1.75rem;
-            border-radius: 28px;
+            border-radius: 18px;
             text-align: center;
-            background: rgba(255, 255, 255, 0.72);
-            border: 1px solid rgba(255, 255, 255, 0.85);
-            box-shadow:
-                0 24px 60px rgba(30, 64, 175, 0.12),
-                inset 0 1px 0 rgba(255, 255, 255, 0.78);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
+            background: #ffffff;
+            border: 1px solid #d7deea;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
         }
 
         .boot-mark {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 1.2rem;
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 1rem;
             position: relative;
         }
 
-        .boot-ring,
-        .boot-core {
+        .boot-spinner {
             position: absolute;
             inset: 0;
             border-radius: 50%;
-        }
-
-        .boot-ring {
-            border: 2px solid rgba(59, 130, 246, 0.14);
-        }
-
-        .boot-ring.outer {
+            border: 3px solid #d7deea;
             border-top-color: #2563eb;
-            animation: bootSpin 1.05s linear infinite;
-        }
-
-        .boot-ring.inner {
-            inset: 12px;
-            border-bottom-color: #60a5fa;
-            animation: bootSpinReverse 1.55s linear infinite;
-        }
-
-        .boot-core {
-            inset: 28px;
-            display: grid;
-            place-items: center;
-            background:
-                radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.55), transparent 52%),
-                linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
-            border: 1px solid rgba(147, 197, 253, 0.78);
-            box-shadow: 0 12px 32px rgba(37, 99, 235, 0.15);
-            color: #2563eb;
-        }
-
-        .boot-core svg {
-            width: 34px;
-            height: 34px;
+            animation: bootSpin 0.9s linear infinite;
         }
 
         .boot-title {
             margin: 0 0 0.4rem;
-            font-family: 'Comfortaa', cursive;
-            font-size: 2rem;
+            font-size: 1.75rem;
             font-weight: 700;
-            color: #1d4ed8;
+            color: #111827;
         }
 
         .boot-copy {
             margin: 0;
-            font-size: 0.98rem;
+            font-size: 0.95rem;
             line-height: 1.5;
-            color: #4b6486;
-        }
-
-        .boot-dots {
-            display: inline-flex;
-            gap: 0.45rem;
-            margin-top: 1rem;
-        }
-
-        .boot-dots span {
-            width: 0.55rem;
-            height: 0.55rem;
-            border-radius: 999px;
-            background: linear-gradient(135deg, #60a5fa, #2563eb);
-            animation: bootPulse 1.1s ease-in-out infinite;
-        }
-
-        .boot-dots span:nth-child(2) {
-            animation-delay: 0.15s;
-        }
-
-        .boot-dots span:nth-child(3) {
-            animation-delay: 0.3s;
+            color: #6b7280;
         }
 
         @keyframes bootSpin {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
-        }
-
-        @keyframes bootSpinReverse {
-            from { transform: rotate(360deg); }
-            to { transform: rotate(0deg); }
-        }
-
-        @keyframes bootPulse {
-            0%, 100% { transform: translateY(0) scale(0.88); opacity: 0.45; }
-            50% { transform: translateY(-2px) scale(1); opacity: 1; }
         }
     </style>
 </head>
@@ -159,22 +90,10 @@
         <div class="boot-splash">
             <div class="boot-card">
                 <div class="boot-mark" aria-hidden="true">
-                    <div class="boot-ring outer"></div>
-                    <div class="boot-ring inner"></div>
-                    <div class="boot-core">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="8"></circle>
-                            <path d="M12 7v5l3 3"></path>
-                        </svg>
-                    </div>
+                    <div class="boot-spinner"></div>
                 </div>
                 <h1 class="boot-title">Habitee</h1>
                 <p class="boot-copy">Loading your habit space...</p>
-                <div class="boot-dots" aria-hidden="true">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
             </div>
         </div>
     </div>

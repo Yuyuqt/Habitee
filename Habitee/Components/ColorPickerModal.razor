@@ -1,6 +1,6 @@
 @using Microsoft.AspNetCore.Components
 
-<div class="modal-overlay slide-up">
+<div class="modal-overlay">
     <div class="modal-content">
         <header class="modal-header">
             <button class="icon-btn" @onclick="OnClose">
@@ -43,22 +43,13 @@
         justify-content: center;
     }
 
-    .slide-up {
-        animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-
-    @@keyframes slideUp {
-        from { transform: translateY(100%); }
-        to { transform: translateY(0); }
-    }
-
     .modal-content {
         width: 100%;
         max-width: 800px;
         height: 100%;
         display: flex;
         flex-direction: column;
-        background: var(--bg-gradient, var(--bg-color));
+        background: var(--bg-color);
     }
 
     .modal-header {
@@ -110,12 +101,7 @@
         border-radius: 8px;
         border: none;
         cursor: pointer;
-        transition: transform 0.2s;
         position: relative;
-    }
-    
-    .color-swatch:active {
-        transform: scale(0.9);
     }
 
     .color-swatch.selected::after {
