@@ -36,6 +36,7 @@
                     <span></span><span></span><span></span>
                 </div>
                 <div class="frame-title">Daily Focus</div>
+                <div class="frame-header-spacer" aria-hidden="true"></div>
             </div>
             
             <div class="frame-content">
@@ -154,8 +155,10 @@
     }
 
     .frame-header {
-        display: flex;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
         align-items: center;
+        column-gap: 0.75rem;
         padding: 1rem 1.5rem;
         background: rgba(255, 255, 255, 0.5);
         border-bottom: 1px solid var(--card-border);
@@ -177,13 +180,16 @@
     .traffic-lights span:nth-child(2) { background-color: #FFBD2E; }
     .traffic-lights span:nth-child(3) { background-color: #27C93F; }
 
+    .frame-header-spacer {
+        width: 48px;
+    }
+
     .frame-title {
-        flex: 1;
         text-align: center;
         font-weight: 600;
         font-size: 0.9rem;
         color: var(--text-muted);
-        margin-right: 42px; /* To offset traffic lights */
+        min-width: 0;
     }
 
     .frame-content {
