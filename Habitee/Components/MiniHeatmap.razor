@@ -1,10 +1,11 @@
 @using Habitee.Models
+@using Habitee.Services
 
 <div class="mini-heatmap">
     @for (int i = 4; i >= 0; i--)
     {
         var dateStr = DateTime.Today.AddDays(-i).ToString("yyyy-MM-dd");
-        var isCompleted = Logs.Any(l => l.Date == dateStr && l.CompletedCount >= TargetCount);
+        var isCompleted = Logs.Any(l => l.Date == dateStr && DatabaseService.IsCompleteForTarget(l.CompletedCount, TargetCount));
         
         <div class="heatmap-cell @(isCompleted ? "completed" : "")" title="@dateStr"></div>
     }

@@ -10,8 +10,17 @@
     --dock-bottom-offset: 2rem;
     --dock-height: 6rem;
     --dock-clearance: calc(var(--dock-height) + var(--dock-bottom-offset) + var(--safe-area-bottom));
+    --sidebar-width: 150px;
+    --sidebar-offset: 1.5rem;
+    --sidebar-top-offset: 1.5rem;
+    --layout-shell-gap: 1.5rem;
+    --desktop-nav-clearance: calc(var(--sidebar-width) + (var(--sidebar-offset) * 2) + var(--layout-shell-gap));
+    --app-nav-clearance: 0px;
     --bottom-action-gap: 1rem;
-    --bottom-action-offset: calc(var(--dock-clearance) + var(--bottom-action-gap));
+    --page-action-height: 6rem;
+    --page-action-offset: 1.5rem;
+    --page-action-clearance: calc(var(--page-action-height) + var(--page-action-offset));
+    --bottom-action-offset: var(--page-action-offset);
 }
 
 body {
@@ -532,7 +541,7 @@ body {
 [data-theme="paper"] h2,
 [data-theme="paper"] h3,
 [data-theme="paper"] .theme-btn.paper {
-    font-family: 'Quicksand', 'Nunito', sans-serif;
+    font-family: 'Comfortaa', 'Nunito', sans-serif;
 }
 
 [data-theme="paper"] .glass-panel,
@@ -688,5 +697,9 @@ p {
         --dock-bottom-offset: 1rem;
         --dock-height: 5.6rem;
         --bottom-action-gap: 0.85rem;
+        --desktop-nav-clearance: 0px;
+        --app-nav-clearance: var(--dock-clearance);
+        --page-action-offset: calc(var(--dock-clearance) + var(--bottom-action-gap));
+        --page-action-clearance: calc(var(--page-action-height) + var(--page-action-offset));
     }
 }

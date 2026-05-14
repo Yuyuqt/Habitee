@@ -14,7 +14,7 @@
 <style>
     .page-container {
         position: relative;
-        z-index: 1; /* Ensure content is above background */
+        z-index: 1;
         min-height: 100vh;
         display: flex;
         flex-direction: column;
@@ -22,10 +22,19 @@
 
     .content-wrapper {
         flex: 1;
-        padding-bottom: var(--dock-clearance);
-        max-width: 1200px;
-        margin: 0 auto;
         width: 100%;
+        max-width: none;
+        margin: 0;
+        padding-left: var(--desktop-nav-clearance);
+        padding-bottom: var(--app-nav-clearance);
+        padding-right: var(--layout-shell-gap);
+    }
+
+    @@media (max-width: 720px) {
+        .content-wrapper {
+            padding-left: 0;
+            padding-right: 0;
+        }
     }
 </style>
 

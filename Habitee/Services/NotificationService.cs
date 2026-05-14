@@ -467,7 +467,8 @@ public sealed class NotificationService : IAsyncDisposable
 
     private static bool IsHabitCompleteForToday(Habit habit, IReadOnlyDictionary<string, HabitLog> todayLogs)
     {
-        return todayLogs.TryGetValue(habit.Id, out var log) && log.CompletedCount >= habit.TargetCount;
+        return todayLogs.TryGetValue(habit.Id, out var log)
+            && DatabaseService.IsCompleteForTarget(log.CompletedCount, habit.TargetCount);
     }
 
     private static bool IsHabitDueToday(Habit habit, DateTime today)

@@ -138,6 +138,48 @@ public class DatabaseService
         NotifyDataChanged();
     }
 
+    public async Task<HabitLog> CycleHabitCompletionAsync(Habit habit, DateTime? date = null)
+    {
+        var targetDate = date ?? DateTime.Today;
+        var dateKey = targetDate.ToString("yyyy-MM-dd");
+        var existingLogs = await GetLogsAsync();
+        var log = existingLogs.FirstOrDefault(entry => entry.HabitId == habit.Id && entry.Date == dateKey);
+
+        if (log == null)
+        {
+            log = new HabitLog
+            {
+                HabitId = habit.Id,
+                Date = dateKey,
+                CompletedCount = 0
+            };
+        }
+
+        log.CompletedCount = GetNextCompletedCount(log.CompletedCount, habit.TargetCount);
+        await SaveLogAsync(log);
+        return log;
+    }
+
+    public static int NormalizeCompletedCount(int completedCount, int targetCount)
+    {
+        var safeTargetCount = Math.Max(1, targetCount);
+        var cycleSize = safeTargetCount + 1;
+        var normalized = completedCount % cycleSize;
+        return normalized < 0 ? normalized + cycleSize : normalized;
+    }
+
+    public static int GetNextCompletedCount(int completedCount, int targetCount)
+    {
+        var safeTargetCount = Math.Max(1, targetCount);
+        var normalized = NormalizeCompletedCount(completedCount, safeTargetCount);
+        return (normalized + 1) % (safeTargetCount + 1);
+    }
+
+    public static bool IsCompleteForTarget(int completedCount, int targetCount)
+    {
+        return NormalizeCompletedCount(completedCount, targetCount) == Math.Max(1, targetCount);
+    }
+
     public async Task<string> ExportDataAsync()
     {
         if (string.IsNullOrWhiteSpace(_currentUserId))

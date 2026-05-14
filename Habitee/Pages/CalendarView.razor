@@ -79,8 +79,8 @@
             {
                 var habitLogs = logs.Where(log => log.HabitId == habit.Id).ToList();
 
-                <button class="habit-row glass-panel @(ThemeService.CurrentTheme == "pastel" ? "pastel-row" : "")"
-                        @onclick='() => NavManager.NavigateTo($"/habit/{habit.Id}")'>
+                <div class="habit-row glass-panel @(ThemeService.CurrentTheme == "pastel" ? "pastel-row" : "")"
+                     @onclick='() => NavManager.NavigateTo($"/habit/{habit.Id}")'>
                     <div class="habit-row-info">
                         <div class="habit-icon-shell" style="@($"--habit-color: {habit.Color};")">
                             <HabitIcon Name="@habit.Icon" Color="@habit.Color" Size="26" />
@@ -92,6 +92,23 @@
                                 <p>@habit.Description</p>
                             }
                         </div>
+                        <button type="button"
+                                class="habit-row-action @GetTodayActionState(habit, habitLogs)"
+                                style="@($"--habit-color: {habit.Color};")"
+                                title="Update today's progress"
+                                @onclick="() => HandleComplete(habit)"
+                                @onclick:stopPropagation="true">
+                            @if (IsHabitCompleteToday(habit, habitLogs))
+                            {
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                            }
+                            else
+                            {
+                                <span>@GetTodayProgressLabel(habit, habitLogs)</span>
+                            }
+                        </button>
                     </div>
 
                     <div class="habit-row-days">
@@ -106,24 +123,47 @@
                                 var day = item.Value;
                                 var state = GetDayState(habit, habitLogs, day);
 
-                                <div class="day-status @state.CssClass"
-                                     style="@($"--habit-color: {habit.Color};")"
-                                     title="@($"{habit.Title} - {day:yyyy-MM-dd}: {state.Title}")">
-                                    @if (state.ShowCheck)
-                                    {
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
-                                            <polyline points="20 6 9 17 4 12"></polyline>
-                                        </svg>
-                                    }
-                                    else if (!string.IsNullOrEmpty(state.DisplayText))
-                                    {
-                                        <span>@state.DisplayText</span>
-                                    }
-                                </div>
+                                @if (day.Date == DateTime.Today)
+                                {
+                                    <button type="button"
+                                            class="day-status @state.CssClass clickable"
+                                            style="@($"--habit-color: {habit.Color};")"
+                                            title="@($"{habit.Title} - {day:yyyy-MM-dd}: {state.Title}. Click to update today's progress.")"
+                                            @onclick="() => HandleComplete(habit)"
+                                            @onclick:stopPropagation="true">
+                                        @if (state.ShowCheck)
+                                        {
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                            </svg>
+                                        }
+                                        else if (!string.IsNullOrEmpty(state.DisplayText))
+                                        {
+                                            <span>@state.DisplayText</span>
+                                        }
+                                    </button>
+                                }
+                                else
+                                {
+                                    <div class="day-status @state.CssClass"
+                                         style="@($"--habit-color: {habit.Color};")"
+                                         title="@($"{habit.Title} - {day:yyyy-MM-dd}: {state.Title}")">
+                                        @if (state.ShowCheck)
+                                        {
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                            </svg>
+                                        }
+                                        else if (!string.IsNullOrEmpty(state.DisplayText))
+                                        {
+                                            <span>@state.DisplayText</span>
+                                        }
+                                    </div>
+                                }
                             }
                         }
                     </div>
-                </button>
+                </div>
             }
         </div>
     }
@@ -359,6 +399,7 @@
 
     .habit-row-copy {
         min-width: 0;
+        flex: 1;
     }
 
     .habit-row-copy h3 {
@@ -376,6 +417,38 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+    }
+
+    .habit-row-action {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        border: 2px solid color-mix(in srgb, var(--habit-color) 40%, var(--card-border));
+        background: rgba(255, 255, 255, 0.18);
+        color: var(--text-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        padding: 0;
+        cursor: pointer;
+        font: inherit;
+        font-size: 0.72rem;
+        font-weight: 700;
+    }
+
+    .habit-row-action.complete {
+        background: color-mix(in srgb, var(--habit-color) 84%, white 16%);
+        border-color: transparent;
+        color: white;
+    }
+
+    .habit-row-action.partial {
+        color: var(--habit-color);
+    }
+
+    .habit-row-action.empty {
+        color: var(--text-muted);
     }
 
     .habit-row-days {
@@ -399,6 +472,12 @@
         color: var(--text-muted);
         font-weight: 700;
         position: relative;
+        padding: 0;
+        font: inherit;
+    }
+
+    .day-status.clickable {
+        cursor: pointer;
     }
 
     .day-status.complete {
@@ -420,18 +499,33 @@
             inset 0 1px 0 rgba(255, 255, 255, 0.82);
     }
 
+    [data-theme="sakura"] .habit-row-action {
+        background: color-mix(in srgb, var(--card-bg) 88%, white 12%);
+        border-color: color-mix(in srgb, var(--habit-color) 22%, var(--sakura-frame-soft));
+    }
+
+    [data-theme="sakura"][data-theme-mode="light"] .habit-row-action {
+        background: linear-gradient(180deg, rgba(255, 241, 247, 0.96) 0%, rgba(247, 223, 233, 0.92) 100%);
+        border-color: color-mix(in srgb, var(--habit-color) 34%, var(--sakura-frame-strong));
+        box-shadow:
+            0 8px 16px rgba(193, 122, 158, 0.12),
+            inset 0 1px 0 rgba(255, 255, 255, 0.82);
+    }
+
     [data-theme="matcha"] .habit-row {
         border-color: color-mix(in srgb, var(--primary-color) 22%, var(--card-border));
     }
 
     [data-theme="retro"] .habit-row,
     [data-theme="retro"] .day-status,
+    [data-theme="retro"] .habit-row-action,
     [data-theme="retro"] .day-chip.today {
         border-radius: 6px !important;
     }
 
     [data-theme="retro"] .habit-row-copy h3,
     [data-theme="retro"] .day-status span,
+    [data-theme="retro"] .habit-row-action,
     [data-theme="retro"] .range-select,
     [data-theme="retro"] .range-menu-item {
         font-family: 'Press Start 2P', 'JetBrains Mono', monospace;
@@ -443,6 +537,13 @@
     }
 
     [data-theme="retro"] .day-status {
+        border-width: 2px;
+        box-shadow:
+            3px 3px 0 color-mix(in srgb, var(--accent-color) 30%, transparent),
+            0 0 12px color-mix(in srgb, var(--primary-color) 18%, transparent);
+    }
+
+    [data-theme="retro"] .habit-row-action {
         border-width: 2px;
         box-shadow:
             3px 3px 0 color-mix(in srgb, var(--accent-color) 30%, transparent),
@@ -463,11 +564,20 @@
             inset 0 1px 0 rgba(255, 255, 255, 0.18);
     }
 
+    [data-theme="ocean"] .habit-row-action {
+        background: linear-gradient(180deg, color-mix(in srgb, var(--card-bg) 88%, rgba(255, 255, 255, 0.14)) 0%, color-mix(in srgb, var(--card-bg) 96%, transparent) 100%);
+        border-color: color-mix(in srgb, var(--accent-color) 46%, var(--card-border));
+        box-shadow:
+            0 10px 18px rgba(2, 33, 44, 0.16),
+            inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    }
+
     [data-theme="paper"] .habit-row {
         border-style: solid;
     }
 
     [data-theme="paper"] .day-chip.today,
+    [data-theme="paper"] .habit-row-action,
     [data-theme="paper"] .day-status {
         border-radius: 18px !important;
         border-color: var(--paper-ink-strong);
@@ -577,6 +687,13 @@
         isLoading = false;
     }
 
+    private async Task HandleComplete(Habit habit)
+    {
+        await DbService.CycleHabitCompletionAsync(habit);
+        logs = await DbService.GetLogsAsync();
+        StateHasChanged();
+    }
+
     private void SelectRange(int range)
     {
         selectedRange = range;
@@ -607,18 +724,46 @@
         return $"Last {selectedRange} {(selectedRange == 1 ? "day" : "days")}";
     }
 
+    private static int GetTodayProgressCount(Habit habit, List<HabitLog> habitLogs)
+    {
+        var todayKey = DateTime.Today.ToString("yyyy-MM-dd");
+        return DatabaseService.NormalizeCompletedCount(
+            habitLogs.FirstOrDefault(log => log.Date == todayKey)?.CompletedCount ?? 0,
+            habit.TargetCount);
+    }
+
+    private static bool IsHabitCompleteToday(Habit habit, List<HabitLog> habitLogs)
+    {
+        return DatabaseService.IsCompleteForTarget(GetTodayProgressCount(habit, habitLogs), habit.TargetCount);
+    }
+
+    private static string GetTodayProgressLabel(Habit habit, List<HabitLog> habitLogs)
+    {
+        return $"{GetTodayProgressCount(habit, habitLogs)}/{habit.TargetCount}";
+    }
+
+    private static string GetTodayActionState(Habit habit, List<HabitLog> habitLogs)
+    {
+        var count = GetTodayProgressCount(habit, habitLogs);
+
+        if (DatabaseService.IsCompleteForTarget(count, habit.TargetCount))
+        {
+            return "complete";
+        }
+
+        return count > 0 ? "partial" : "empty";
+    }
+
     private static DayState GetDayState(Habit habit, List<HabitLog> habitLogs, DateTime day)
     {
         var dateKey = day.ToString("yyyy-MM-dd");
-        var completedCount = habitLogs.FirstOrDefault(log => log.Date == dateKey)?.CompletedCount ?? 0;
+        var completedCount = DatabaseService.NormalizeCompletedCount(
+            habitLogs.FirstOrDefault(log => log.Date == dateKey)?.CompletedCount ?? 0,
+            habit.TargetCount);
 
-        if (completedCount >= habit.TargetCount)
+        if (DatabaseService.IsCompleteForTarget(completedCount, habit.TargetCount))
         {
-            var title = completedCount == habit.TargetCount
-                ? $"{completedCount}/{habit.TargetCount} complete"
-                : $"{completedCount}/{habit.TargetCount} complete (over target)";
-
-            return new DayState("complete", title, string.Empty, true);
+            return new DayState("complete", $"{completedCount}/{habit.TargetCount} complete", string.Empty, true);
         }
 
         if (completedCount > 0)

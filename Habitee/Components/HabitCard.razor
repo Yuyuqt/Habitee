@@ -20,10 +20,10 @@
 
         <div class="habit-status">
             <span class="habit-streak">
-                @(TodayLog?.CompletedCount ?? 0) of @Habit.TargetCount
+                @CurrentCount of @Habit.TargetCount
             </span>
             <button class="habit-action glass-button @(ThemeService.CurrentTheme == "pastel" ? "pastel-action" : "")" @onclick="CompleteHabit" @onclick:stopPropagation="true">
-                @if ((TodayLog?.CompletedCount ?? 0) >= Habit.TargetCount)
+                @if (IsCompletedToday)
                 {
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--success-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                 }
@@ -223,6 +223,8 @@
     private bool isPopping = false;
 
     private HabitLog? TodayLog => Logs.FirstOrDefault(l => l.Date == DateTime.Today.ToString("yyyy-MM-dd"));
+    private int CurrentCount => DatabaseService.NormalizeCompletedCount(TodayLog?.CompletedCount ?? 0, Habit.TargetCount);
+    private bool IsCompletedToday => DatabaseService.IsCompleteForTarget(TodayLog?.CompletedCount ?? 0, Habit.TargetCount);
 
     private void GoToDetail()
     {
@@ -234,14 +236,15 @@
 
     private async Task CompleteHabit()
     {
+        var nextCount = DatabaseService.GetNextCompletedCount(TodayLog?.CompletedCount ?? 0, Habit.TargetCount);
+
         isPopping = false;
         await Task.Delay(10); // reset animation
         isPopping = true;
         
         await OnComplete.InvokeAsync(Habit);
 
-        // Check if goal met
-        if (TodayLog != null && TodayLog.CompletedCount >= Habit.TargetCount)
+        if (nextCount == Math.Max(1, Habit.TargetCount))
         {
             ConfettiService.TriggerBurst();
         }

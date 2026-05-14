@@ -35,8 +35,8 @@
                 var habitLogs = logs.Where(log => log.HabitId == habit.Id).ToList();
                 var todayProgress = GetTodayProgress(habit, habitLogs);
 
-                <button class="grid-habit-card glass-panel @(ThemeService.CurrentTheme == "pastel" ? "pastel-card" : "")"
-                        @onclick='() => NavManager.NavigateTo($"/habit/{habit.Id}")'>
+                <div class="grid-habit-card glass-panel @(ThemeService.CurrentTheme == "pastel" ? "pastel-card" : "")"
+                     @onclick='() => NavManager.NavigateTo($"/habit/{habit.Id}")'>
                     <div class="grid-card-top">
                         <div class="grid-habit-copy">
                             <div class="grid-icon-ring" style="@($"--habit-color: {habit.Color};")">
@@ -51,7 +51,12 @@
                             </div>
                         </div>
 
-                        <div class="grid-status-badge @todayProgress.CssClass" style="@($"--habit-color: {habit.Color};")">
+                        <button type="button"
+                                class="grid-status-badge @todayProgress.CssClass"
+                                style="@($"--habit-color: {habit.Color};")"
+                                title="Update today's progress"
+                                @onclick="() => HandleComplete(habit)"
+                                @onclick:stopPropagation="true">
                             @if (todayProgress.IsComplete)
                             {
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -62,7 +67,7 @@
                             {
                                 <span>@todayProgress.Label</span>
                             }
-                        </div>
+                        </button>
                     </div>
 
                     <div class="grid-contribution-wrap">
@@ -73,7 +78,7 @@
                                                   MonthsToShow="1"
                                                   ShowMonthLabel="false" />
                     </div>
-                </button>
+                </div>
             }
 
             <button class="grid-habit-card add-habit-card glass-panel @(ThemeService.CurrentTheme == "pastel" ? "pastel-card" : "")"
@@ -220,6 +225,9 @@
         flex-shrink: 0;
         color: var(--text-color);
         background: rgba(255, 255, 255, 0.18);
+        padding: 0;
+        cursor: pointer;
+        font: inherit;
     }
 
     .grid-status-badge.complete {
@@ -396,12 +404,21 @@
         isLoading = false;
     }
 
+    private async Task HandleComplete(Habit habit)
+    {
+        await DbService.CycleHabitCompletionAsync(habit);
+        logs = await DbService.GetLogsAsync();
+        StateHasChanged();
+    }
+
     private static HabitProgressState GetTodayProgress(Habit habit, List<HabitLog> habitLogs)
     {
         var todayKey = DateTime.Today.ToString("yyyy-MM-dd");
-        var completedCount = habitLogs.FirstOrDefault(log => log.Date == todayKey)?.CompletedCount ?? 0;
+        var completedCount = DatabaseService.NormalizeCompletedCount(
+            habitLogs.FirstOrDefault(log => log.Date == todayKey)?.CompletedCount ?? 0,
+            habit.TargetCount);
 
-        if (completedCount >= habit.TargetCount)
+        if (DatabaseService.IsCompleteForTarget(completedCount, habit.TargetCount))
         {
             return new HabitProgressState($"{completedCount}/{habit.TargetCount}", "complete", true);
         }

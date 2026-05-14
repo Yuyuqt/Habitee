@@ -99,25 +99,8 @@
 
     private async Task HandleComplete(Habit habit)
     {
-        var todayStr = DateTime.Today.ToString("yyyy-MM-dd");
-        var log = logs.FirstOrDefault(l => l.HabitId == habit.Id && l.Date == todayStr);
-        
-        if (log == null)
-        {
-            log = new HabitLog
-            {
-                HabitId = habit.Id,
-                Date = todayStr,
-                CompletedCount = 1
-            };
-            logs.Add(log);
-        }
-        else
-        {
-            log.CompletedCount++;
-        }
-
-        await DbService.SaveLogAsync(log);
+        await DbService.CycleHabitCompletionAsync(habit);
+        logs = await DbService.GetLogsAsync();
         StateHasChanged();
     }
 }
