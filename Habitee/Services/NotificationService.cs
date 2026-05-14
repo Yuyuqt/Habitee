@@ -211,6 +211,8 @@ public sealed class NotificationService : IAsyncDisposable
 
     private void HandleDataChanged()
     {
+        UpdateHeartbeatState();
+
         if (CanNotify && _isVisible)
         {
             _ = RunDueReminderCheckSafeAsync(HeartbeatLookback);

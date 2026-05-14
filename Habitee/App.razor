@@ -3,6 +3,7 @@
 @inject DatabaseService DbService
 @inject AuthService AuthService
 @inject NavigationManager NavManager
+@inject NotificationService NotificationService
 @implements IDisposable
 
 @if (!isReady)
@@ -186,6 +187,7 @@ else
         await ThemeService.InitializeAsync();
         await DbService.InitializeAsync();
         await AuthService.InitializeAsync();
+        await NotificationService.InitializeAsync();
         isReady = true;
     }
 
