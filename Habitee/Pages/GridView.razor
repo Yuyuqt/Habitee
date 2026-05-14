@@ -22,10 +22,7 @@
     }
     else if (!habits.Any())
     {
-        <div class="grid-empty glass-panel">
-            <h2>No habits yet</h2>
-            <p>Add your first habit to start building a contribution grid.</p>
-        </div>
+        <Habitee.Components.RedirectTo Url="/add-habit" />
     }
     else
     {
@@ -415,6 +412,14 @@
     {
         isLoading = true;
         habits = await DbService.GetActiveHabitsAsync();
+
+        if (!habits.Any())
+        {
+            logs = new();
+            isLoading = false;
+            return;
+        }
+
         logs = await DbService.GetLogsAsync();
         isLoading = false;
     }

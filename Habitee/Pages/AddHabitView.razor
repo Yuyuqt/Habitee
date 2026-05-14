@@ -1,11 +1,20 @@
 @page "/add-habit"
+@using Habitee.Services
+@inject DatabaseService DbService
 @inject NavigationManager NavManager
 
 <div class="view-container slide-in">
     <header class="app-header">
-        <button class="icon-btn" @onclick='() => NavManager.NavigateTo("/app")'>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-        </button>
+        @if (showBackButton)
+        {
+            <button class="icon-btn" @onclick='() => NavManager.NavigateTo("/app")'>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+        }
+        else
+        {
+            <div style="width: 24px;"></div>
+        }
         <h1 class="header-title">Add Habits</h1>
         <div style="width: 24px;"></div> <!-- Spacer -->
     </header>
@@ -250,6 +259,13 @@
 @code {
     private string currentTab = "positive";
     private string searchQuery = "";
+    private bool showBackButton;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var activeHabits = await DbService.GetActiveHabitsAsync();
+        showBackButton = activeHabits.Any();
+    }
 
     private List<HabitCategory> CurrentTemplates => currentTab == "positive" ? positiveTemplates : negativeTemplates;
 
