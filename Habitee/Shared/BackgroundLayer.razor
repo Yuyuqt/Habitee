@@ -3,7 +3,7 @@
 @inject ConfettiService ConfettiService
 @implements IDisposable
 
-<div class="background-layer" style="z-index: -1; background: var(--bg-gradient, var(--bg-color));">
+<div class="background-layer" style="z-index: -1; background: var(--bg-gradient, var(--bg-color)); background-size: var(--bg-size, auto); background-repeat: var(--bg-repeat, no-repeat); background-position: var(--bg-position, center);">
     @if (ThemeService.CurrentTheme == "habitee")
     {
         for (int i = 0; i < 15; i++)
@@ -54,6 +54,23 @@
         for (int i = 0; i < 30; i++)
         {
             <div class="particle sparkle" style="left: @(RandomNumber(0, 100))vw; top: @(RandomNumber(0, 100))vh; animation-duration: @(RandomNumber(7, 15))s; animation-delay: -@(RandomNumber(0, 12))s;"></div>
+        }
+    }
+    else if (ThemeService.CurrentTheme == "ocean")
+    {
+        <div class="ocean-depth-glow"></div>
+
+        @for (int i = 0; i < 4; i++)
+        {
+            <div class="particle ocean-ripple"
+                 style="left: @(RandomNumber(10, 90))vw; top: @(RandomNumber(14, 82))vh; width: @(RandomNumber(110, 220))px; height: @(RandomNumber(24, 54))px; animation-duration: @(RandomNumber(12, 20))s; animation-delay: -@(RandomNumber(0, 20))s;"></div>
+        }
+
+        @for (int i = 0; i < 14; i++)
+        {
+            var size = RandomNumber(8, 24);
+            <div class="particle ocean-lumen"
+                 style="left: @(RandomNumber(0, 100))vw; top: @(RandomNumber(8, 100))vh; width: @(size)px; height: @(size)px; animation-duration: @(RandomNumber(16, 30))s; animation-delay: -@(RandomNumber(0, 30))s; --bubble-drift: @(RandomNumber(-10, 10))vw; --bubble-opacity: @(RandomOpacity(0.18, 0.44));"></div>
         }
     }
     else if (ThemeService.CurrentTheme == "cyberpunk")
@@ -189,6 +206,79 @@
 
         50% {
             transform: rotate(16deg) scale(calc(var(--petal-scale-x) * 1.02), calc(var(--petal-scale-y) * 1.02)) translateX(2px);
+        }
+    }
+
+    /* Ocean */
+    .ocean-depth-glow {
+        position: absolute;
+        inset: auto 0 -18vh 0;
+        height: 42vh;
+        background:
+            radial-gradient(circle at 50% 50%, rgba(102, 245, 255, 0.18) 0%, rgba(102, 245, 255, 0) 44%),
+            linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 33, 46, 0.34) 100%);
+        filter: blur(16px);
+        opacity: 0.85;
+    }
+
+    .ocean-ripple {
+        border-radius: 999px;
+        border: 1px solid rgba(134, 243, 255, 0.24);
+        box-shadow:
+            0 0 22px rgba(90, 234, 255, 0.12),
+            inset 0 0 12px rgba(90, 234, 255, 0.06);
+        animation: oceanRipple ease-in-out infinite;
+        opacity: 0;
+    }
+
+    .ocean-lumen {
+        border-radius: 50%;
+        background:
+            radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.84) 0%, rgba(255, 255, 255, 0.2) 28%, rgba(90, 234, 255, 0.18) 56%, rgba(90, 234, 255, 0) 100%);
+        box-shadow:
+            0 0 22px rgba(90, 234, 255, 0.18),
+            0 0 8px rgba(255, 255, 255, 0.12);
+        animation: oceanLumen linear infinite;
+        opacity: 0;
+    }
+
+    @@keyframes oceanRipple {
+        0%, 100% {
+            transform: scale(0.92);
+            opacity: 0;
+        }
+
+        24% {
+            opacity: 0.36;
+        }
+
+        60% {
+            transform: scale(1.08);
+            opacity: 0.18;
+        }
+
+        82% {
+            opacity: 0;
+        }
+    }
+
+    @@keyframes oceanLumen {
+        0% {
+            transform: translate3d(0, 12vh, 0) scale(0.7);
+            opacity: 0;
+        }
+
+        18% {
+            opacity: var(--bubble-opacity);
+        }
+
+        56% {
+            transform: translate3d(calc(var(--bubble-drift) * 0.5), -22vh, 0) scale(1);
+        }
+
+        100% {
+            transform: translate3d(var(--bubble-drift), -56vh, 0) scale(0.76);
+            opacity: 0;
         }
     }
 

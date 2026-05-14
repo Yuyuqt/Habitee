@@ -39,6 +39,10 @@
                     <button class="theme-btn sakura @(ThemeService.CurrentTheme == "sakura" ? "selected" : "")" @onclick="@(() => SetTheme("sakura"))">Sakura</button>
                     <button class="theme-btn galaxy @(ThemeService.CurrentTheme == "galaxy" ? "selected" : "")" @onclick="@(() => SetTheme("galaxy"))">Starry Galaxy</button>
                     <button class="theme-btn cyberpunk @(ThemeService.CurrentTheme == "cyberpunk" ? "selected" : "")" @onclick="@(() => SetTheme("cyberpunk"))">Cyberpunk</button>
+                    <button class="theme-btn matcha @(ThemeService.CurrentTheme == "matcha" ? "selected" : "")" @onclick="@(() => SetTheme("matcha"))">Matcha Latte</button>
+                    <button class="theme-btn retro @(ThemeService.CurrentTheme == "retro" ? "selected" : "")" @onclick="@(() => SetTheme("retro"))">Retro Arcade</button>
+                    <button class="theme-btn ocean @(ThemeService.CurrentTheme == "ocean" ? "selected" : "")" @onclick="@(() => SetTheme("ocean"))">Deep Sea</button>
+                    <button class="theme-btn paper @(ThemeService.CurrentTheme == "paper" ? "selected" : "")" @onclick="@(() => SetTheme("paper"))">Paper Sketch</button>
                 </div>
             </div>
         </section>
@@ -279,6 +283,10 @@
     .theme-btn.sakura { border-left: 4px solid #df7fa3; font-family: 'Quicksand', 'Nunito', sans-serif; }
     .theme-btn.galaxy { border-left: 4px solid #8b5cf6; }
     .theme-btn.cyberpunk { border-left: 4px solid #f43f5e; font-family: 'JetBrains Mono', monospace; }
+    .theme-btn.matcha { border-left: 4px solid #7b9165; font-family: 'Nunito', 'Quicksand', sans-serif; }
+    .theme-btn.retro { border-left: 4px solid #ff4fd8; font-family: 'Press Start 2P', 'JetBrains Mono', monospace; font-size: 0.7rem; line-height: 1.4; }
+    .theme-btn.ocean { border-left: 4px solid #0c90b6; font-family: 'Nunito', 'Inter', sans-serif; }
+    .theme-btn.paper { border-left: 4px solid #2f76b8; font-family: 'Quicksand', 'Nunito', sans-serif; }
 
     .notification-actions {
         display: flex;

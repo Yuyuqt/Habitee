@@ -9,10 +9,16 @@
     
     --primary-color: #0d6efd;
     --success-color: #198754;
+    --accent-color: #cfe2ff;
     
     --font-family: 'Inter', sans-serif;
     --font-weight-title: 600;
     --font-weight-desc: 300;
+    --bg-size: auto;
+    --bg-repeat: no-repeat;
+    --bg-position: center;
+    --glass-blur: 20px;
+    --glass-button-blur: 10px;
 }
 
 [data-theme-mode="dark"] {
@@ -193,17 +199,219 @@
     --card-bg: rgba(240, 240, 240, 0.8);
 }
 
-/* Debounce transition for body */
+/* Theme F: Matcha Latte (Cozy & Organic) */
+[data-theme="matcha"] {
+    --bg-color: #f3efe4;
+    --bg-gradient:
+        radial-gradient(circle at 18% 16%, rgba(236, 229, 197, 0.74) 0%, rgba(236, 229, 197, 0) 22%),
+        radial-gradient(circle at 84% 18%, rgba(197, 213, 181, 0.48) 0%, rgba(197, 213, 181, 0) 24%),
+        linear-gradient(180deg, #f8f4ea 0%, #f1ecd8 34%, #e6ead6 72%, #d9e2cc 100%);
+    --text-color: #495543;
+    --text-muted: #70806b;
+    --card-bg: rgba(255, 250, 238, 0.72);
+    --card-border: rgba(145, 159, 122, 0.3);
+    --card-shadow:
+        0 18px 38px rgba(98, 111, 85, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.72);
+    --primary-color: #7b9165;
+    --success-color: #95b576;
+    --accent-color: #dac6a1;
+    --font-family: 'Nunito', 'Quicksand', sans-serif;
+    --font-weight-title: 700;
+    --font-weight-desc: 500;
+    --border-radius: 28px;
+    --outline-width: 1.5px;
+    --theme-btn-bg: rgba(255, 248, 235, 0.9);
+    --theme-btn-text: #495543;
+    --matcha-fiber: rgba(115, 129, 96, 0.16);
+    --matcha-paper: rgba(255, 253, 244, 0.54);
+    --glass-blur: 16px;
+    --glass-button-blur: 12px;
+}
+[data-theme="matcha"][data-theme-mode="dark"] {
+    --bg-color: #1c231b;
+    --bg-gradient:
+        radial-gradient(circle at 22% 14%, rgba(148, 172, 112, 0.16) 0%, rgba(148, 172, 112, 0) 22%),
+        radial-gradient(circle at 82% 86%, rgba(88, 109, 81, 0.24) 0%, rgba(88, 109, 81, 0) 26%),
+        linear-gradient(180deg, #141915 0%, #1d231b 36%, #273025 72%, #2f382c 100%);
+    --text-color: #eef0e5;
+    --text-muted: #b7c0aa;
+    --card-bg: rgba(42, 52, 39, 0.7);
+    --card-border: rgba(191, 204, 167, 0.18);
+    --card-shadow:
+        0 18px 38px rgba(7, 10, 6, 0.32),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    --primary-color: #b7cc8d;
+    --success-color: #91c5a1;
+    --accent-color: #8d7650;
+    --theme-btn-bg: rgba(53, 65, 48, 0.9);
+    --theme-btn-text: #eef0e5;
+    --matcha-fiber: rgba(197, 214, 167, 0.1);
+    --matcha-paper: rgba(255, 251, 229, 0.06);
+}
+
+/* Theme G: Retro Arcade (8-Bit Nostalgia) */
+[data-theme="retro"] {
+    --bg-color: #160628;
+    --bg-gradient:
+        radial-gradient(circle at top, rgba(111, 82, 255, 0.28) 0%, rgba(111, 82, 255, 0) 38%),
+        linear-gradient(180deg, #0f041f 0%, #1a0731 42%, #25094a 78%, #13061f 100%);
+    --text-color: #f7f1ff;
+    --text-muted: #cbb7e7;
+    --card-bg: rgba(26, 8, 49, 0.82);
+    --card-border: rgba(255, 79, 216, 0.72);
+    --card-shadow:
+        0 0 0 2px rgba(86, 244, 255, 0.2),
+        0 18px 34px rgba(7, 2, 18, 0.4),
+        0 0 24px rgba(255, 79, 216, 0.22);
+    --primary-color: #ff4fd8;
+    --success-color: #c7ff36;
+    --accent-color: #56f4ff;
+    --font-family: 'JetBrains Mono', monospace;
+    --font-weight-title: 700;
+    --font-weight-desc: 500;
+    --border-radius: 6px;
+    --outline-width: 2px;
+    --theme-btn-bg: rgba(32, 11, 58, 0.94);
+    --theme-btn-text: #f7f1ff;
+    --retro-shadow-step: rgba(86, 244, 255, 0.4);
+    --retro-pixel-fill: rgba(18, 5, 38, 0.8);
+    --glass-blur: 8px;
+    --glass-button-blur: 6px;
+}
+[data-theme="retro"][data-theme-mode="light"] {
+    --bg-color: #f8efff;
+    --bg-gradient:
+        radial-gradient(circle at top, rgba(111, 82, 255, 0.18) 0%, rgba(111, 82, 255, 0) 34%),
+        linear-gradient(180deg, #fff7ff 0%, #f6ecff 40%, #efe6ff 74%, #dfe3ff 100%);
+    --text-color: #2f1d4f;
+    --text-muted: #6b5c87;
+    --card-bg: rgba(255, 247, 255, 0.84);
+    --card-border: rgba(132, 101, 255, 0.52);
+    --card-shadow:
+        0 0 0 2px rgba(255, 255, 255, 0.56),
+        0 14px 30px rgba(104, 67, 180, 0.18),
+        0 0 18px rgba(255, 79, 216, 0.14);
+    --primary-color: #ff3fc8;
+    --success-color: #94cc00;
+    --accent-color: #6f52ff;
+    --theme-btn-bg: rgba(255, 244, 255, 0.94);
+    --theme-btn-text: #2f1d4f;
+    --retro-shadow-step: rgba(111, 82, 255, 0.24);
+    --retro-pixel-fill: rgba(255, 255, 255, 0.84);
+}
+
+/* Theme H: Deep Sea (Calming Depth) */
+[data-theme="ocean"] {
+    --bg-color: #dff6fb;
+    --bg-gradient:
+        radial-gradient(circle at 50% 0%, rgba(122, 224, 255, 0.22) 0%, rgba(122, 224, 255, 0) 28%),
+        linear-gradient(180deg, #edf9ff 0%, #d7eff7 34%, #a7d7e5 76%, #79b6ca 100%);
+    --text-color: #10394a;
+    --text-muted: #3f6977;
+    --card-bg: rgba(235, 252, 255, 0.36);
+    --card-border: rgba(17, 88, 110, 0.18);
+    --card-shadow:
+        0 24px 44px rgba(38, 103, 131, 0.16),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    --primary-color: #0c90b6;
+    --success-color: #27c9d8;
+    --accent-color: #86f3ff;
+    --font-family: 'Nunito', 'Inter', sans-serif;
+    --font-weight-title: 700;
+    --font-weight-desc: 500;
+    --border-radius: 30px;
+    --outline-width: 1.4px;
+    --theme-btn-bg: rgba(230, 249, 255, 0.72);
+    --theme-btn-text: #10394a;
+    --ocean-glow: rgba(134, 243, 255, 0.28);
+    --ocean-depth: rgba(12, 83, 106, 0.18);
+    --glass-blur: 28px;
+    --glass-button-blur: 18px;
+}
+[data-theme="ocean"][data-theme-mode="dark"] {
+    --bg-color: #02131b;
+    --bg-gradient:
+        radial-gradient(circle at 50% -10%, rgba(53, 199, 231, 0.22) 0%, rgba(53, 199, 231, 0) 28%),
+        linear-gradient(180deg, #011018 0%, #032330 34%, #003845 74%, #02576b 100%);
+    --text-color: #ebfdff;
+    --text-muted: #9fd0da;
+    --card-bg: rgba(5, 34, 43, 0.66);
+    --card-border: rgba(118, 230, 246, 0.18);
+    --card-shadow:
+        0 24px 48px rgba(0, 8, 12, 0.34),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    --primary-color: #5aeaff;
+    --success-color: #47c1df;
+    --accent-color: #8ef8ff;
+    --theme-btn-bg: rgba(6, 43, 54, 0.86);
+    --theme-btn-text: #ebfdff;
+    --ocean-glow: rgba(90, 234, 255, 0.18);
+    --ocean-depth: rgba(0, 0, 0, 0.2);
+}
+
+/* Theme I: Paper Sketch (Hand-Drawn) */
+[data-theme="paper"] {
+    --bg-color: #f8fbff;
+    --bg-gradient:
+        linear-gradient(rgba(91, 143, 191, 0.16) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(91, 143, 191, 0.16) 1px, transparent 1px),
+        linear-gradient(180deg, #fcfeff 0%, #eef6ff 100%);
+    --bg-size: 24px 24px, 24px 24px, auto;
+    --bg-repeat: repeat, repeat, no-repeat;
+    --bg-position: top left, top left, center;
+    --text-color: #2c435f;
+    --text-muted: #67819a;
+    --card-bg: rgba(255, 255, 255, 0.9);
+    --card-border: rgba(53, 89, 122, 0.78);
+    --card-shadow:
+        6px 7px 0 rgba(83, 117, 149, 0.12),
+        0 14px 28px rgba(76, 111, 145, 0.12);
+    --primary-color: #2f76b8;
+    --success-color: #2d9b78;
+    --accent-color: #bfd7ef;
+    --font-family: 'Quicksand', 'Nunito', sans-serif;
+    --font-weight-title: 700;
+    --font-weight-desc: 500;
+    --outline-width: 1.8px;
+    --theme-btn-bg: rgba(255, 255, 255, 0.94);
+    --theme-btn-text: #2c435f;
+    --paper-ink: rgba(53, 89, 122, 0.28);
+    --paper-ink-strong: rgba(53, 89, 122, 0.74);
+    --glass-blur: 6px;
+    --glass-button-blur: 4px;
+}
+[data-theme="paper"][data-theme-mode="dark"] {
+    --bg-color: #1b2330;
+    --bg-gradient:
+        linear-gradient(rgba(110, 141, 181, 0.14) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(110, 141, 181, 0.14) 1px, transparent 1px),
+        linear-gradient(180deg, #141a24 0%, #1b2330 42%, #202c3d 100%);
+    --bg-size: 24px 24px, 24px 24px, auto;
+    --bg-repeat: repeat, repeat, no-repeat;
+    --bg-position: top left, top left, center;
+    --text-color: #eef3f8;
+    --text-muted: #a8bacd;
+    --card-bg: rgba(31, 43, 58, 0.82);
+    --card-border: rgba(179, 203, 227, 0.24);
+    --card-shadow:
+        6px 7px 0 rgba(7, 10, 16, 0.24),
+        0 14px 28px rgba(7, 10, 16, 0.24);
+    --primary-color: #93c4ff;
+    --success-color: #6bd4b0;
+    --accent-color: #5a7191;
+    --theme-btn-bg: rgba(36, 48, 66, 0.92);
+    --theme-btn-text: #eef3f8;
+    --paper-ink: rgba(179, 203, 227, 0.18);
+    --paper-ink-strong: rgba(214, 229, 242, 0.68);
+}
+
+/* Transitions */
 body {
     transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
 }
 
 @keyframes galaxyBorderRun {
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }

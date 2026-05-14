@@ -227,6 +227,70 @@
         opacity: 1;
         box-shadow: 0 2px 6px rgba(200, 128, 165, 0.14);
     }
+
+    [data-theme="matcha"] .monthly-graph.compact .day-cell {
+        background-color: color-mix(in srgb, var(--primary-color) 18%, white 18%);
+        opacity: 0.34;
+        box-shadow: none;
+    }
+
+    [data-theme="matcha"] .monthly-graph.compact .month-block {
+        padding: 0.34rem 0.46rem 0.48rem;
+        border-radius: 18px;
+        background: rgba(255, 252, 242, 0.18);
+        border: 1px solid color-mix(in srgb, var(--primary-color) 18%, var(--card-border));
+    }
+
+    [data-theme="ocean"] .monthly-graph.compact .day-cell {
+        background-color: color-mix(in srgb, var(--accent-color) 24%, transparent);
+        opacity: 0.34;
+        box-shadow: none;
+    }
+
+    [data-theme="ocean"] .monthly-graph.compact .month-block {
+        padding: 0.34rem 0.46rem 0.48rem;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid color-mix(in srgb, var(--accent-color) 18%, var(--card-border));
+        box-shadow: 0 10px 18px rgba(2, 33, 44, 0.12);
+    }
+
+    /* Retro Arcade Overrides */
+    [data-theme="retro"] .monthly-graph.compact .month-block {
+        padding: 0.34rem 0.46rem 0.48rem;
+        border-radius: 6px;
+        border: 2px solid color-mix(in srgb, var(--accent-color) 42%, transparent);
+        box-shadow: 4px 4px 0 color-mix(in srgb, var(--accent-color) 22%, transparent);
+        background: color-mix(in srgb, var(--card-bg) 94%, transparent);
+    }
+
+    [data-theme="retro"] .day-cell {
+        border-radius: 0;
+        border: 1px solid color-mix(in srgb, var(--success-color) 28%, transparent);
+        background-color: color-mix(in srgb, var(--primary-color) 12%, transparent);
+    }
+
+    [data-theme="retro"] .day-cell.completed {
+        box-shadow: 0 0 10px var(--habit-color, var(--primary-color));
+        opacity: 1;
+    }
+
+    /* Paper Sketch Overrides */
+    [data-theme="paper"] .monthly-graph.compact .month-block {
+        padding: 0.34rem 0.46rem 0.48rem;
+        border-radius: 18px;
+    }
+
+    [data-theme="paper"] .day-cell {
+        border-radius: 1px;
+        border: 1px solid var(--paper-ink);
+        background-color: color-mix(in srgb, var(--accent-color) 18%, transparent);
+    }
+    [data-theme="paper"] .month-block {
+        border: 2px solid var(--paper-ink-strong);
+        box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.1);
+        background: color-mix(in srgb, var(--card-bg) 96%, transparent);
+    }
 </style>
 
 @code {

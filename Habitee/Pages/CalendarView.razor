@@ -175,6 +175,8 @@
         padding: 0.55rem 0.8rem;
         border-radius: 18px;
         position: relative;
+        overflow: visible;
+        z-index: 20;
     }
 
     .range-select-wrap span {
@@ -226,6 +228,7 @@
         gap: 0.2rem;
         background: color-mix(in srgb, var(--card-bg) 92%, var(--bg-color));
         box-shadow: 0 18px 36px rgba(0, 0, 0, 0.22);
+        z-index: 30;
     }
 
     .range-menu-item {
@@ -415,6 +418,60 @@
         box-shadow:
             0 8px 16px rgba(193, 122, 158, 0.12),
             inset 0 1px 0 rgba(255, 255, 255, 0.82);
+    }
+
+    [data-theme="matcha"] .habit-row {
+        border-color: color-mix(in srgb, var(--primary-color) 22%, var(--card-border));
+    }
+
+    [data-theme="retro"] .habit-row,
+    [data-theme="retro"] .day-status,
+    [data-theme="retro"] .day-chip.today {
+        border-radius: 6px !important;
+    }
+
+    [data-theme="retro"] .habit-row-copy h3,
+    [data-theme="retro"] .day-status span,
+    [data-theme="retro"] .range-select,
+    [data-theme="retro"] .range-menu-item {
+        font-family: 'Press Start 2P', 'JetBrains Mono', monospace;
+    }
+
+    [data-theme="retro"] .habit-row-copy h3 {
+        font-size: 0.74rem;
+        line-height: 1.5;
+    }
+
+    [data-theme="retro"] .day-status {
+        border-width: 2px;
+        box-shadow:
+            3px 3px 0 color-mix(in srgb, var(--accent-color) 30%, transparent),
+            0 0 12px color-mix(in srgb, var(--primary-color) 18%, transparent);
+    }
+
+    [data-theme="ocean"] .day-chip.today {
+        background: color-mix(in srgb, var(--card-bg) 88%, rgba(255, 255, 255, 0.12));
+        border-color: color-mix(in srgb, var(--accent-color) 34%, var(--card-border));
+        box-shadow: 0 10px 18px rgba(2, 33, 44, 0.14);
+    }
+
+    [data-theme="ocean"] .day-status {
+        background: linear-gradient(180deg, color-mix(in srgb, var(--card-bg) 88%, rgba(255, 255, 255, 0.14)) 0%, color-mix(in srgb, var(--card-bg) 96%, transparent) 100%);
+        border-color: color-mix(in srgb, var(--accent-color) 46%, var(--card-border));
+        box-shadow:
+            0 10px 18px rgba(2, 33, 44, 0.16),
+            inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    }
+
+    [data-theme="paper"] .habit-row {
+        border-style: solid;
+    }
+
+    [data-theme="paper"] .day-chip.today,
+    [data-theme="paper"] .day-status {
+        border-radius: 18px !important;
+        border-color: var(--paper-ink-strong);
+        box-shadow: 2px 3px 0 rgba(0, 0, 0, 0.08);
     }
 
     .day-status.partial {

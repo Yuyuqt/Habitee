@@ -151,6 +151,57 @@
             0 8px 18px rgba(197, 121, 160, 0.14),
             inset 0 1px 0 rgba(255, 255, 255, 0.82);
     }
+
+    [data-theme="matcha"] .habit-card {
+        border-color: color-mix(in srgb, var(--primary-color) 24%, var(--card-border));
+    }
+
+    [data-theme="matcha"] .habit-action {
+        background: linear-gradient(180deg, rgba(255, 250, 239, 0.94) 0%, rgba(238, 233, 212, 0.82) 100%);
+        border-color: color-mix(in srgb, var(--primary-color) 36%, var(--card-border));
+    }
+
+    [data-theme="retro"] .habit-card,
+    [data-theme="retro"] .habit-action {
+        border-radius: 6px !important;
+    }
+
+    [data-theme="retro"] .habit-title,
+    [data-theme="retro"] .habit-streak,
+    [data-theme="retro"] .habit-action {
+        font-family: 'Press Start 2P', 'JetBrains Mono', monospace;
+    }
+
+    [data-theme="retro"] .habit-title {
+        font-size: 0.88rem;
+        line-height: 1.35;
+    }
+
+    [data-theme="retro"] .habit-streak {
+        font-size: 0.68rem;
+    }
+
+    [data-theme="retro"] .habit-action {
+        border-width: 2px;
+    }
+
+    [data-theme="ocean"] .habit-action {
+        background: linear-gradient(180deg, color-mix(in srgb, var(--card-bg) 88%, rgba(255, 255, 255, 0.12)) 0%, color-mix(in srgb, var(--card-bg) 96%, transparent) 100%);
+        border-color: color-mix(in srgb, var(--accent-color) 44%, var(--card-border));
+        box-shadow:
+            0 10px 20px rgba(3, 40, 52, 0.16),
+            inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    }
+
+    [data-theme="paper"] .habit-card {
+        border-style: solid;
+    }
+
+    [data-theme="paper"] .habit-action {
+        border-radius: 18px !important;
+        border-color: var(--paper-ink-strong);
+        box-shadow: 2px 3px 0 rgba(0, 0, 0, 0.08);
+    }
 </style>
 
 @code {
