@@ -47,48 +47,163 @@
     --outline-width: 1.5px;
 }
 
-/* 
-  Theme Switcher Structure 
-  Change the vibe entirely just by swapping the 4 hex codes below! 
-*/
+/* --- Theme Switcher Structure --- */
 
 [data-theme="habitee"] {
     --main-bg: #f8fafc;
     --wave-color: #2563eb;
     --card-bg: #ffffff;
     --text-color: #1e293b;
+    --accent-color: #2563eb;
+    --palette-1: #2563eb;
+    --palette-2: #60a5fa;
+    --palette-3: #93c5fd;
+    --palette-4: #dbeafe;
+    --palette-5: #f8fafc;
 }
 
-[data-theme="sunset"] {
-    --main-bg: #fffbf0;
-    --wave-color: #ff8b70;
-    --card-bg: #ffffff;
-    --text-color: #4a2e2b;
+[data-theme="pastel"] {
+    --main-bg: #e0decd;
+    --wave-color: #8690a2;
+    --card-bg: #b4d1d3;
+    --text-color: #62574d;
+    --accent-color: #d2c296;
+    --palette-1: #ab9b8e;
+    --palette-2: #8690a2;
+    --palette-3: #d2c296;
+    --palette-4: #b4d1d3;
+    --palette-5: #e0decd;
+}
+
+[data-theme="sakura"] {
+    --main-bg: #e5dfe9;
+    --wave-color: #ae5d5c;
+    --card-bg: #b6d1ef;
+    --text-color: #704645;
+    --accent-color: #eb908f;
+    --palette-1: #ae5d5c;
+    --palette-2: #eb908f;
+    --palette-3: #abacba;
+    --palette-4: #b6d1ef;
+    --palette-5: #e5dfe9;
+}
+
+[data-theme="galaxy"] {
+    --main-bg: #e6e1e1;
+    --wave-color: #ff2446;
+    --card-bg: #f5b6c2;
+    --text-color: #7f2437;
+    --accent-color: #ff7c96;
+    --palette-1: #ff2446;
+    --palette-2: #ff7c96;
+    --palette-3: #f5b6c2;
+    --palette-4: #d8c3c3;
+    --palette-5: #e6e1e1;
+}
+
+[data-theme="cyberpunk"] {
+    --main-bg: #d4d9de;
+    --wave-color: #1c3704;
+    --card-bg: #a4b4c4;
+    --text-color: #24331b;
+    --accent-color: #4b6c34;
+    --palette-1: #1c3704;
+    --palette-2: #4b6c34;
+    --palette-3: #8cb5b4;
+    --palette-4: #a4b4c4;
+    --palette-5: #d4d9de;
 }
 
 [data-theme="matcha"] {
-    --main-bg: #f3f7f0;
-    --wave-color: #8ab882;
-    --card-bg: #ffffff;
-    --text-color: #2a3a28;
+    --main-bg: #dedede;
+    --wave-color: #5d011b;
+    --card-bg: #cc9059;
+    --text-color: #3d3432;
+    --accent-color: #c12457;
+    --palette-1: #3a3937;
+    --palette-2: #5d011b;
+    --palette-3: #c12457;
+    --palette-4: #cc9059;
+    --palette-5: #dedede;
 }
 
-[data-theme="midnight"] {
-    --main-bg: #0f172a;
-    --wave-color: #6366f1;
-    --card-bg: #1e293b;
-    --text-color: #f1f5f9;
-}
-
-/* Base Dark Mode overrides */
+/* Base Dark Mode overrides - Only for generic effects, core colors come from themes */
 [data-theme-mode="dark"] {
+    --card-shadow: 0 14px 40px rgba(2, 6, 23, 0.4);
+    --card-shadow-strong: 0 20px 50px rgba(2, 6, 23, 0.5);
+}
+
+/* Default theme dark variant */
+[data-theme="habitee"][data-theme-mode="dark"] {
     --main-bg: #0f172a;
     --wave-color: #3b82f6;
     --card-bg: #1e293b;
     --text-color: #f1f5f9;
-    
-    --card-shadow: 0 14px 40px rgba(2, 6, 23, 0.4);
-    --card-shadow-strong: 0 20px 50px rgba(2, 6, 23, 0.5);
+}
+
+[data-theme="pastel"][data-theme-mode="dark"] {
+    --main-bg: #1e1a19;
+    --wave-color: #aeb6c4;
+    --card-bg: #2b2524;
+    --text-color: #eee7dc;
+    --accent-color: #d9c89a;
+    --palette-1: #403731;
+    --palette-2: #aeb6c4;
+    --palette-3: #d9c89a;
+    --palette-4: #5f777c;
+    --palette-5: #1e1a19;
+}
+
+[data-theme="sakura"][data-theme-mode="dark"] {
+    --main-bg: #211718;
+    --wave-color: #d98b88;
+    --card-bg: #302325;
+    --text-color: #f4e7e7;
+    --accent-color: #d1daf2;
+    --palette-1: #4a292b;
+    --palette-2: #d98b88;
+    --palette-3: #8b8ea2;
+    --palette-4: #d1daf2;
+    --palette-5: #211718;
+}
+
+[data-theme="galaxy"][data-theme-mode="dark"] {
+    --main-bg: #221417;
+    --wave-color: #ff8ea0;
+    --card-bg: #321c22;
+    --text-color: #ffe9ee;
+    --accent-color: #f8c0c9;
+    --palette-1: #642330;
+    --palette-2: #ff8ea0;
+    --palette-3: #f8c0c9;
+    --palette-4: #8d6b73;
+    --palette-5: #221417;
+}
+
+[data-theme="cyberpunk"][data-theme-mode="dark"] {
+    --main-bg: #10170f;
+    --wave-color: #8eb57a;
+    --card-bg: #1a2418;
+    --text-color: #edf4ec;
+    --accent-color: #94c2c0;
+    --palette-1: #203818;
+    --palette-2: #8eb57a;
+    --palette-3: #94c2c0;
+    --palette-4: #5d6c7d;
+    --palette-5: #10170f;
+}
+
+[data-theme="matcha"][data-theme-mode="dark"] {
+    --main-bg: #171314;
+    --wave-color: #d66f8d;
+    --card-bg: #261d1f;
+    --text-color: #f6e9e6;
+    --accent-color: #d9a16d;
+    --palette-1: #4d4b4b;
+    --palette-2: #8a213d;
+    --palette-3: #d66f8d;
+    --palette-4: #d9a16d;
+    --palette-5: #171314;
 }
 
 body {

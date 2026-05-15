@@ -1,4 +1,5 @@
 @page "/add-habit"
+@using Habitee.Models
 @using Habitee.Services
 @inject DatabaseService DbService
 @inject NavigationManager NavManager
@@ -40,13 +41,26 @@
                     <div class="template-list">
                         @foreach (var template in category.Items)
                         {
-                            <div class="template-card glass-panel" @onclick="() => SelectTemplate(template)">
+                            <div class="template-card glass-panel @(IsSelected(template) ? "selected" : "")"
+                                 @onclick="() => HandleTemplateClick(template)">
                                 <HabitIcon Name="@template.Icon" Color="@template.Color" Size="24" />
                                 <div class="template-info">
                                     <h4>@template.Title</h4>
                                     <p>@template.Description</p>
                                 </div>
-                                <div class="checkbox"></div>
+                                <button type="button"
+                                        class="checkbox @(IsSelected(template) ? "selected" : "")"
+                                        aria-label="Select template"
+                                        aria-pressed="@IsSelected(template)"
+                                        @onclick:stopPropagation="true"
+                                        @onclick="() => ToggleTemplateSelection(template)">
+                                    @if (IsSelected(template))
+                                    {
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            <polyline points="20 6 9 17 4 12"></polyline>
+                                        </svg>
+                                    }
+                                </button>
                             </div>
                         }
                     </div>
@@ -65,8 +79,12 @@
     </div>
 
     <div class="fixed-bottom">
-        <button class="primary-btn glass-button" @onclick='() => NavManager.NavigateTo("/new-habit?reset=true")'>
-            Create Custom Habit
+        <button class="primary-btn glass-button"
+                disabled="@isSavingSelection"
+                @onclick="HandlePrimaryAction">
+            @(SelectedCount > 0
+                ? (isSavingSelection ? "Adding..." : $"Add Selected Habits ({SelectedCount})")
+                : "Create Custom Habit")
         </button>
     </div>
 </div>
@@ -198,6 +216,17 @@
         transition: border-color 0.16s ease, box-shadow 0.16s ease, background-color 0.16s ease;
     }
 
+    .template-card:hover {
+        border-color: color-mix(in srgb, var(--primary-color) 24%, var(--card-border));
+        background: color-mix(in srgb, var(--button-hover-surface) 82%, transparent);
+    }
+
+    .template-card.selected {
+        border-color: color-mix(in srgb, var(--primary-color) 44%, var(--card-border));
+        background: color-mix(in srgb, var(--primary-color) 14%, transparent);
+        box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary-color) 18%, transparent);
+    }
+
 
 
     .template-info {
@@ -220,6 +249,20 @@
         height: 24px;
         border: 2px solid var(--card-border);
         border-radius: 6px;
+        background: transparent;
+        color: var(--primary-contrast);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        padding: 0;
+        cursor: pointer;
+        transition: border-color 0.16s ease, background-color 0.16s ease, color 0.16s ease;
+    }
+
+    .checkbox.selected {
+        border-color: var(--primary-color);
+        background: var(--primary-color);
     }
 
     .fixed-bottom {
@@ -262,6 +305,9 @@
     private string currentTab = "positive";
     private string searchQuery = "";
     private bool showBackButton;
+    private bool isSavingSelection;
+    private readonly HashSet<HabitTemplate> selectedTemplates = new();
+    private int SelectedCount => selectedTemplates.Count;
 
     protected override async Task OnInitializedAsync()
     {
@@ -283,10 +329,64 @@
         })
         .Where(c => c.Items.Any());
 
-    private void SelectTemplate(HabitTemplate template)
+    private void HandleTemplateClick(HabitTemplate template)
     {
-        // Pass parameters to new-habit form via query string
+        if (SelectedCount > 0)
+        {
+            ToggleTemplateSelection(template);
+            return;
+        }
+
         NavManager.NavigateTo($"/new-habit?reset=true&title={Uri.EscapeDataString(template.Title)}&desc={Uri.EscapeDataString(template.Description)}&icon={template.Icon}&color={Uri.EscapeDataString(template.Color)}");
+    }
+
+    private bool IsSelected(HabitTemplate template) => selectedTemplates.Contains(template);
+
+    private void ToggleTemplateSelection(HabitTemplate template)
+    {
+        if (!selectedTemplates.Add(template))
+        {
+            selectedTemplates.Remove(template);
+        }
+    }
+
+    private async Task HandlePrimaryAction()
+    {
+        if (SelectedCount == 0)
+        {
+            NavManager.NavigateTo("/new-habit?reset=true");
+            return;
+        }
+
+        if (isSavingSelection)
+        {
+            return;
+        }
+
+        isSavingSelection = true;
+
+        try
+        {
+            foreach (var template in selectedTemplates)
+            {
+                var habit = new Habit
+                {
+                    Title = template.Title,
+                    Description = template.Description,
+                    Icon = template.Icon,
+                    Color = template.Color
+                };
+
+                await DbService.SaveHabitAsync(habit);
+            }
+
+            selectedTemplates.Clear();
+            NavManager.NavigateTo("/app");
+        }
+        finally
+        {
+            isSavingSelection = false;
+        }
     }
 
     private class HabitCategory
