@@ -5,9 +5,15 @@
     --wave-color: #2563eb;
     --card-bg: #ffffff;
     --text-color: #1e293b;
+    --page-bg: var(--main-bg);
+    --wave-hue-1: var(--wave-color);
+    --wave-hue-2: var(--wave-color);
+    --wave-hue-3: var(--wave-color);
+    --wave-hue-4: var(--wave-color);
+    --wave-hue-5: var(--wave-color);
 
     /* --- Derived Colors (Automated) --- */
-    --bg-color: var(--main-bg);
+    --bg-color: var(--page-bg);
     --primary-color: var(--wave-color);
     --primary-contrast: var(--card-bg);
     
@@ -21,6 +27,8 @@
     
     --success-color: #10b981; /* Standard success */
     --accent-color: var(--wave-color);
+    --wave-opacity-soft: 0.18;
+    --wave-opacity-strong: 0.3;
 
     /* Shadows and Effects */
     --card-shadow: 0 12px 30px color-mix(in srgb, var(--text-color) 4%, transparent);
@@ -114,23 +122,46 @@
     --palette-5: #d4d9de;
 }
 
-[data-theme="matcha"] {
-    --main-bg: #dedede;
-    --wave-color: #5d011b;
-    --card-bg: #cc9059;
-    --text-color: #3d3432;
-    --accent-color: #c12457;
-    --palette-1: #3a3937;
-    --palette-2: #5d011b;
-    --palette-3: #c12457;
-    --palette-4: #cc9059;
-    --palette-5: #dedede;
+[data-theme="harvest"] {
+    --main-bg: #f1eae4;
+    --wave-color: #ca5908;
+    --card-bg: #e7d4b5;
+    --text-color: #6a3510;
+    --accent-color: #fe7527;
+    --palette-1: #ca5908;
+    --palette-2: #fe7527;
+    --palette-3: #d49650;
+    --palette-4: #e7d4b5;
+    --palette-5: #f1eae4;
+}
+
+[data-theme="prism"] {
+    --main-bg: #ffffff;
+    --page-bg: #ffffff;
+    --wave-color: #111111;
+    --card-bg: #ffffff;
+    --text-color: #111111;
+    --accent-color: #111111;
+    --wave-hue-1: #9794d1;
+    --wave-hue-2: #85b4da;
+    --wave-hue-3: #c8aad7;
+    --wave-hue-4: #f1b6b0;
+    --wave-hue-5: #f3e3b3;
+    --wave-opacity-soft: 0.34;
+    --wave-opacity-strong: 0.56;
+    --palette-1: #9794d1;
+    --palette-2: #85b4da;
+    --palette-3: #c8aad7;
+    --palette-4: #f1b6b0;
+    --palette-5: #f3e3b3;
 }
 
 /* Base Dark Mode overrides - Only for generic effects, core colors come from themes */
 [data-theme-mode="dark"] {
     --card-shadow: 0 14px 40px rgba(2, 6, 23, 0.4);
     --card-shadow-strong: 0 20px 50px rgba(2, 6, 23, 0.5);
+    --wave-opacity-soft: 0.24;
+    --wave-opacity-strong: 0.38;
 }
 
 /* Default theme dark variant */
@@ -193,17 +224,38 @@
     --palette-5: #10170f;
 }
 
-[data-theme="matcha"][data-theme-mode="dark"] {
-    --main-bg: #171314;
-    --wave-color: #d66f8d;
-    --card-bg: #261d1f;
-    --text-color: #f6e9e6;
-    --accent-color: #d9a16d;
-    --palette-1: #4d4b4b;
-    --palette-2: #8a213d;
-    --palette-3: #d66f8d;
-    --palette-4: #d9a16d;
-    --palette-5: #171314;
+[data-theme="harvest"][data-theme-mode="dark"] {
+    --main-bg: #21140f;
+    --wave-color: #f39454;
+    --card-bg: #35221b;
+    --text-color: #f8eee6;
+    --accent-color: #d9ae73;
+    --palette-1: #5a260b;
+    --palette-2: #f39454;
+    --palette-3: #d9ae73;
+    --palette-4: #8c6b54;
+    --palette-5: #21140f;
+}
+
+[data-theme="prism"][data-theme-mode="dark"] {
+    --main-bg: #000000;
+    --page-bg: #000000;
+    --wave-color: #f5f5f5;
+    --card-bg: #111111;
+    --text-color: #f5f5f5;
+    --accent-color: #f5f5f5;
+    --wave-hue-1: #9794d1;
+    --wave-hue-2: #85b4da;
+    --wave-hue-3: #c8aad7;
+    --wave-hue-4: #f1b6b0;
+    --wave-hue-5: #f3e3b3;
+    --wave-opacity-soft: 0.3;
+    --wave-opacity-strong: 0.52;
+    --palette-1: #9794d1;
+    --palette-2: #85b4da;
+    --palette-3: #c8aad7;
+    --palette-4: #f1b6b0;
+    --palette-5: #f3e3b3;
 }
 
 body {

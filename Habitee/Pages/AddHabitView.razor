@@ -318,9 +318,9 @@
     private List<HabitCategory> CurrentTemplates => currentTab == "positive" ? positiveTemplates : negativeTemplates;
 
     private IEnumerable<HabitCategory> FilteredCategories => CurrentTemplates
-        .Select(c => new HabitCategory 
-        { 
-            CategoryName = c.CategoryName, 
+        .Select(c => new HabitCategory
+        {
+            CategoryName = c.CategoryName,
             Items = c.Items.Where(i =>
                     string.IsNullOrEmpty(searchQuery)
                     || i.Title.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)

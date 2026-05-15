@@ -53,12 +53,19 @@
                         <div class="preview"></div>
                         <span>Quiet Grove</span>
                     </button>
-                    
-                    <button class="theme-btn matcha @(ThemeService.CurrentTheme == "matcha" ? "selected" : "")" 
-                            @onclick='() => SetTheme("matcha")'>
+
+                    <button class="theme-btn harvest @(ThemeService.CurrentTheme == "harvest" ? "selected" : "")" 
+                            @onclick='() => SetTheme("harvest")'>
                         <div class="preview"></div>
-                        <span>Velvet Spiral</span>
+                        <span>Pumpkin Glow</span>
                     </button>
+
+                    <button class="theme-btn prism @(ThemeService.CurrentTheme == "prism" ? "selected" : "")" 
+                            @onclick='() => SetTheme("prism")'>
+                        <div class="preview"></div>
+                        <span>Prism Veil</span>
+                    </button>
+
                 </div>
             </div>
         </section>
@@ -410,16 +417,28 @@
         --palette-5: #d4d9de;
     }
 
-    .theme-btn.matcha {
-        --theme-preview: #5d011b;
-        --theme-surface: #dedede;
-        --theme-ink: #3d3432;
-        --theme-accent: #c12457;
-        --palette-1: #3a3937;
-        --palette-2: #5d011b;
-        --palette-3: #c12457;
-        --palette-4: #cc9059;
-        --palette-5: #dedede;
+    .theme-btn.harvest {
+        --theme-preview: #ca5908;
+        --theme-surface: #f1eae4;
+        --theme-ink: #6a3510;
+        --theme-accent: #fe7527;
+        --palette-1: #ca5908;
+        --palette-2: #fe7527;
+        --palette-3: #d49650;
+        --palette-4: #e7d4b5;
+        --palette-5: #f1eae4;
+    }
+
+    .theme-btn.prism {
+        --theme-preview: #9794d1;
+        --theme-surface: #ffffff;
+        --theme-ink: #111111;
+        --theme-accent: #85b4da;
+        --palette-1: #9794d1;
+        --palette-2: #85b4da;
+        --palette-3: #c8aad7;
+        --palette-4: #f1b6b0;
+        --palette-5: #f3e3b3;
     }
 
     [data-theme-mode="dark"] .theme-btn.pastel {
@@ -470,16 +489,28 @@
         --palette-5: #10170f;
     }
 
-    [data-theme-mode="dark"] .theme-btn.matcha {
-        --theme-preview: #d66f8d;
-        --theme-surface: #171314;
-        --theme-ink: #f6e9e6;
-        --theme-accent: #d9a16d;
-        --palette-1: #4d4b4b;
-        --palette-2: #8a213d;
-        --palette-3: #d66f8d;
-        --palette-4: #d9a16d;
-        --palette-5: #171314;
+    [data-theme-mode="dark"] .theme-btn.harvest {
+        --theme-preview: #f39454;
+        --theme-surface: #21140f;
+        --theme-ink: #f8eee6;
+        --theme-accent: #d9ae73;
+        --palette-1: #5a260b;
+        --palette-2: #f39454;
+        --palette-3: #d9ae73;
+        --palette-4: #8c6b54;
+        --palette-5: #21140f;
+    }
+
+    [data-theme-mode="dark"] .theme-btn.prism {
+        --theme-preview: #b2afe8;
+        --theme-surface: #060606;
+        --theme-ink: #f5f5f5;
+        --theme-accent: #8eb7dd;
+        --palette-1: #8f8bd4;
+        --palette-2: #7eadd3;
+        --palette-3: #b99ace;
+        --palette-4: #e5aaa5;
+        --palette-5: #151515;
     }
 
     .notification-actions {

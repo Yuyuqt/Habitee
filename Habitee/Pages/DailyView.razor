@@ -29,12 +29,34 @@
     else
     {
         <div class="habits-list">
-            @foreach (var habit in habits)
+            @foreach (var habit in VisibleHabits)
             {
                 var habitLogs = logs.Where(l => l.HabitId == habit.Id).ToList();
                 <HabitCard Habit="habit" Logs="habitLogs" OnComplete="HandleComplete" />
             }
         </div>
+
+        @if (TotalPages > 1)
+        {
+            <div class="pager-row">
+                <button type="button"
+                        class="glass-button pager-btn"
+                        disabled="@(CurrentPage == 1)"
+                        @onclick="PreviousPage">
+                    Previous
+                </button>
+                <div class="pager-meta">
+                    <span>Page @CurrentPage of @TotalPages</span>
+                    <small>@PageSummary</small>
+                </div>
+                <button type="button"
+                        class="glass-button pager-btn"
+                        disabled="@(CurrentPage == TotalPages)"
+                        @onclick="NextPage">
+                    Next
+                </button>
+            </div>
+        }
     }
 </div>
 
@@ -74,9 +96,31 @@
 </style>
 
 @code {
+    private const int PageSize = 6;
     private List<Habit> habits = new();
     private List<HabitLog> logs = new();
     private bool isLoading = true;
+    private int currentPage = 1;
+
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling(habits.Count / (double)PageSize));
+    private int CurrentPage => Math.Min(currentPage, TotalPages);
+    private IEnumerable<Habit> VisibleHabits => habits
+        .Skip((CurrentPage - 1) * PageSize)
+        .Take(PageSize);
+    private string PageSummary
+    {
+        get
+        {
+            if (!habits.Any())
+            {
+                return "0 habits";
+            }
+
+            var start = ((CurrentPage - 1) * PageSize) + 1;
+            var end = Math.Min(CurrentPage * PageSize, habits.Count);
+            return $"{start}-{end} of {habits.Count} habits";
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -109,5 +153,21 @@
         await DbService.CycleHabitCompletionAsync(habit);
         logs = await DbService.GetLogsAsync();
         StateHasChanged();
+    }
+
+    private void PreviousPage()
+    {
+        if (CurrentPage > 1)
+        {
+            currentPage--;
+        }
+    }
+
+    private void NextPage()
+    {
+        if (CurrentPage < TotalPages)
+        {
+            currentPage++;
+        }
     }
 }

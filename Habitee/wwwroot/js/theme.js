@@ -1,15 +1,20 @@
 window.themeInterop = {
+    validThemes: ['habitee', 'pastel', 'sakura', 'galaxy', 'cyberpunk', 'harvest', 'prism'],
+
     init: function () {
-        const theme = localStorage.getItem('habitee-theme') || 'habitee';
+        const storedTheme = localStorage.getItem('habitee-theme') || 'habitee';
+        const theme = this.validThemes.includes(storedTheme) ? storedTheme : 'habitee';
         const mode = localStorage.getItem('habitee-theme-mode') || 'light';
+        localStorage.setItem('habitee-theme', theme);
         this.applyTheme(theme, mode);
         return { theme, mode };
     },
     
     setTheme: function (theme, mode) {
-        localStorage.setItem('habitee-theme', theme);
+        const safeTheme = this.validThemes.includes(theme) ? theme : 'habitee';
+        localStorage.setItem('habitee-theme', safeTheme);
         localStorage.setItem('habitee-theme-mode', mode);
-        this.applyTheme(theme, mode);
+        this.applyTheme(safeTheme, mode);
     },
     
     applyTheme: function (theme, mode) {
