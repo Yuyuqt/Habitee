@@ -43,7 +43,7 @@
                         {
                             <div class="template-card glass-panel @(IsSelected(template) ? "selected" : "")"
                                  @onclick="() => HandleTemplateClick(template)">
-                                <HabitIcon Name="@template.Icon" Color="@template.Color" Size="24" />
+                                <HabitIcon Name="@template.Icon" Color="@template.Color" Size="22" />
                                 <div class="template-info">
                                     <h4>@template.Title</h4>
                                     <p>@template.Description</p>
@@ -191,27 +191,27 @@
     }
 
     .category-section {
-        margin-bottom: 2rem;
+        margin-bottom: 1.35rem;
     }
 
     .category-title {
         font-size: var(--font-size-body-xs);
         color: var(--text-muted);
-        margin-bottom: 1rem;
+        margin-bottom: 0.65rem;
         letter-spacing: 1px;
     }
 
     .template-list {
         display: flex;
         flex-direction: column;
-        gap: 0.75rem;
+        gap: 0.55rem;
     }
 
     .template-card {
         display: flex;
         align-items: center;
-        padding: 1rem;
-        gap: 1rem;
+        padding: 0.8rem 0.95rem;
+        gap: 0.8rem;
         cursor: pointer;
         transition: border-color 0.16s ease, box-shadow 0.16s ease, background-color 0.16s ease;
     }
@@ -231,17 +231,23 @@
 
     .template-info {
         flex: 1;
+        min-width: 0;
     }
 
     .template-info h4 {
-        margin: 0 0 0.25rem 0;
-        font-size: var(--font-size-card-title);
+        margin: 0 0 0.15rem 0;
+        font-size: 1.02rem;
+        line-height: 1.15;
     }
 
     .template-info p {
         margin: 0;
         font-size: var(--font-size-body-xs);
         color: var(--text-muted);
+        line-height: 1.25;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .checkbox {
@@ -294,9 +300,53 @@
         .view-container {
             padding-top: 1.5rem;
         }
+
         .fixed-bottom {
             left: 0;
             padding: 0 1rem;
+        }
+
+        .tabs-container {
+            margin-bottom: 0.75rem;
+        }
+
+        .tab-btn {
+            padding: 0.68rem;
+        }
+
+        .search-container {
+            padding: 0 1rem 0.8rem 1rem;
+        }
+
+        .content-scroll {
+            padding: 0 1rem;
+        }
+
+        .category-section {
+            margin-bottom: 1.1rem;
+        }
+
+        .template-card {
+            padding: 0.72rem 0.8rem;
+            gap: 0.72rem;
+            border-radius: 22px;
+        }
+
+        .template-info h4 {
+            font-size: 0.96rem;
+        }
+
+        .template-info p {
+            font-size: 0.8rem;
+        }
+
+        .checkbox {
+            width: 22px;
+            height: 22px;
+        }
+
+        .primary-btn {
+            padding: 0.9rem;
         }
     }
 </style>

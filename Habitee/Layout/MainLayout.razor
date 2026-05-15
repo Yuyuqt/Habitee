@@ -2,10 +2,11 @@
 @implements IDisposable
 @inject NotificationService NotificationService
 @inject ThemeService ThemeService
+@inject NavigationManager NavManager
 
 <BackgroundLayer />
 
-<div class="page-container fade-in">
+<div class="page-container fade-in @(ShouldHideMobileNav ? "mobile-nav-hidden" : "")">
     <button type="button"
             class="mode-toggle glass-button @(ThemeService.CurrentMode == "dark" ? "active" : "")"
             title="Toggle light and dark mode"
@@ -40,7 +41,7 @@
     </main>
 </div>
 
-<DockNavigation />
+<DockNavigation HideOnMobile="@ShouldHideMobileNav" />
 
 <style>
     .page-container {
@@ -88,6 +89,11 @@
     }
 
     @@media (max-width: 720px) {
+        .mobile-nav-hidden {
+            --page-action-offset: calc(var(--safe-area-bottom) + 0.9rem);
+            --page-action-clearance: calc(var(--page-action-height) + var(--page-action-offset));
+        }
+
         .mode-toggle {
             top: 0.9rem;
             right: 0.9rem;
@@ -95,6 +101,14 @@
             width: 48px;
             height: 48px;
             padding: 0;
+        }
+
+        .mobile-nav-hidden .mode-toggle {
+            top: calc(env(safe-area-inset-top, 0px) + 0.2rem);
+            right: 0.45rem;
+            min-width: 42px;
+            width: 42px;
+            height: 42px;
         }
 
         .mode-toggle span {
@@ -105,6 +119,10 @@
             padding-left: 0;
             padding-right: 0;
         }
+
+        .mobile-nav-hidden .content-wrapper {
+            padding-bottom: 0;
+        }
     }
 </style>
 
@@ -112,7 +130,10 @@
     protected override void OnInitialized()
     {
         ThemeService.OnThemeChanged += HandleThemeChanged;
+        NavManager.LocationChanged += HandleLocationChanged;
     }
+
+    private bool ShouldHideMobileNav => !IsMainRoute(NavManager.Uri);
 
     private async Task ToggleMode()
     {
@@ -124,8 +145,20 @@
         InvokeAsync(StateHasChanged);
     }
 
+    private void HandleLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private static bool IsMainRoute(string uri)
+    {
+        var path = new Uri(uri).AbsolutePath.TrimEnd('/').ToLowerInvariant();
+        return path is "" or "/" or "/app" or "/grid" or "/calendar" or "/settings";
+    }
+
     public void Dispose()
     {
         ThemeService.OnThemeChanged -= HandleThemeChanged;
+        NavManager.LocationChanged -= HandleLocationChanged;
     }
 }

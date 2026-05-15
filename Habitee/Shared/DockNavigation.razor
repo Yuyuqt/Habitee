@@ -1,4 +1,4 @@
-<nav class="dock-nav glass-panel" aria-label="Primary">
+<nav class="dock-nav glass-panel @(HideOnMobile ? "hide-on-mobile" : "")" aria-label="Primary">
     <ul>
         <li>
             <NavLink href="/app" Match="NavLinkMatch.All" class="nav-item">
@@ -108,6 +108,10 @@
     }
 
     @@media (max-width: 720px) {
+        .dock-nav.hide-on-mobile {
+            display: none;
+        }
+
         .dock-nav {
             top: auto;
             bottom: calc(var(--dock-bottom-offset) + var(--safe-area-bottom));
@@ -153,3 +157,8 @@
         }
     }
 </style>
+
+@code {
+    [Parameter]
+    public bool HideOnMobile { get; set; }
+}
