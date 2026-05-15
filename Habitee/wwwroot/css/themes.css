@@ -1,333 +1,96 @@
 /* Base palette and typography tokens */
 :root {
-    --bg-color: #ffffff;
-    --bg-gradient: none;
-    --bg-size: auto;
-    --bg-repeat: no-repeat;
-    --bg-position: center;
-
-    --text-color: #2c3e50;
-    --text-muted: #6d7d8a;
-
+    /* --- The 4 Core Hex Codes --- */
+    --main-bg: #f8fafc;
+    --wave-color: #2563eb;
     --card-bg: #ffffff;
-    --card-border: #d8dfe3;
-    --card-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
-    --card-shadow-strong: 0 12px 28px rgba(15, 23, 42, 0.1);
+    --text-color: #1e293b;
 
-    --button-hover-surface: #eef2f3;
-    --button-hover-border: #c0cacc;
+    /* --- Derived Colors (Automated) --- */
+    --bg-color: var(--main-bg);
+    --primary-color: var(--wave-color);
+    --primary-contrast: var(--card-bg);
+    
+    /* Using color-mix to create muted text, borders, and hovers automatically */
+    --text-muted: color-mix(in srgb, var(--text-color) 60%, transparent);
+    --card-border: color-mix(in srgb, var(--text-color) 12%, transparent);
+    
+    --button-hover-surface: color-mix(in srgb, var(--wave-color) 8%, var(--card-bg));
+    --button-hover-border: color-mix(in srgb, var(--wave-color) 30%, transparent);
     --button-hover-text: var(--text-color);
+    
+    --success-color: #10b981; /* Standard success */
+    --accent-color: var(--wave-color);
 
-    --primary-color: #95a5a6;
-    --primary-contrast: #2c3e50;
-    --success-color: #6f8f90;
-    --accent-color: #edf3f3;
+    /* Shadows and Effects */
+    --card-shadow: 0 12px 30px color-mix(in srgb, var(--text-color) 4%, transparent);
+    --card-shadow-strong: 0 16px 40px color-mix(in srgb, var(--text-color) 8%, transparent);
 
-    --font-size-page-title: 2rem;
+    /* --- Typography and Structure --- */
+    --font-size-page-title: 2.25rem;
     --font-size-section-title: 1.5rem;
-    --font-size-card-title: 1.05rem;
+    --font-size-card-title: 1.15rem;
     --font-size-body: 1rem;
     --font-size-body-sm: 0.92rem;
     --font-size-body-xs: 0.85rem;
     --font-size-label: 0.78rem;
     --font-size-badge: 0.82rem;
     --font-size-micro: 0.72rem;
-    --line-height-title: 1.1;
-    --line-height-copy: 1.5;
+    --line-height-title: 1.2;
+    --line-height-copy: 1.6;
 
-    --font-family: 'Inter', sans-serif;
+    --font-family: 'Outfit', 'Inter', sans-serif;
     --font-weight-title: 700;
     --font-weight-desc: 400;
 
-    --border-radius: 18px;
-    --outline-width: 1px;
-    --glass-blur: 0;
-    --glass-button-blur: 0;
+    --border-radius: 28px;
+    --outline-width: 1.5px;
 }
 
-[data-theme-mode="dark"] {
-    --bg-color: #17212b;
-    --text-color: #f4f7f7;
-    --text-muted: #b3c0c1;
-    --card-bg: #1f2d38;
-    --card-border: #33434f;
-    --card-shadow: 0 10px 28px rgba(2, 6, 23, 0.28);
-    --card-shadow-strong: 0 14px 30px rgba(2, 6, 23, 0.34);
-    --button-hover-surface: #283742;
-    --button-hover-border: #54636d;
-    --button-hover-text: var(--text-color);
-}
+/* 
+  Theme Switcher Structure 
+  Change the vibe entirely just by swapping the 4 hex codes below! 
+*/
 
 [data-theme="habitee"] {
-    --bg-color: #ffffff;
-    --text-color: #2c3e50;
-    --text-muted: #6d7d8a;
+    --main-bg: #f8fafc;
+    --wave-color: #2563eb;
     --card-bg: #ffffff;
-    --card-border: #d8dfe3;
-    --button-hover-surface: #eef2f3;
-    --button-hover-border: #c0cacc;
-    --button-hover-text: #2c3e50;
-    --primary-color: #95a5a6;
-    --primary-contrast: #2c3e50;
-    --success-color: #6f8f90;
-    --accent-color: #edf3f3;
+    --text-color: #1e293b;
 }
 
-[data-theme="habitee"][data-theme-mode="dark"] {
-    --bg-color: #17212b;
-    --text-color: #f4f7f7;
-    --text-muted: #b3c0c1;
-    --card-bg: #1f2d38;
-    --card-border: #33434f;
-    --button-hover-surface: #283742;
-    --button-hover-border: #54636d;
-    --button-hover-text: #f4f7f7;
-    --primary-color: #b9c6c7;
-    --primary-contrast: #1c2833;
-    --success-color: #8fb8a8;
-    --accent-color: #2a3a44;
-}
-
-[data-theme="pastel"] {
-    --bg-color: #f7fbf8;
-    --text-color: #5f5369;
-    --text-muted: #8a7d90;
-    --card-bg: #fffdfd;
-    --card-border: #eadfe8;
-    --button-hover-surface: #f3edf5;
-    --button-hover-border: #dac8dd;
-    --button-hover-text: #5f5369;
-    --primary-color: #e0bbe4;
-    --primary-contrast: #4f3d59;
-    --success-color: #8fbea2;
-    --accent-color: #fec8d8;
-}
-
-[data-theme="pastel"][data-theme-mode="dark"] {
-    --bg-color: #1f1a23;
-    --text-color: #f7eff7;
-    --text-muted: #c9bdd0;
-    --card-bg: #2a2430;
-    --card-border: #433848;
-    --button-hover-surface: #342d3a;
-    --button-hover-border: #5a4e62;
-    --button-hover-text: #f7eff7;
-    --primary-color: #e6c6ea;
-    --primary-contrast: #3f2c47;
-    --success-color: #9fcfb2;
-    --accent-color: #5b4254;
-}
-
-[data-theme="sakura"] {
-    --bg-color: #fff0f5;
-    --text-color: #8b4c55;
-    --text-muted: #a27179;
-    --card-bg: #fffafc;
-    --card-border: #efd6de;
-    --button-hover-surface: #f8e6ed;
-    --button-hover-border: #e2bec8;
-    --button-hover-text: #8b4c55;
-    --primary-color: #ffb7c5;
-    --primary-contrast: #6a3942;
-    --success-color: #c992a1;
-    --accent-color: #ffd8e2;
-}
-
-[data-theme="sakura"][data-theme-mode="dark"] {
-    --bg-color: #23171b;
-    --text-color: #f9edf1;
-    --text-muted: #d5b7c0;
-    --card-bg: #2f2025;
-    --card-border: #4a333a;
-    --button-hover-surface: #3a2830;
-    --button-hover-border: #614850;
-    --button-hover-text: #f9edf1;
-    --primary-color: #ffc8d3;
-    --primary-contrast: #6c3942;
-    --success-color: #d8a6b1;
-    --accent-color: #604049;
-}
-
-[data-theme="galaxy"] {
-    --bg-color: #f4f3ff;
-    --text-color: #0b1026;
-    --text-muted: #596078;
+[data-theme="sunset"] {
+    --main-bg: #fffbf0;
+    --wave-color: #ff8b70;
     --card-bg: #ffffff;
-    --card-border: #dcdcf1;
-    --button-hover-surface: #ecebfa;
-    --button-hover-border: #c8c9e8;
-    --button-hover-text: #0b1026;
-    --primary-color: #7a5fff;
-    --primary-contrast: #ffffff;
-    --success-color: #8f97ff;
-    --accent-color: #e6e6fa;
-}
-
-[data-theme="galaxy"][data-theme-mode="dark"] {
-    --bg-color: #0b1026;
-    --text-color: #edf0ff;
-    --text-muted: #a8b1d3;
-    --card-bg: #151c38;
-    --card-border: #2c3556;
-    --button-hover-surface: #202a4a;
-    --button-hover-border: #45527d;
-    --button-hover-text: #edf0ff;
-    --primary-color: #9f8cff;
-    --primary-contrast: #0b1026;
-    --success-color: #bcc4ff;
-    --accent-color: #262e54;
-}
-
-[data-theme="cyberpunk"] {
-    --bg-color: #eefeff;
-    --text-color: #0d0d0d;
-    --text-muted: #5d6670;
-    --card-bg: #ffffff;
-    --card-border: #d9eef0;
-    --button-hover-surface: #e5fbfc;
-    --button-hover-border: #94dce0;
-    --button-hover-text: #0d0d0d;
-    --primary-color: #ff00ff;
-    --primary-contrast: #140814;
-    --success-color: #00d6df;
-    --accent-color: #00f3ff;
-}
-
-[data-theme="cyberpunk"][data-theme-mode="dark"] {
-    --bg-color: #0d0d0d;
-    --text-color: #f7fbfb;
-    --text-muted: #aeb7bc;
-    --card-bg: #16181c;
-    --card-border: #2c3036;
-    --button-hover-surface: #20242b;
-    --button-hover-border: #444b55;
-    --button-hover-text: #f7fbfb;
-    --primary-color: #ff4df3;
-    --primary-contrast: #140814;
-    --success-color: #00f3ff;
-    --accent-color: #1a2f33;
+    --text-color: #4a2e2b;
 }
 
 [data-theme="matcha"] {
-    --bg-color: #f8f1e9;
-    --text-color: #4b5945;
-    --text-muted: #73806d;
-    --card-bg: #fcf8f1;
-    --card-border: #ddd4c6;
-    --button-hover-surface: #f1e8dd;
-    --button-hover-border: #cfc1ac;
-    --button-hover-text: #4b5945;
-    --primary-color: #91ac8f;
-    --primary-contrast: #2e3a2b;
-    --success-color: #7ca276;
-    --accent-color: #ece3d7;
+    --main-bg: #f3f7f0;
+    --wave-color: #8ab882;
+    --card-bg: #ffffff;
+    --text-color: #2a3a28;
 }
 
-[data-theme="matcha"][data-theme-mode="dark"] {
-    --bg-color: #191914;
-    --text-color: #f2ede6;
-    --text-muted: #c1baaf;
-    --card-bg: #25261f;
-    --card-border: #3d4035;
-    --button-hover-surface: #303328;
-    --button-hover-border: #5a5f4d;
-    --button-hover-text: #f2ede6;
-    --primary-color: #aec7ab;
-    --primary-contrast: #2a3428;
-    --success-color: #93bb88;
-    --accent-color: #35382d;
+[data-theme="midnight"] {
+    --main-bg: #0f172a;
+    --wave-color: #6366f1;
+    --card-bg: #1e293b;
+    --text-color: #f1f5f9;
 }
 
-[data-theme="retro"] {
-    --bg-color: #fff8df;
-    --text-color: #1a1a1a;
-    --text-muted: #625a3c;
-    --card-bg: #fffdf4;
-    --card-border: #eadfb3;
-    --button-hover-surface: #fbf1c6;
-    --button-hover-border: #d6c27a;
-    --button-hover-text: #1a1a1a;
-    --primary-color: #3d52d5;
-    --primary-contrast: #ffffff;
-    --success-color: #d4a514;
-    --accent-color: #f9c80e;
-}
-
-[data-theme="retro"][data-theme-mode="dark"] {
-    --bg-color: #1a1a1a;
-    --text-color: #fff9e6;
-    --text-muted: #c4b991;
-    --card-bg: #232323;
-    --card-border: #3a3a3a;
-    --button-hover-surface: #2f3138;
-    --button-hover-border: #515460;
-    --button-hover-text: #fff9e6;
-    --primary-color: #88a0ff;
-    --primary-contrast: #131313;
-    --success-color: #f2d15f;
-    --accent-color: #5b4907;
-}
-
-[data-theme="ocean"] {
-    --bg-color: #f5f5dc;
-    --text-color: #002b36;
-    --text-muted: #4f6970;
-    --card-bg: #fffef5;
-    --card-border: #d7dcc8;
-    --button-hover-surface: #edf0da;
-    --button-hover-border: #b8c4b3;
-    --button-hover-text: #002b36;
-    --primary-color: #002b36;
-    --primary-contrast: #f5f5dc;
-    --success-color: #5fb6c7;
-    --accent-color: #7fdbff;
-}
-
-[data-theme="ocean"][data-theme-mode="dark"] {
-    --bg-color: #07181f;
-    --text-color: #eef4e7;
-    --text-muted: #b5c5c1;
-    --card-bg: #0e242d;
-    --card-border: #23404a;
-    --button-hover-surface: #15313b;
-    --button-hover-border: #3b5b67;
-    --button-hover-text: #eef4e7;
-    --primary-color: #7fdbff;
-    --primary-contrast: #08202a;
-    --success-color: #8de5ff;
-    --accent-color: #1c3c47;
-}
-
-[data-theme="paper"] {
-    --bg-color: #f4f1ea;
-    --text-color: #333333;
-    --text-muted: #6a6a67;
-    --card-bg: #fcfaf5;
-    --card-border: #ddd8ce;
-    --button-hover-surface: #efebe2;
-    --button-hover-border: #c9c1b4;
-    --button-hover-text: #333333;
-    --primary-color: #1b263b;
-    --primary-contrast: #f4f1ea;
-    --success-color: #5d8a86;
-    --accent-color: #d7dde7;
-}
-
-[data-theme="paper"][data-theme-mode="dark"] {
-    --bg-color: #181c22;
-    --text-color: #f1ece3;
-    --text-muted: #b8b1a5;
-    --card-bg: #222830;
-    --card-border: #38404b;
-    --button-hover-surface: #2a313b;
-    --button-hover-border: #536071;
-    --button-hover-text: #f1ece3;
-    --primary-color: #bcc9dd;
-    --primary-contrast: #1b263b;
-    --success-color: #8aa0b3;
-    --accent-color: #2d3644;
+/* Base Dark Mode overrides */
+[data-theme-mode="dark"] {
+    --main-bg: #0f172a;
+    --wave-color: #3b82f6;
+    --card-bg: #1e293b;
+    --text-color: #f1f5f9;
+    
+    --card-shadow: 0 14px 40px rgba(2, 6, 23, 0.4);
+    --card-shadow-strong: 0 20px 50px rgba(2, 6, 23, 0.5);
 }
 
 body {
-    transition: background-color 0.18s ease, color 0.18s ease;
+    transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }

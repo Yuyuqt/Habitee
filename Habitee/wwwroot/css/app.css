@@ -10,10 +10,10 @@
     --dock-bottom-offset: 2rem;
     --dock-height: 6rem;
     --dock-clearance: calc(var(--dock-height) + var(--dock-bottom-offset) + var(--safe-area-bottom));
-    --sidebar-width: 150px;
+    --sidebar-width: 160px;
     --sidebar-offset: 1.5rem;
     --sidebar-top-offset: 1.5rem;
-    --layout-shell-gap: 1.5rem;
+    --layout-shell-gap: 2rem;
     --desktop-nav-clearance: calc(var(--sidebar-width) + (var(--sidebar-offset) * 2) + var(--layout-shell-gap));
     --app-nav-clearance: 0px;
     --bottom-action-gap: 1rem;
@@ -26,6 +26,8 @@
 html,
 body {
     min-height: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 body {
@@ -50,17 +52,11 @@ textarea {
     right: 1rem;
     bottom: 1rem;
     z-index: 2000;
-    padding: 0.85rem 1rem;
-    border-radius: 14px;
-    background: #1f2937;
+    padding: 1rem 1.25rem;
+    border-radius: 20px;
+    background: #1e293b;
     color: #ffffff;
-    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.24);
-}
-
-#blazor-error-ui .reload,
-#blazor-error-ui .dismiss {
-    color: inherit;
-    margin-left: 0.75rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
 }
 
 .glass-panel {
@@ -70,31 +66,54 @@ textarea {
     border: var(--outline-width) solid var(--card-border);
     border-radius: var(--border-radius);
     box-shadow: var(--card-shadow);
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
 }
 
 .glass-button {
     background: var(--card-bg);
     border: var(--outline-width) solid var(--card-border);
-    border-radius: 14px;
+    border-radius: calc(var(--border-radius) * 0.7);
     box-shadow: none;
     color: var(--text-color);
     cursor: pointer;
-    padding: 0.75rem 1.5rem;
-    font-weight: 600;
-    transition: background-color 0.16s ease, border-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease;
+    padding: 0.8rem 1.75rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    user-select: none;
 }
 
 .glass-button:hover {
     background: var(--button-hover-surface);
     border-color: var(--button-hover-border);
     color: var(--button-hover-text);
+    transform: translateY(-2px);
     box-shadow: var(--card-shadow);
 }
 
+.glass-button:active {
+    transform: scale(0.96);
+}
+
+.glass-button.primary-btn {
+    background: var(--primary-color);
+    color: var(--primary-contrast);
+    border-color: transparent;
+}
+
+.glass-button.primary-btn:hover {
+    background: color-mix(in srgb, var(--primary-color) 85%, black);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
+}
+
 .glass-button:disabled {
-    opacity: 0.55;
+    opacity: 0.5;
     cursor: not-allowed;
-    box-shadow: none;
+    transform: none;
 }
 
 h1,
@@ -105,6 +124,7 @@ h5,
 h6 {
     font-weight: var(--font-weight-title);
     margin-bottom: 0.5rem;
+    letter-spacing: -0.01em;
 }
 
 p {
@@ -115,7 +135,7 @@ p {
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 2rem;
+    padding: 2.5rem 2rem;
 }
 
 .flex-center {
@@ -131,7 +151,7 @@ p {
 }
 
 ::-webkit-scrollbar {
-    width: 8px;
+    width: 10px;
 }
 
 ::-webkit-scrollbar-track {
@@ -140,7 +160,8 @@ p {
 
 ::-webkit-scrollbar-thumb {
     background: var(--card-border);
-    border-radius: 4px;
+    border-radius: 10px;
+    border: 3px solid var(--bg-color);
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -161,11 +182,16 @@ p {
 @media (max-width: 720px) {
     :root {
         --dock-bottom-offset: 1rem;
-        --dock-height: 5.6rem;
+        --dock-height: 5.8rem;
         --bottom-action-gap: 0.85rem;
         --desktop-nav-clearance: 0px;
         --app-nav-clearance: var(--dock-clearance);
         --page-action-offset: calc(var(--dock-clearance) + var(--bottom-action-gap));
         --page-action-clearance: calc(var(--page-action-height) + var(--page-action-offset));
+        --layout-shell-gap: 1rem;
+    }
+
+    .container {
+        padding: 1.5rem 1.25rem;
     }
 }

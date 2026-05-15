@@ -1,4 +1,16 @@
-<div class="background-layer" aria-hidden="true"></div>
+<div class="background-layer" aria-hidden="true">
+    <!-- Top Wave (Double Ribbon) -->
+    <svg class="bg-wave wave-top" viewBox="0 0 1440 320" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill="var(--wave-color)" fill-opacity="0.1" d="M0,160L48,170.7C96,181,192,203,288,202.7C384,203,480,181,576,149.3C672,117,768,75,864,80C960,85,1056,139,1152,149.3C1248,160,1344,128,1392,112L1440,96L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path>
+        <path fill="var(--wave-color)" fill-opacity="0.2" d="M0,64L48,85.3C96,107,192,149,288,149.3C384,149,480,107,576,112C672,117,768,171,864,192C960,213,1056,203,1152,176C1248,149,1344,107,1392,85.3L1440,64L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path>
+    </svg>
+
+    <!-- Bottom Wave (Double Ribbon) -->
+    <svg class="bg-wave wave-bottom" viewBox="0 0 1440 320" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill="var(--wave-color)" fill-opacity="0.1" d="M0,96L48,112C96,128,192,160,288,181.3C384,203,480,213,576,213.3C672,213,768,203,864,170.7C960,139,1056,85,1152,74.7C1248,64,1344,96,1392,112L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+        <path fill="var(--wave-color)" fill-opacity="0.2" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,224C672,245,768,267,864,261.3C960,256,1056,224,1152,197.3C1248,171,1344,149,1392,138.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+    </svg>
+</div>
 
 <style>
     .background-layer {
@@ -6,16 +18,34 @@
         inset: 0;
         z-index: -1;
         pointer-events: none;
-        background:
-            linear-gradient(180deg,
-                color-mix(in srgb, var(--primary-color) 6%, transparent) 0%,
-                transparent 22%);
+        overflow: hidden;
+        background-color: var(--main-bg);
+        transition: background-color 0.3s ease;
     }
 
-    [data-theme-mode="dark"] .background-layer {
-        background:
-            linear-gradient(180deg,
-                color-mix(in srgb, var(--primary-color) 10%, transparent) 0%,
-                transparent 24%);
+    .bg-wave {
+        position: absolute;
+        width: 100vw;
+        height: 22vh; /* Responsive height */
+        min-height: 180px;
+        max-height: 350px;
+        left: 0;
+        /* Using color-mix to tint the waves subtly in dark mode if needed, but var() directly works well too */
+    }
+
+    .wave-top {
+        top: 0;
+    }
+
+    .wave-bottom {
+        bottom: 0;
+    }
+
+    /* Stack elegantly on mobile */
+    @@media (max-width: 768px) {
+        .bg-wave {
+            height: 18vh; 
+            min-height: 140px;
+        }
     }
 </style>

@@ -79,6 +79,7 @@
         max-width: 800px;
         margin: 0 auto;
         position: relative;
+        padding-top: 2.5rem;
     }
 
     .app-header {
@@ -119,18 +120,20 @@
 
     .tabs-wrapper {
         display: flex;
-        padding: 0.25rem;
-        border-radius: 12px;
+        padding: 0;
+        border-radius: 14px;
+        overflow: hidden;
+        border: var(--outline-width, 1px) solid var(--card-border);
     }
 
     .tab-btn {
         flex: 1;
-        padding: 0.5rem;
+        padding: 0.75rem;
         border: none;
         background: transparent;
         color: var(--text-muted);
         font-weight: 600;
-        border-radius: 8px;
+        border-radius: 0;
         cursor: pointer;
         transition: all 0.2s;
         font-size: var(--font-size-body-sm);
@@ -245,6 +248,9 @@
     }
 
     @@media (max-width: 720px) {
+        .view-container {
+            padding-top: 1.5rem;
+        }
         .fixed-bottom {
             left: 0;
             padding: 0 1rem;

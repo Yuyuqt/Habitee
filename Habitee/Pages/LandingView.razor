@@ -76,12 +76,12 @@
     }
 
     .hero-title {
-        font-size: 4rem;
+        font-size: 4.5rem;
         font-weight: 800;
-        line-height: 1.1;
+        line-height: 1;
         margin: 0;
         color: var(--text-color);
-        letter-spacing: -0.02em;
+        letter-spacing: -0.04em;
     }
 
     .text-accent {
@@ -106,13 +106,13 @@
         background-color: var(--primary-color);
         color: var(--primary-contrast);
         border: none;
-        padding: 0.875rem 1.5rem;
-        border-radius: 14px;
+        padding: 1rem 2rem;
+        border-radius: 20px;
         font-size: 1.1rem;
-        font-weight: 600;
+        font-weight: 700;
         cursor: pointer;
-        transition: background-color 0.16s ease, box-shadow 0.16s ease;
-        box-shadow: none;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 0 10px 20px rgba(37, 99, 235, 0.15);
     }
 
     .primary-btn:hover {
@@ -132,12 +132,12 @@
     }
 
     .app-frame {
-        border-radius: var(--border-radius);
+        border-radius: 32px;
         overflow: hidden;
         background: var(--card-bg);
-        border: 1px solid var(--card-border);
-        box-shadow: var(--card-shadow);
-        padding: 0.5rem; /* slight horizontal padding around inner frame */
+        border: 2px solid var(--card-border);
+        box-shadow: var(--card-shadow-strong);
+        padding: 0.5rem;
     }
 
     .frame-header {

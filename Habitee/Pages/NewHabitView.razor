@@ -144,6 +144,7 @@
         max-width: 820px;
         margin: 0 auto;
         position: relative;
+        padding-top: 2.5rem;
     }
 
     .app-header {
@@ -274,9 +275,11 @@
 
     .segmented-control {
         display: flex;
-        padding: 0.3rem;
-        border-radius: 18px;
-        gap: 0.3rem;
+        padding: 0;
+        border-radius: 14px;
+        gap: 0;
+        overflow: hidden;
+        border: var(--outline-width, 1px) solid var(--card-border);
     }
 
     .segment {
@@ -286,7 +289,7 @@
         background: transparent;
         color: var(--text-muted);
         font-weight: 700;
-        border-radius: 14px;
+        border-radius: 0;
         cursor: pointer;
         transition: background-color 0.2s ease, color 0.2s ease;
         font-size: var(--font-size-body-sm);
@@ -439,6 +442,9 @@
     }
 
     @@media (max-width: 720px) {
+        .view-container {
+            padding-top: 1.5rem;
+        }
         .fixed-bottom {
             left: 0;
             padding: 0 1rem;

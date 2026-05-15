@@ -23,17 +23,13 @@
                     <h3>Theme</h3>
                     <p>Choose your aesthetic</p>
                 </div>
+                @* 
                 <div class="theme-selector">
                     <button class="theme-btn habitee @(ThemeService.CurrentTheme == "habitee" ? "selected" : "")" @onclick="@(() => SetTheme("habitee"))">Habitee+</button>
-                    <button class="theme-btn pastel @(ThemeService.CurrentTheme == "pastel" ? "selected" : "")" @onclick="@(() => SetTheme("pastel"))">Pastel Dream</button>
-                    <button class="theme-btn sakura @(ThemeService.CurrentTheme == "sakura" ? "selected" : "")" @onclick="@(() => SetTheme("sakura"))">Sakura</button>
-                    <button class="theme-btn galaxy @(ThemeService.CurrentTheme == "galaxy" ? "selected" : "")" @onclick="@(() => SetTheme("galaxy"))">Starry Galaxy</button>
-                    <button class="theme-btn cyberpunk @(ThemeService.CurrentTheme == "cyberpunk" ? "selected" : "")" @onclick="@(() => SetTheme("cyberpunk"))">Cyberpunk</button>
-                    <button class="theme-btn matcha @(ThemeService.CurrentTheme == "matcha" ? "selected" : "")" @onclick="@(() => SetTheme("matcha"))">Matcha Latte</button>
-                    <button class="theme-btn retro @(ThemeService.CurrentTheme == "retro" ? "selected" : "")" @onclick="@(() => SetTheme("retro"))">Retro Arcade</button>
-                    <button class="theme-btn ocean @(ThemeService.CurrentTheme == "ocean" ? "selected" : "")" @onclick="@(() => SetTheme("ocean"))">Deep Sea</button>
-                    <button class="theme-btn paper @(ThemeService.CurrentTheme == "paper" ? "selected" : "")" @onclick="@(() => SetTheme("paper"))">Paper Sketch</button>
+                    <!-- Extra themes removed for clean UI. Add back here when ready. -->
                 </div>
+                *@
+                <p class="setting-hint">Dynamic theme options will return in a future update.</p>
             </div>
         </section>
 
