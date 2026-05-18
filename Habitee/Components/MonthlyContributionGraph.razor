@@ -179,6 +179,33 @@
     [data-theme-mode="dark"] .monthly-graph.compact .day-cell.future {
         opacity: 0.48;
     }
+
+    @@media (max-width: 720px) {
+        .monthly-graph {
+            gap: 1rem;
+            padding-bottom: 0.35rem;
+        }
+
+        .month-block {
+            min-width: 108px;
+        }
+
+        .monthly-graph.compact .day-cell {
+            min-height: 8px;
+            border-radius: 4px;
+        }
+    }
+
+    @@media (max-width: 540px) {
+        .monthly-graph {
+            gap: 0.8rem;
+        }
+
+        .weekdays,
+        .days-grid {
+            gap: 1px;
+        }
+    }
 </style>
 
 @code {

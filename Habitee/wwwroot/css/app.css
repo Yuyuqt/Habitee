@@ -28,6 +28,9 @@ body {
     min-height: 100%;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: clip;
 }
 
 body {
@@ -35,6 +38,8 @@ body {
     color: var(--text-color);
     font-family: var(--font-family);
     line-height: var(--line-height-copy);
+    width: 100%;
+    max-width: 100vw;
     overflow-x: hidden;
 }
 
@@ -43,6 +48,25 @@ input,
 select,
 textarea {
     font: inherit;
+}
+
+a,
+button,
+input,
+select,
+textarea,
+.nav-item,
+.glass-button,
+.primary-btn,
+.secondary-btn,
+.icon-btn,
+.tab-btn,
+.segment,
+.mini-choice,
+.settings-link-card,
+.range-select,
+.range-menu-item {
+    min-height: 44px;
 }
 
 #blazor-error-ui {
@@ -138,6 +162,31 @@ p {
     padding: 2.5rem 2rem;
 }
 
+.page-container,
+.content-wrapper,
+.public-shell,
+.view-container,
+.container,
+.landing-container,
+.grid-view,
+.calendar-view {
+    width: 100%;
+    max-width: 100%;
+}
+
+.glass-panel,
+.glass-button,
+.glass-input,
+.habit-card,
+.grid-habit-card,
+.habit-row,
+.settings-section,
+.auth-card,
+.app-frame,
+.fixed-bottom {
+    max-width: 100%;
+}
+
 .flex-center {
     display: flex;
     align-items: center;
@@ -225,8 +274,56 @@ p {
         --layout-shell-gap: 1rem;
     }
 
+    html,
+    body {
+        max-width: 100vw;
+        overflow-x: hidden;
+    }
+
     .container {
-        padding: 1.5rem 1.25rem;
+        padding: 1.5rem 1rem;
+    }
+
+    .page-container,
+    .content-wrapper,
+    .public-shell,
+    .view-container {
+        max-width: 100vw;
+        overflow-x: clip;
+    }
+
+    .glass-panel,
+    .glass-button,
+    .glass-input,
+    .habit-card,
+    .grid-habit-card,
+    .habit-row,
+    .settings-section,
+    .auth-card,
+    .app-frame {
+        min-width: 0;
+    }
+
+    .glass-button,
+    .primary-btn,
+    .secondary-btn,
+    .auth-primary,
+    .notification-toggle,
+    .action-btn,
+    .logout-btn,
+    .permission-btn,
+    .add-reminder-btn {
+        width: 100%;
+    }
+
+    .pager-row {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .pager-meta {
+        order: -1;
+        width: 100%;
     }
 
     .pager-row {
@@ -235,5 +332,25 @@ p {
 
     .pager-btn {
         min-width: 84px;
+    }
+}
+
+@media (min-width: 721px) and (max-width: 960px) {
+    .container {
+        padding: 2rem 1.5rem;
+    }
+}
+
+@media (max-width: 540px) {
+    .container {
+        padding: 1.25rem 1rem;
+    }
+
+    .glass-button {
+        padding: 0.8rem 1rem;
+    }
+
+    .pager-btn {
+        width: calc(50% - 0.25rem);
     }
 }

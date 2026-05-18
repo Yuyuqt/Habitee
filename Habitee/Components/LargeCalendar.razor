@@ -166,6 +166,42 @@
         background-color: currentColor;
         opacity: 0.8;
     }
+
+    @@media (max-width: 720px) {
+        .large-calendar {
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .calendar-header {
+            margin-bottom: 1rem;
+        }
+
+        .weekdays,
+        .days-grid {
+            gap: 0.35rem;
+        }
+
+        .day-cell {
+            border-radius: 10px;
+            font-size: var(--font-size-body-sm);
+        }
+    }
+
+    @@media (max-width: 540px) {
+        .month-title {
+            font-size: var(--font-size-card-title);
+        }
+
+        .nav-btn {
+            width: 34px;
+            height: 34px;
+        }
+
+        .weekdays span {
+            font-size: var(--font-size-micro);
+        }
+    }
 </style>
 
 @code {

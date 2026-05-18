@@ -132,7 +132,7 @@
             flex-direction: column;
             min-width: 0;
             flex: 1;
-            padding: 0.65rem 0.4rem 0.5rem;
+            padding: 0.7rem 0.4rem 0.55rem;
             gap: 0.35rem;
         }
 
@@ -154,6 +154,25 @@
             width: 4px;
             height: 4px;
             border-radius: 50%;
+        }
+    }
+
+    @@media (max-width: 540px) {
+        .dock-nav {
+            width: min(calc(100vw - 1rem), 520px);
+            padding: 0.55rem 0.6rem 0.75rem;
+        }
+
+        .dock-nav ul {
+            gap: 0.25rem;
+        }
+
+        .nav-item {
+            padding: 0.65rem 0.25rem 0.5rem;
+        }
+
+        .nav-item span {
+            font-size: 0.68rem;
         }
     }
 </style>

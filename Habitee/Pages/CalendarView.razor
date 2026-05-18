@@ -260,6 +260,7 @@
         align-items: center;
         justify-content: space-between;
         gap: 0.75rem;
+        min-height: 44px;
     }
 
     .range-select span {
@@ -544,6 +545,11 @@
             padding: 1.5rem 1rem 1rem;
         }
 
+        .calendar-header {
+            padding-top: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
         .day-header {
             grid-template-columns: 1fr;
             gap: 0.75rem;
@@ -578,6 +584,11 @@
             justify-content: space-between;
         }
 
+        .range-select {
+            min-width: 0;
+            width: 100%;
+        }
+
         .range-menu {
             width: 100%;
         }
@@ -593,6 +604,29 @@
         .habit-icon-shell {
             width: 56px;
             height: 56px;
+        }
+
+        .habit-row-copy h3,
+        .habit-row-copy p {
+            white-space: normal;
+            overflow: visible;
+            text-overflow: unset;
+        }
+    }
+
+    @@media (max-width: 540px) {
+        .day-header-grid,
+        .habit-row-days {
+            gap: 0.25rem;
+        }
+
+        .day-chip,
+        .day-status {
+            max-width: 42px;
+        }
+
+        .day-chip strong {
+            font-size: 0.95rem;
         }
     }
 </style>

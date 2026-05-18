@@ -145,9 +145,36 @@
     }
 
     @@media (max-width: 720px) {
+        .app-header {
+            padding: 1.5rem 1rem 1rem;
+            gap: 0.5rem;
+        }
+
+        .header-title {
+            white-space: normal;
+            overflow: visible;
+            text-overflow: unset;
+            font-size: var(--font-size-page-title);
+            padding: 0 0.5rem;
+        }
+
+        .content-scroll {
+            padding: 0 1rem;
+        }
+
         .fixed-bottom {
             left: 0;
             padding: 0 1rem;
+        }
+    }
+
+    @@media (max-width: 540px) {
+        .app-header {
+            align-items: flex-start;
+        }
+
+        .icon-btn {
+            padding: 0.35rem;
         }
     }
 </style>

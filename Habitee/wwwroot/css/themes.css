@@ -55,6 +55,42 @@
     --outline-width: 1.5px;
 }
 
+@media (max-width: 720px) {
+    :root {
+        --font-size-page-title: 1.75rem;
+        --font-size-section-title: 1.35rem;
+        --font-size-card-title: 1.05rem;
+        --font-size-body: 0.96rem;
+        --font-size-body-sm: 0.9rem;
+        --font-size-body-xs: 0.82rem;
+        --font-size-label: 0.74rem;
+        --font-size-badge: 0.78rem;
+        --font-size-micro: 0.7rem;
+        --line-height-title: 1.18;
+        --line-height-copy: 1.55;
+        --border-radius: 24px;
+        --card-shadow: 0 10px 24px color-mix(in srgb, var(--text-color) 5%, transparent);
+        --card-shadow-strong: 0 14px 32px color-mix(in srgb, var(--text-color) 8%, transparent);
+    }
+}
+
+@media (max-width: 540px) {
+    :root {
+        --font-size-page-title: 1.55rem;
+        --font-size-section-title: 1.22rem;
+        --font-size-card-title: 1rem;
+        --font-size-body: 0.92rem;
+        --font-size-body-sm: 0.86rem;
+        --font-size-body-xs: 0.8rem;
+        --font-size-badge: 0.75rem;
+        --font-size-micro: 0.68rem;
+        --line-height-title: 1.16;
+        --border-radius: 22px;
+        --card-shadow: 0 8px 20px color-mix(in srgb, var(--text-color) 5%, transparent);
+        --card-shadow-strong: 0 12px 28px color-mix(in srgb, var(--text-color) 8%, transparent);
+    }
+}
+
 /* --- Theme Switcher Structure --- */
 
 [data-theme="habitee"] {

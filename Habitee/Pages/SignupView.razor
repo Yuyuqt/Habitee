@@ -69,7 +69,7 @@
         border: none;
         background: none;
         color: var(--primary-color);
-        padding: 0;
+        padding: 0.15rem 0;
         cursor: pointer;
         font: inherit;
     }
@@ -123,6 +123,28 @@
         border-radius: 14px;
         background: rgba(244, 63, 94, 0.12);
         color: #f43f5e;
+    }
+
+    @@media (max-width: 720px) {
+        .auth-page {
+            align-items: flex-start;
+            padding: 1rem;
+        }
+
+        .auth-card {
+            padding: 1.5rem 1rem;
+            border-radius: 22px;
+        }
+
+        .auth-form {
+            gap: 0.9rem;
+            margin-top: 1.25rem;
+        }
+
+        .glass-input,
+        .auth-primary {
+            padding: 0.95rem 1rem;
+        }
     }
 </style>
 
