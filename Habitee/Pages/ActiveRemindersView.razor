@@ -262,7 +262,7 @@
         return habit.Reminders
             .Where(reminder => reminder.Enabled)
             .OrderBy(reminder => reminder.TimeLocal)
-            .Select(reminder => reminder.TimeLocal)
+            .Select(reminder => TimeFormatHelper.ToDisplayTime(reminder.TimeLocal))
             .ToList();
     }
 }

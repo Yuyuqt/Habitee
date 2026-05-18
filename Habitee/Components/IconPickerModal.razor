@@ -6,7 +6,7 @@
             <button class="icon-btn" @onclick="OnClose">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
             </button>
-            <h2 class="modal-title">Pick Icon</h2>
+        <h2 class="modal-title">Pick Icon</h2>
             <button class="icon-btn" @onclick="OnClose">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
             </button>
@@ -14,12 +14,91 @@
 
         <div class="modal-body content-scroll">
             <div class="search-shell">
-                <input type="text"
-                       class="search-input glass-panel"
-                       placeholder="Search icons"
-                       @bind="searchQuery"
-                       @bind:event="oninput" />
+                <div class="search-row">
+                    <input type="text"
+                           class="search-input glass-panel"
+                           placeholder="Search icons"
+                           @bind="searchQuery"
+                           @bind:event="oninput" />
+                    <button type="button" class="color-picker-btn" style="background-color:@SelectedColor;" @onclick="ToggleColorPicker" title="Pick icon color">
+                        <span class="sr-only">Pick icon color</span>
+                    </button>
+                </div>
             </div>
+
+            @if (isColorPickerOpen)
+            {
+                <div class="color-section">
+                    <div class="color-section-header">
+                        <h3 class="section-title">Pick Icon Color</h3>
+                        <button type="button" class="color-action-btn delete-color-btn" @onclick="ToggleDeleteMode" title="Delete selected colors">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 6h18"></path>
+                                <path d="M8 6V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1"></path>
+                                <path d="M5 6l1 14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-14"></path>
+                                <line x1="10" y1="11" x2="10" y2="17"></line>
+                                <line x1="14" y1="11" x2="14" y2="17"></line>
+                            </svg>
+                            <span class="sr-only">Delete selected custom color</span>
+                        </button>
+                    </div>
+
+                    @if (isDeleteMode)
+                    {
+                        <div class="color-delete-prompt">
+                            <div class="color-delete-text">Select one or more colors to delete, then confirm.</div>
+                            <div class="color-delete-controls">
+                                <button type="button"
+                                        class="color-delete-btn"
+                                        @onclick="ConfirmDeleteCustomColors"
+                                        disabled="@(!colorsMarkedForDeletion.Any())">
+                                    Yes
+                                </button>
+                                <button type="button"
+                                        class="color-delete-cancel-btn"
+                                        @onclick="CancelDeleteMode">
+                                    No
+                                </button>
+                            </div>
+                        </div>
+                    }
+
+                    @if (isCustomColorPickerOpen)
+                    {
+                        <div class="custom-color-section">
+                            <label class="color-editor-label">Choose custom icon color</label>
+                            <div class="custom-color-editor">
+                                <input class="color-wheel-input" type="color" value="@customColorInput" @onchange="OnCustomColorChanged" />
+                                <input class="hex-input glass-panel" type="text" placeholder="#RRGGBB" value="@customColorInput" @oninput="OnCustomHexChanged" />
+                                <button type="button" class="add-custom-btn" @onclick="AddCustomColor" disabled="@(!IsValidHex(customColorInput))">Add</button>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="color-grid icon-color-grid">
+                        @foreach (var color in AllColors)
+                        {
+                            <button class="@GetColorSwatchClass(color)"
+                                    style="background-color: @color;"
+                                    @onclick="() => OnColorTileClick(color)">
+                            </button>
+                        }
+                        @if (CanAddCustomColorTile)
+                        {
+                            <button type="button"
+                                    class="color-swatch add-color-swatch"
+                                    title="Add custom color"
+                                    @onclick="ToggleCustomColorPicker">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                <span class="sr-only">Add custom color</span>
+                            </button>
+                        }
+                    </div>
+                </div>
+            }
 
             @if (VisibleIconGroups.Any())
             {
@@ -34,7 +113,7 @@
                                         @onclick="() => SelectIcon(icon.Key)"
                                         title="@icon.Label"
                                         aria-label="@icon.Label">
-                                    <HabitIcon Name="@icon.Key" Color="currentColor" Size="24" />
+                                    <HabitIcon Name="@icon.Key" Color="@PreviewColor" Size="24" />
                                     <span class="icon-label">@icon.Label</span>
                                 </button>
                             }
@@ -100,6 +179,48 @@
         display: flex;
     }
 
+    .search-row {
+        display: flex;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+
+    .search-input {
+        flex: 1;
+        height: 3.95rem;
+        box-sizing: border-box;
+    }
+
+    .color-picker-btn {
+        width: 3.95rem;
+        height: 3.95rem;
+        flex: 0 0 3.95rem;
+        aspect-ratio: 1 / 1;
+        box-sizing: border-box;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        border: 1px solid color-mix(in srgb, var(--card-border) 70%, rgba(255, 255, 255, 0.2));
+        cursor: pointer;
+        padding: 0;
+        border-style: solid;
+        border-width: 1px;
+        background-color: var(--card-bg);
+    }
+
+    .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+
     .content-scroll {
         flex: 1;
         overflow-y: auto;
@@ -116,17 +237,215 @@
 
     .search-input {
         width: 100%;
-        padding: 0.95rem 1rem;
+        padding: 0 1rem;
         border-radius: 16px;
         border: var(--outline-width, 1px) solid var(--card-border);
         background: var(--card-bg);
         color: var(--text-color);
         font-family: inherit;
         font-size: var(--font-size-body);
+        height: 3.95rem;
+        line-height: 1;
     }
 
     .search-input::placeholder {
         color: var(--text-muted);
+    }
+
+    .color-section {
+        margin-bottom: 1.4rem;
+    }
+
+    .color-section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .color-action-btn {
+        width: 2rem;
+        height: 2rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        border: 1px solid color-mix(in srgb, var(--card-border) 70%, rgba(255, 255, 255, 0.2));
+        background: var(--card-bg);
+        color: var(--text-color);
+        cursor: pointer;
+        padding: 0;
+    }
+
+    .color-action-btn[disabled] {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+
+    .delete-color-btn {
+        border-radius: 10px;
+        color: var(--text-muted);
+    }
+
+    .color-delete-prompt {
+        margin-bottom: 0.85rem;
+        border: 1px dashed color-mix(in srgb, var(--card-border) 65%, rgba(255, 255, 255, 0.15));
+        padding: 0.75rem 0.85rem;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+    }
+
+    .color-delete-text {
+        color: var(--text-muted);
+        font-size: var(--font-size-micro);
+    }
+
+    .color-delete-controls {
+        display: inline-flex;
+        gap: 0.55rem;
+    }
+
+    .color-delete-btn,
+    .color-delete-cancel-btn {
+        border-radius: 8px;
+        border: 1px solid color-mix(in srgb, var(--card-border) 70%, rgba(255, 255, 255, 0.2));
+        background: var(--card-bg);
+        color: var(--text-color);
+        padding: 0.45rem 0.7rem;
+        cursor: pointer;
+        font-size: var(--font-size-body-sm);
+        min-height: 2rem;
+    }
+
+    .color-delete-btn:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+
+    .custom-color-section {
+        margin-bottom: 0.95rem;
+    }
+
+    .color-editor-label {
+        display: block;
+        font-size: var(--font-size-micro);
+        color: var(--text-muted);
+        margin-bottom: 0.45rem;
+    }
+
+    .custom-color-editor {
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+    }
+
+    .color-wheel-input {
+        width: 3rem;
+        height: 2.45rem;
+        border-radius: 10px;
+        border: 1px solid color-mix(in srgb, var(--card-border) 70%, rgba(255, 255, 255, 0.2));
+        padding: 0;
+        background: var(--card-bg);
+    }
+
+    .hex-input {
+        flex: 1;
+        min-width: 0;
+        height: 2.45rem;
+        padding: 0 0.7rem;
+        border-radius: 10px;
+        border: var(--outline-width, 1px) solid var(--card-border);
+        background: var(--card-bg);
+        color: var(--text-color);
+        font-size: var(--font-size-body-sm);
+    }
+
+    .hex-input::placeholder {
+        color: var(--text-muted);
+    }
+
+    .add-custom-btn {
+        height: 2.45rem;
+        padding: 0 0.75rem;
+        border-radius: 10px;
+        border: 1px solid color-mix(in srgb, var(--card-border) 70%, rgba(255, 255, 255, 0.2));
+        background: var(--card-bg);
+        color: var(--text-color);
+        cursor: pointer;
+        font-size: var(--font-size-body-sm);
+    }
+
+    .add-custom-btn:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+
+    .color-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+        gap: 0.75rem;
+        padding: 0.75rem 0 0;
+    }
+
+    .icon-color-grid {
+        grid-template-columns: repeat(auto-fill, minmax(38px, 1fr));
+    }
+
+    .color-swatch {
+        aspect-ratio: 1;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .add-color-swatch {
+        border: 1px dashed color-mix(in srgb, var(--card-border) 68%, rgba(255, 255, 255, 0.25));
+        background: var(--card-bg);
+        padding: 0;
+        color: var(--text-muted);
+        box-sizing: border-box;
+    }
+
+    .add-color-swatch svg {
+        width: 1.4rem;
+        height: 1.4rem;
+    }
+
+    .color-swatch.selected::after {
+        content: '';
+        position: absolute;
+        top: -4px;
+        left: -4px;
+        right: -4px;
+        bottom: -4px;
+        border: 3px solid var(--text-color);
+        border-radius: 12px;
+        pointer-events: none;
+    }
+
+    .color-swatch.delete-marked {
+        box-shadow: inset 0 0 0 2px color-mix(in srgb, #ef4444 55%, transparent);
+    }
+
+    .color-swatch.delete-marked::before {
+        content: '';
+        position: absolute;
+        inset: -4px;
+        border: 3px solid color-mix(in srgb, #ef4444 65%, transparent);
+        border-radius: 12px;
+        pointer-events: none;
+    }
+
+    .color-swatch.selected.delete-marked::after {
+        border-color: color-mix(in srgb, #ef4444 70%, #000);
     }
 
     .icon-section {
@@ -217,22 +536,251 @@
     public string SelectedIcon { get; set; } = "check";
 
     [Parameter]
+    public string SelectedColor { get; set; } = "#3b82f6";
+
+    [Parameter]
     public EventCallback<string> OnIconSelected { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnColorSelected { get; set; }
 
     [Parameter]
     public EventCallback OnClose { get; set; }
 
+    private bool isColorPickerOpen = true;
+    private bool isCustomColorPickerOpen = false;
+    private string customColorInput = "#3b82f6";
+    private readonly string[] defaultColors = new[]
+    {
+        "#f43f5e", "#f97316", "#10b981", "#6366f1", "#3b82f6", "#d946ef", "#475569",
+        "#fb7185", "#fbbf24", "#34d399", "#8b5cf6", "#38bdf8", "#e879f9", "#64748b",
+        "#fda4af", "#fde047", "#86efac", "#a78bfa", "#7dd3fc", "#f472b6", "#94a3b8"
+    };
+    private readonly List<string> customColors = new();
+    private const int MaxTotalColors = 45;
+    private readonly HashSet<string> colorsMarkedForDeletion = new(StringComparer.OrdinalIgnoreCase);
+    private bool isDeleteMode = false;
     private string searchQuery = string.Empty;
+    private IEnumerable<string> AllColors => defaultColors.Concat(customColors);
+    private bool CanAddCustomColorTile => AllColors.Count() < MaxTotalColors;
 
     private List<IGrouping<string, HabitIconDefinition>> VisibleIconGroups => HabitIconCatalog.All
         .Where(IsVisible)
         .GroupBy(icon => icon.Category)
         .ToList();
 
+    private string PreviewColor => string.IsNullOrWhiteSpace(SelectedColor)
+        ? "var(--primary-color)"
+        : SelectedColor;
+
     private async Task SelectIcon(string icon)
     {
         SelectedIcon = icon;
         await OnIconSelected.InvokeAsync(icon);
+    }
+
+    private void ToggleColorPicker()
+    {
+        isColorPickerOpen = !isColorPickerOpen;
+    }
+
+    private void ToggleCustomColorPicker()
+    {
+        isCustomColorPickerOpen = !isCustomColorPickerOpen;
+        customColorInput = SelectedColor;
+    }
+
+    private async Task SelectColor(string color)
+    {
+        SelectedColor = color;
+        await OnColorSelected.InvokeAsync(color);
+    }
+
+    private async Task OnColorTileClick(string color)
+    {
+        if (isDeleteMode)
+        {
+            ToggleDeleteSelection(color);
+            return;
+        }
+
+        await SelectColor(color);
+    }
+
+    private void ToggleDeleteSelection(string color)
+    {
+        if (!IsCustomColor(color))
+        {
+            return;
+        }
+
+        if (!colorsMarkedForDeletion.Add(color))
+        {
+            colorsMarkedForDeletion.Remove(color);
+        }
+    }
+
+    private string GetColorSwatchClass(string color)
+    {
+        var selected = string.Equals(color, SelectedColor, StringComparison.OrdinalIgnoreCase);
+        var marked = isDeleteMode && colorsMarkedForDeletion.Contains(color);
+        return $"color-swatch{(selected ? " selected" : "")}{(marked ? " delete-marked" : "")}";
+    }
+
+    private void ToggleDeleteMode()
+    {
+        if (isDeleteMode)
+        {
+            CancelDeleteMode();
+            return;
+        }
+
+        isDeleteMode = true;
+        colorsMarkedForDeletion.Clear();
+        if (IsCustomColor(SelectedColor))
+        {
+            colorsMarkedForDeletion.Add(SelectedColor);
+        }
+    }
+
+    private void CancelDeleteMode()
+    {
+        isDeleteMode = false;
+        colorsMarkedForDeletion.Clear();
+    }
+
+    private async Task ConfirmDeleteCustomColors()
+    {
+        if (!colorsMarkedForDeletion.Any())
+        {
+            CancelDeleteMode();
+            return;
+        }
+
+        var deletions = colorsMarkedForDeletion.ToList();
+        foreach (var color in deletions)
+        {
+            customColors.Remove(color);
+        }
+
+        var deletedSelected = deletions.Any(color => string.Equals(color, SelectedColor, StringComparison.OrdinalIgnoreCase));
+        if (deletedSelected)
+        {
+            SelectedColor = AllColors.FirstOrDefault() ?? "#3b82f6";
+            await OnColorSelected.InvokeAsync(SelectedColor);
+        }
+
+        CancelDeleteMode();
+    }
+
+    private bool IsCustomColor(string color)
+    {
+        return customColors.Any(custom => string.Equals(custom, color, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private void OnCustomColorChanged(ChangeEventArgs e)
+    {
+        if (e.Value is not string selected)
+        {
+            return;
+        }
+
+        customColorInput = selected;
+    }
+
+    private void OnCustomHexChanged(ChangeEventArgs e)
+    {
+        if (e.Value is not string typed)
+        {
+            return;
+        }
+
+        customColorInput = typed;
+    }
+
+    private async Task AddCustomColor()
+    {
+        var normalized = NormalizeHex(customColorInput);
+        if (normalized is null)
+        {
+            return;
+        }
+
+        var isExistingDefault = ColorListContains(defaultColors, normalized);
+        var isExistingCustom = ColorListContains(customColors, normalized);
+        if (!isExistingDefault && !isExistingCustom && !CanAddCustomColorTile)
+        {
+            return;
+        }
+
+        if (!isExistingDefault && !isExistingCustom)
+        {
+            customColors.Add(normalized);
+        }
+
+        customColorInput = normalized;
+        await SelectColor(normalized);
+        isCustomColorPickerOpen = false;
+    }
+
+    private bool IsValidHex(string input)
+    {
+        return NormalizeHex(input) is not null;
+    }
+
+    private string NormalizeHex(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        var normalized = value.Trim();
+        if (!normalized.StartsWith("#"))
+        {
+            normalized = $"#{normalized}";
+        }
+
+        if (normalized.Length == 4 &&
+            normalized.StartsWith("#") &&
+            IsHexDigit(normalized[1]) &&
+            IsHexDigit(normalized[2]) &&
+            IsHexDigit(normalized[3]))
+        {
+            return $"#{char.ToLowerInvariant(normalized[1])}{char.ToLowerInvariant(normalized[1])}{char.ToLowerInvariant(normalized[2])}{char.ToLowerInvariant(normalized[2])}{char.ToLowerInvariant(normalized[3])}{char.ToLowerInvariant(normalized[3])}";
+        }
+
+        if (normalized.Length != 7 || normalized[0] != '#')
+        {
+            return null;
+        }
+
+        return IsValidHexValue(normalized)
+            ? normalized.ToLowerInvariant()
+            : null;
+    }
+
+    private static bool IsValidHexValue(string value)
+    {
+        for (var i = 1; i < value.Length; i++)
+        {
+            if (!IsHexDigit(value[i]))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static bool IsHexDigit(char c)
+    {
+        return c is >= '0' and <= '9' or >= 'a' and <= 'f' or >= 'A' and <= 'F';
+    }
+
+    private bool ColorListContains(IEnumerable<string> source, string color)
+    {
+        return source.Any(item => string.Equals(item, color, StringComparison.OrdinalIgnoreCase));
     }
 
     private bool IsVisible(HabitIconDefinition icon)

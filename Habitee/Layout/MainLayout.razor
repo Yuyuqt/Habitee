@@ -2,39 +2,49 @@
 @implements IDisposable
 @inject NotificationService NotificationService
 @inject ThemeService ThemeService
+@inject AuthService AuthService
 @inject NavigationManager NavManager
 
 <BackgroundLayer />
 
 <div class="page-container fade-in @(ShouldHideMobileNav ? "mobile-nav-hidden" : "")">
-    <button type="button"
-            class="mode-toggle glass-button @(ThemeService.CurrentMode == "dark" ? "active" : "")"
-            title="Toggle light and dark mode"
-            aria-label="Toggle light and dark mode"
-            @onclick="ToggleMode">
-        @if (ThemeService.CurrentMode == "dark")
-        {
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <circle cx="12" cy="12" r="5"></circle>
-                <line x1="12" x2="12" y1="1" y2="3"></line>
-                <line x1="12" x2="12" y1="21" y2="23"></line>
-                <line x1="4.22" x2="5.64" y1="4.22" y2="5.64"></line>
-                <line x1="18.36" x2="19.78" y1="18.36" y2="19.78"></line>
-                <line x1="1" x2="3" y1="12" y2="12"></line>
-                <line x1="21" x2="23" y1="12" y2="12"></line>
-                <line x1="4.22" x2="5.64" y1="19.78" y2="18.36"></line>
-                <line x1="18.36" x2="19.78" y1="5.64" y2="4.22"></line>
-            </svg>
-            <span>Light</span>
-        }
-        else
-        {
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <div class="top-controls viewport-control-layer">
+        <button type="button"
+                class="mode-toggle glass-button @(ThemeService.CurrentMode == "dark" ? "active" : "")"
+                title="Toggle light and dark mode"
+                aria-label="Toggle light and dark mode"
+                @onclick="ToggleMode">
+            @if (ThemeService.CurrentMode == "dark")
+            {
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" x2="12" y1="1" y2="3"></line>
+                    <line x1="12" x2="12" y1="21" y2="23"></line>
+                    <line x1="4.22" x2="5.64" y1="4.22" y2="5.64"></line>
+                    <line x1="18.36" x2="19.78" y1="18.36" y2="19.78"></line>
+                    <line x1="1" x2="3" y1="12" y2="12"></line>
+                    <line x1="21" x2="23" y1="12" y2="12"></line>
+                    <line x1="4.22" x2="5.64" y1="19.78" y2="18.36"></line>
+                    <line x1="18.36" x2="19.78" y1="5.64" y2="4.22"></line>
+                </svg>
+                <span>Light</span>
+            }
+            else
+            {
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"></path>
-            </svg>
-            <span>Dark</span>
+                </svg>
+                <span>Dark</span>
+            }
+        </button>
+
+        @if (AuthService.CurrentUser != null)
+        {
+            <button type="button" class="logout-top-btn glass-button" @onclick="Logout">
+                Log Out
+            </button>
         }
-    </button>
+    </div>
 
     <main class="content-wrapper">
         @Body
@@ -52,11 +62,25 @@
         flex-direction: column;
     }
 
+    .top-controls {
+        position: absolute !important;
+        left: auto;
+        top: calc(env(safe-area-inset-top, 0px) + 1rem);
+        right: calc(env(safe-area-inset-right, 0px) + 4rem);
+        z-index: 250;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        pointer-events: none;
+        transform: translate3d(0, 0, 0);
+    }
+
+    .top-controls .mode-toggle,
+    .top-controls .logout-top-btn {
+        pointer-events: auto;
+    }
+
     .mode-toggle {
-        position: fixed;
-        top: 1rem;
-        right: 1rem;
-        z-index: 120;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -64,6 +88,20 @@
         min-width: 100px;
         border-radius: 20px;
         padding: 0.75rem 1rem;
+    }
+
+    .logout-top-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 20px;
+        padding: 0.75rem 1rem;
+        background: var(--primary-color);
+        color: var(--primary-contrast);
+        border-color: transparent;
+        min-width: auto;
+        font-weight: 700;
+        gap: 0.5rem;
     }
 
     .mode-toggle.active {
@@ -94,21 +132,36 @@
             --page-action-clearance: calc(var(--page-action-height) + var(--page-action-offset));
         }
 
+        .top-controls {
+            top: calc(env(safe-area-inset-top, 0px) + 0.9rem) !important;
+            right: calc(env(safe-area-inset-right, 0px) + 1.75rem) !important;
+        }
+
         .mode-toggle {
-            top: 0.9rem;
-            right: 0.9rem;
             min-width: 48px;
             width: 48px;
             height: 48px;
             padding: 0;
+            margin-top: 0;
+        }
+
+        .logout-top-btn {
+            padding: 0.55rem 0.65rem;
         }
 
         .mobile-nav-hidden .mode-toggle {
-            top: calc(env(safe-area-inset-top, 0px) + 0.2rem);
-            right: 0.45rem;
             min-width: 42px;
             width: 42px;
             height: 42px;
+        }
+
+        .mobile-nav-hidden .logout-top-btn {
+            padding: 0.45rem 0.6rem;
+        }
+
+        .mobile-nav-hidden .top-controls {
+            top: calc(env(safe-area-inset-top, 0px) + 0.2rem) !important;
+            right: calc(env(safe-area-inset-right, 0px) + 0.45rem) !important;
         }
 
         .mode-toggle span {
@@ -148,6 +201,12 @@
     private void HandleLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
     {
         _ = InvokeAsync(StateHasChanged);
+    }
+
+    private async Task Logout()
+    {
+        await AuthService.LogoutAsync();
+        NavManager.NavigateTo("/");
     }
 
     private static bool IsMainRoute(string uri)

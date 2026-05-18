@@ -17,18 +17,20 @@
             <div style="width: 24px;"></div>
         }
         <h1 class="header-title">Add Habits</h1>
-        <div style="width: 24px;"></div> <!-- Spacer -->
+        <button class="header-action" type="button" @onclick='() => NavManager.NavigateTo("/new-habit?reset=true")'>
+            Create custom habit
+        </button>
     </header>
+
+    <div class="search-container">
+        <input type="text" class="glass-input search-input" placeholder="Search" @bind="searchQuery" @bind:event="oninput" />
+    </div>
 
     <div class="tabs-container">
         <div class="tabs-wrapper glass-panel">
             <button class="tab-btn @(currentTab == "positive" ? "active" : "")" @onclick='() => currentTab = "positive"'>Positive</button>
             <button class="tab-btn @(currentTab == "negative" ? "active" : "")" @onclick='() => currentTab = "negative"'>Negative</button>
         </div>
-    </div>
-
-    <div class="search-container">
-        <input type="text" class="glass-input search-input" placeholder="Search" @bind="searchQuery" @bind:event="oninput" />
     </div>
 
     <div class="content-scroll">
@@ -73,19 +75,17 @@
                 <p>No templates match your search.</p>
             </div>
         }
-        
-        <!-- Bottom Spacer to ensure last items are clickable above fixed button -->
-        <div style="height: 100px;"></div>
-    </div>
-
-    <div class="fixed-bottom">
-        <button class="primary-btn glass-button"
-                disabled="@isSavingSelection"
-                @onclick="HandlePrimaryAction">
-            @(SelectedCount > 0
-                ? (isSavingSelection ? "Adding..." : $"Add Selected Habits ({SelectedCount})")
-                : "Create Custom Habit")
-        </button>
+                @if (SelectedCount > 0)
+        {
+            <div class="inline-action-btn">
+                <button class="primary-btn glass-button"
+                        disabled="@isSavingSelection"
+                        @onclick="HandlePrimaryAction">
+                    @(isSavingSelection ? "Adding..." : $"Add Selected Habits ({SelectedCount})")
+                </button>
+            </div>
+        }
+        <div style="height: 2rem;"></div>
     </div>
 </div>
 
@@ -105,6 +105,7 @@
         justify-content: space-between;
         align-items: center;
         padding: 2rem 1.5rem 1.5rem;
+        gap: 0.75rem;
     }
 
     .header-title {
@@ -112,12 +113,34 @@
         font-weight: 800;
         line-height: var(--line-height-title);
         margin: 0;
-        text-align: center;
+        text-align: left;
         flex: 1;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        padding: 0 1rem;
+    }
+
+    .header-action {
+        flex-shrink: 0;
+        background: var(--primary-color);
+        color: var(--primary-contrast);
+        border: 1px solid transparent;
+        cursor: pointer;
+        padding: 0.55rem 0.9rem;
+        font: inherit;
+        font-size: var(--font-size-body-sm);
+        font-weight: 700;
+        line-height: 1;
+        border-radius: 12px;
+        transition: background-color 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
+        white-space: nowrap;
+        box-shadow: none;
+    }
+
+    .header-action:hover {
+        opacity: 0.85;
+        transform: translateY(-1px);
+        background: color-mix(in srgb, var(--primary-color) 88%, black 12%);
     }
 
     .icon-btn {
@@ -187,7 +210,7 @@
         flex: 1;
         overflow-y: auto;
         padding: 0 1.5rem;
-        padding-bottom: calc(var(--page-action-clearance) + 1rem);
+        padding-bottom: 1rem;
     }
 
     .category-section {
@@ -271,16 +294,11 @@
         background: var(--primary-color);
     }
 
-    .fixed-bottom {
-        position: fixed;
-        bottom: var(--page-action-offset);
-        left: var(--desktop-nav-clearance);
-        right: 0;
-        padding: 0 1.5rem;
+    .inline-action-btn {
+        padding: 1rem 0;
         display: flex;
         justify-content: center;
-        pointer-events: none;
-        z-index: 5;
+        width: 100%;
     }
 
     .primary-btn {
@@ -311,11 +329,6 @@
             overflow: visible;
             text-overflow: unset;
             padding: 0 0.5rem;
-        }
-
-        .fixed-bottom {
-            left: 0;
-            padding: 0 1rem;
         }
 
         .tabs-container {

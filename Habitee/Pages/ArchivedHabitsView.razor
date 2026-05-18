@@ -64,7 +64,7 @@
                             Unarchive
                         </button>
                         <button class="glass-button archived-action delete"
-                                @onclick="() => DeleteHabitPermanently(habit.Id)"
+                                @onclick='() => AskDelete(habit.Id, habit.Title)'
                                 @onclick:stopPropagation="true">
                             Delete
                         </button>
@@ -74,6 +74,20 @@
         </div>
     }
 </div>
+
+@if (showDeleteConfirm)
+{
+    <div class="modal-backdrop" @onclick="CancelDelete">
+        <div class="confirm-modal glass-panel" @onclick:stopPropagation="true">
+            <h3>Delete this archived habit?</h3>
+            <p>@pendingDeleteHabitTitle cannot be restored after deletion.</p>
+            <div class="confirm-actions">
+                <button class="glass-button" @onclick="CancelDelete">No</button>
+                <button class="glass-button confirm-delete" @onclick="ConfirmDelete">Yes</button>
+            </div>
+        </div>
+    </div>
+}
 
 <style>
     .library-view {
@@ -230,12 +244,59 @@
             flex-direction: column;
         }
     }
+
+    .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 20;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+        background: rgba(8, 10, 16, 0.45);
+    }
+
+    .confirm-modal {
+        width: min(420px, 100%);
+        padding: 1.2rem;
+        border-radius: 18px;
+        border: 1px solid var(--card-border);
+        background: var(--card-bg);
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    .confirm-modal h3 {
+        margin: 0;
+    }
+
+    .confirm-modal p {
+        margin: 0;
+        color: var(--text-muted);
+    }
+
+    .confirm-actions {
+        margin-top: 0.25rem;
+        display: flex;
+        gap: 0.75rem;
+        justify-content: flex-end;
+    }
+
+    .confirm-actions .confirm-delete {
+        color: #ef4444;
+        border-color: rgba(244, 63, 94, 0.3);
+    }
+
 </style>
 
 @code {
     private string statusMessage = "";
     private List<Habit> habits = new();
     private bool isLoading = true;
+    private string? pendingDeleteHabitId;
+    private string pendingDeleteHabitTitle = "";
+    private bool showDeleteConfirm;
 
     protected override async Task OnInitializedAsync()
     {
@@ -271,6 +332,35 @@
         await DbService.DeleteHabitAsync(habitId);
         statusMessage = "Archived habit deleted permanently.";
         await InvokeAsync(StateHasChanged);
+    }
+
+    private void AskDelete(string habitId, string habitTitle)
+    {
+        pendingDeleteHabitId = habitId;
+        pendingDeleteHabitTitle = habitTitle;
+        showDeleteConfirm = true;
+    }
+
+    private void CancelDelete()
+    {
+        showDeleteConfirm = false;
+        pendingDeleteHabitId = null;
+        pendingDeleteHabitTitle = "";
+    }
+
+    private async Task ConfirmDelete()
+    {
+        if (pendingDeleteHabitId == null)
+        {
+            return;
+        }
+
+        var habitId = pendingDeleteHabitId;
+        showDeleteConfirm = false;
+        pendingDeleteHabitId = null;
+        pendingDeleteHabitTitle = "";
+
+        await DeleteHabitPermanently(habitId);
     }
 
     private void HandleDatabaseChanged()

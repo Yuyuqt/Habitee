@@ -37,7 +37,7 @@
                 <div class="auth-error">@errorMessage</div>
             }
 
-            <button class="glass-button auth-primary" @onclick="SignUp" disabled="@isSubmitting">
+            <button class="glass-button auth-primary" @onclick="SignUp" disabled="@(isSubmitting || !CanSubmit)">
                 @(isSubmitting ? "Creating account..." : "Create Account")
             </button>
 
@@ -118,6 +118,14 @@
         padding: 1rem;
     }
 
+    .auth-primary:hover {
+        background: var(--primary-color);
+        color: var(--primary-contrast);
+        border-color: transparent;
+        transform: translateY(-2px);
+        box-shadow: var(--card-shadow);
+    }
+
     .auth-error {
         padding: 0.9rem 1rem;
         border-radius: 14px;
@@ -158,10 +166,21 @@
     private string confirmPassword = string.Empty;
     private string errorMessage = string.Empty;
     private bool isSubmitting;
+    private bool CanSubmit =>
+        !string.IsNullOrWhiteSpace(displayName) &&
+        !string.IsNullOrWhiteSpace(password) &&
+        !string.IsNullOrWhiteSpace(confirmPassword) &&
+        AuthService.IsValidEmail(email);
 
     private async Task SignUp()
     {
         errorMessage = string.Empty;
+
+        if (!AuthService.IsValidEmail(email))
+        {
+            errorMessage = "Please enter a valid email address.";
+            return;
+        }
 
         if (!string.Equals(password, confirmPassword, StringComparison.Ordinal))
         {

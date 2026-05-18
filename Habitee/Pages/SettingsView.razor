@@ -73,15 +73,62 @@
         <section class="settings-section glass-panel">
             <h2>Account</h2>
 
-            <div class="setting-item">
-                <div class="setting-info">
-                    <h3>@(AuthService.CurrentUser?.DisplayName ?? "Local account")</h3>
-                    <p>@(AuthService.CurrentUser?.Email ?? "Signed in on this device")</p>
+            @if (!isEditingAccount)
+            {
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h3>@(AuthService.CurrentUser?.DisplayName ?? "Local account")</h3>
+                        <p>@(AuthService.CurrentUser?.Email ?? "Signed in on this device")</p>
+                    </div>
+
+                    <button type="button" class="glass-button account-edit-btn" @onclick="StartAccountEdit">
+                        Edit
+                    </button>
                 </div>
-                <button class="glass-button logout-btn" @onclick="Logout">
-                    Log Out
-                </button>
-            </div>
+            }
+            else
+            {
+                <div class="account-editor">
+                    <div class="account-field">
+                        <label>User Name</label>
+                        <input class="glass-input" @bind="editedDisplayName" @bind:event="oninput" placeholder="User name" />
+                    </div>
+
+                    <div class="account-password-group">
+                        <div class="account-field">
+                            <label>Current Password</label>
+                            <input type="password" class="glass-input" @bind="currentPassword" @bind:event="oninput" placeholder="Current password" />
+                        </div>
+
+                        <div class="account-field">
+                            <label>New Password</label>
+                            <input type="password" class="glass-input" @bind="newPassword" @bind:event="oninput" placeholder="New password" />
+                        </div>
+
+                        <div class="account-field">
+                            <label>Confirm New Password</label>
+                            <input type="password" class="glass-input" @bind="confirmPassword" @bind:event="oninput" placeholder="Confirm new password" />
+                        </div>
+                    </div>
+
+                    <p class="account-copy">Leave password fields empty if you only want to update your user name.</p>
+
+                    <div class="account-edit-actions">
+                        <button type="button" class="glass-button account-cancel-btn" @onclick="CancelAccountEdit" disabled="@isAccountSaving">
+                            Cancel
+                        </button>
+
+                        <button type="button" class="glass-button account-save-btn" @onclick="SaveAccountChanges" disabled="@isAccountSaving">
+                            @(isAccountSaving ? "Saving..." : "Save Changes")
+                        </button>
+                    </div>
+                </div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(accountMessage))
+            {
+                <div class="status-message fade-in @accountMessageClass">@accountMessage</div>
+            }
         </section>
 
         <section class="settings-section glass-panel">
@@ -223,6 +270,92 @@
     .setting-item:last-child {
         border-bottom: none;
         padding-bottom: 0;
+    }
+
+    .account-edit-btn {
+        font-weight: 700;
+        padding: 0.55rem 1rem;
+        border-color: transparent;
+        border-radius: 12px;
+        background: color-mix(in srgb, var(--primary-color) 16%, transparent);
+    }
+
+    .account-edit-btn:hover {
+        background: color-mix(in srgb, var(--primary-color) 24%, transparent);
+    }
+
+    .account-editor {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .account-password-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.8rem;
+    }
+
+    .account-field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.45rem;
+    }
+
+    .account-field label,
+    .status-message {
+        font-size: var(--font-size-body-sm);
+    }
+
+    .account-field label {
+        font-weight: 600;
+        color: var(--text-muted);
+    }
+
+    .account-copy {
+        margin: 0.2rem 0;
+        font-size: var(--font-size-body-sm);
+        color: var(--text-muted);
+    }
+
+    .account-edit-actions {
+        display: flex;
+        gap: 0.7rem;
+        justify-content: flex-end;
+    }
+
+    .account-edit-actions .glass-button {
+        min-width: 120px;
+    }
+
+    .account-cancel-btn {
+        border-color: var(--card-border);
+        background: transparent;
+    }
+
+    .account-save-btn {
+        font-weight: 700;
+        background: var(--primary-color);
+        color: var(--primary-contrast);
+        border-color: transparent;
+    }
+
+    .account-save-btn:disabled,
+    .account-cancel-btn:disabled,
+    .account-edit-btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+
+    .status-message.success {
+        background: color-mix(in srgb, var(--success-color) 12%, transparent);
+        color: color-mix(in srgb, var(--success-color) 24%, var(--text-color));
+    }
+
+    .status-message.error {
+        background: rgba(244, 63, 94, 0.14);
+        color: #f43f5e;
     }
 
     .setting-stack {
@@ -552,12 +685,6 @@
         color: var(--success-color);
     }
 
-    .logout-btn {
-        color: #f43f5e;
-        border-color: rgba(244, 63, 94, 0.25);
-        background: rgba(244, 63, 94, 0.08);
-    }
-
     .settings-link-card {
         width: 100%;
         display: flex;
@@ -664,6 +791,10 @@
             width: 100%;
         }
 
+        .account-password-group {
+            grid-template-columns: 1fr;
+        }
+
         .settings-link-card {
             padding-right: 0;
         }
@@ -686,6 +817,14 @@
     private int archivedHabitCount;
     private int activeReminderHabitCount;
     private bool isCollectionsLoading = true;
+    private bool isEditingAccount;
+    private bool isAccountSaving;
+    private string editedDisplayName = "";
+    private string currentPassword = "";
+    private string newPassword = "";
+    private string confirmPassword = "";
+    private string accountMessage = "";
+    private string accountMessageClass = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -693,6 +832,7 @@
         NotificationService.StatusChanged += HandleNotificationStatusChanged;
         DbService.DataChanged += HandleDatabaseChanged;
         await LoadSettingsCollectionsAsync();
+        editedDisplayName = AuthService.CurrentUser?.DisplayName ?? string.Empty;
     }
 
     public void Dispose()
@@ -836,9 +976,120 @@
         });
     }
 
-    private async Task Logout()
+    private void StartAccountEdit()
     {
-        await AuthService.LogoutAsync();
-        NavManager.NavigateTo("/");
+        editedDisplayName = AuthService.CurrentUser?.DisplayName ?? string.Empty;
+        currentPassword = string.Empty;
+        newPassword = string.Empty;
+        confirmPassword = string.Empty;
+        accountMessage = "";
+        accountMessageClass = "";
+        isEditingAccount = true;
     }
+
+    private void CancelAccountEdit()
+    {
+        isEditingAccount = false;
+        editedDisplayName = AuthService.CurrentUser?.DisplayName ?? string.Empty;
+        currentPassword = string.Empty;
+        newPassword = string.Empty;
+        confirmPassword = string.Empty;
+        accountMessage = "";
+        accountMessageClass = "";
+    }
+
+    private async Task SaveAccountChanges()
+    {
+        if (isAccountSaving)
+        {
+            return;
+        }
+
+        accountMessage = "";
+        accountMessageClass = "";
+
+        var nameToSave = editedDisplayName.Trim();
+        var wantsPasswordChange = !string.IsNullOrWhiteSpace(currentPassword)
+            || !string.IsNullOrWhiteSpace(newPassword)
+            || !string.IsNullOrWhiteSpace(confirmPassword);
+
+        if (string.IsNullOrWhiteSpace(nameToSave))
+        {
+            accountMessage = "User name cannot be empty.";
+            accountMessageClass = "error";
+            return;
+        }
+
+        if (wantsPasswordChange)
+        {
+            if (string.IsNullOrWhiteSpace(currentPassword) || string.IsNullOrWhiteSpace(newPassword) || string.IsNullOrWhiteSpace(confirmPassword))
+            {
+                accountMessage = "Fill in all password fields to change your password.";
+                accountMessageClass = "error";
+                return;
+            }
+
+            if (!string.Equals(newPassword, confirmPassword, StringComparison.Ordinal))
+            {
+                accountMessage = "New password and confirmation must match.";
+                accountMessageClass = "error";
+                return;
+            }
+        }
+
+        var currentUser = AuthService.CurrentUser;
+        var hasDisplayNameChange = currentUser != null && !string.Equals(currentUser.DisplayName, nameToSave, StringComparison.Ordinal);
+
+        if (!hasDisplayNameChange && !wantsPasswordChange)
+        {
+            accountMessage = "No changes to save.";
+            accountMessageClass = "error";
+            return;
+        }
+
+        isAccountSaving = true;
+        StateHasChanged();
+
+        try
+        {
+            if (hasDisplayNameChange)
+            {
+                var nameResult = await AuthService.UpdateDisplayNameAsync(nameToSave);
+                if (!nameResult.Success)
+                {
+                    accountMessage = nameResult.ErrorMessage ?? "Failed to update user name.";
+                    accountMessageClass = "error";
+                    return;
+                }
+            }
+
+            if (wantsPasswordChange)
+            {
+                var passwordResult = await AuthService.UpdatePasswordAsync(currentPassword, newPassword);
+                if (!passwordResult.Success)
+                {
+                    accountMessage = passwordResult.ErrorMessage ?? "Failed to update password.";
+                    accountMessageClass = "error";
+                    return;
+                }
+            }
+
+            accountMessage = "Account updated successfully.";
+            accountMessageClass = "success";
+            isEditingAccount = false;
+            editedDisplayName = AuthService.CurrentUser?.DisplayName ?? "";
+            currentPassword = string.Empty;
+            newPassword = string.Empty;
+            confirmPassword = string.Empty;
+            StateHasChanged();
+            await Task.Delay(1200);
+            accountMessage = "";
+            accountMessageClass = "";
+        }
+        finally
+        {
+            isAccountSaving = false;
+        }
+    }
+
 }

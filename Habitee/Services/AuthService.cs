@@ -1,4 +1,5 @@
 using Habitee.Models;
+using System.Net.Mail;
 using Microsoft.JSInterop;
 
 namespace Habitee.Services;
@@ -76,6 +77,11 @@ public sealed class AuthService
             return AuthResult.Fail("Email is required.");
         }
 
+        if (!IsValidEmail(normalizedEmail))
+        {
+            return AuthResult.Fail("Please enter a valid email address.");
+        }
+
         if (password.Length < 8)
         {
             return AuthResult.Fail("Password must be at least 8 characters.");
@@ -119,6 +125,11 @@ public sealed class AuthService
         if (string.IsNullOrWhiteSpace(normalizedEmail) || string.IsNullOrWhiteSpace(password))
         {
             return AuthResult.Fail("Enter your email and password.");
+        }
+
+        if (!IsValidEmail(normalizedEmail))
+        {
+            return AuthResult.Fail("Please enter a valid email address.");
         }
 
         var user = await _databaseService.GetUserByEmailAsync(normalizedEmail);
@@ -165,8 +176,101 @@ public sealed class AuthService
         AuthStateChanged?.Invoke();
     }
 
+    public async Task<AuthResult> UpdateDisplayNameAsync(string displayName)
+    {
+        displayName = displayName?.Trim() ?? string.Empty;
+
+        if (CurrentUser == null)
+        {
+            return AuthResult.Fail("You are not signed in.");
+        }
+
+        if (string.IsNullOrWhiteSpace(displayName))
+        {
+            return AuthResult.Fail("Display name is required.");
+        }
+
+        if (string.Equals(CurrentUser.DisplayName, displayName, StringComparison.Ordinal))
+        {
+            return AuthResult.Ok();
+        }
+
+        var user = await _databaseService.GetUserByIdAsync(CurrentUser.Id);
+
+        if (user == null)
+        {
+            return AuthResult.Fail("Could not find your account.");
+        }
+
+        user.DisplayName = displayName;
+        await _databaseService.SaveUserAsync(user);
+        ApplyAuthenticatedUser(user);
+        NotifyStateChanged();
+        return AuthResult.Ok();
+    }
+
+    public async Task<AuthResult> UpdatePasswordAsync(string currentPassword, string newPassword)
+    {
+        if (CurrentUser == null)
+        {
+            return AuthResult.Fail("You are not signed in.");
+        }
+
+        if (string.IsNullOrWhiteSpace(currentPassword))
+        {
+            return AuthResult.Fail("Current password is required.");
+        }
+
+        if (string.IsNullOrWhiteSpace(newPassword) || newPassword.Length < 8)
+        {
+            return AuthResult.Fail("New password must be at least 8 characters.");
+        }
+
+        var user = await _databaseService.GetUserByIdAsync(CurrentUser.Id);
+
+        if (user == null)
+        {
+            return AuthResult.Fail("Could not find your account.");
+        }
+
+        var currentHash = await _jsRuntime.InvokeAsync<string>("habiteeAuth.hashPassword", currentPassword, user.PasswordSalt);
+
+        if (!string.Equals(currentHash, user.PasswordHash, StringComparison.Ordinal))
+        {
+            return AuthResult.Fail("Current password is not correct.");
+        }
+
+        var newSalt = await _jsRuntime.InvokeAsync<string>("habiteeAuth.generateSalt");
+        var newHash = await _jsRuntime.InvokeAsync<string>("habiteeAuth.hashPassword", newPassword, newSalt);
+
+        user.PasswordSalt = newSalt;
+        user.PasswordHash = newHash;
+        await _databaseService.SaveUserAsync(user);
+        ApplyAuthenticatedUser(user);
+        NotifyStateChanged();
+        return AuthResult.Ok();
+    }
+
     private static string NormalizeEmail(string? email)
     {
         return email?.Trim().ToLowerInvariant() ?? string.Empty;
+    }
+
+    public static bool IsValidEmail(string? email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return false;
+        }
+
+        try
+        {
+            _ = new MailAddress(email);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 }

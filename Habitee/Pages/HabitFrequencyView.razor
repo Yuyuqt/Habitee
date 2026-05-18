@@ -3,6 +3,7 @@
 @using Habitee.Services
 @implements IDisposable
 @inject HabitDraftService DraftService
+@inject DatabaseService DbService
 @inject NavigationManager NavManager
 @inject NotificationService NotificationService
 
@@ -70,9 +71,18 @@
                             {
                                 var currentDay = day;
                                 <button type="button" 
-                                        class="choice-cell @(IsMonthlySelected(currentDay) ? "active" : "")" 
+                                        class="choice-cell @(IsMonthlySelected(currentDay) ? "active" : "") @(IsPastDay(currentDay) ? "locked" : "") @(IsPastDayCompleted(currentDay) ? "completed" : "")" 
+                                        disabled="@IsPastDay(currentDay)"
+                                        style="--habit-color: @draft.Color;"
                                         @onclick='() => ToggleMonthlyDay(currentDay)'>
-                                    @currentDay
+                                    <span class="day-label">@currentDay</span>
+                                    @if (IsPastDay(currentDay))
+                                    {
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lock-icon">
+                                            <rect x="3" y="10" width="18" height="11" rx="2" ry="2"></rect>
+                                            <path d="M7 10V7a5 5 0 0 1 10 0v3"></path>
+                                        </svg>
+                                    }
                                 </button>
                             }
                         }
@@ -80,23 +90,6 @@
                 </div>
             </section>
         }
-
-        <section class="section-block">
-            <label>NOTIFICATION PERMISSION</label>
-            <div class="permission-panel glass-panel">
-                <div class="permission-copy">
-                    <h3>@GetPermissionTitle()</h3>
-                    <p>@GetPermissionDescription()</p>
-                </div>
-
-                @if (NotificationService.IsSupported && NotificationService.Permission != "denied" && !NotificationService.AppNotificationsEnabled)
-                {
-                    <button type="button" class="permission-btn glass-button" @onclick="EnableNotifications">
-                        Enable Reminders
-                    </button>
-                }
-            </div>
-        </section>
 
         <section class="section-block">
             <div class="reminders-header">
@@ -121,10 +114,11 @@
                     @foreach (var reminder in draft.Reminders.OrderBy(reminder => reminder.TimeLocal))
                     {
                         <div class="reminder-row glass-panel">
-                            <input type="time"
-                                   class="glass-input reminder-time"
-                                   value="@reminder.TimeLocal"
-                                   @onchange="eventArgs => UpdateReminderTime(reminder, eventArgs.Value?.ToString())" />
+                            <button type="button"
+                                    class="glass-input reminder-time reminder-time-picker-button"
+                                    @onclick="() => OpenTimePicker(reminder)">
+                                @GetDisplayTime(reminder)
+                            </button>
 
                             <button type="button"
                                     class="toggle-pill @(reminder.Enabled ? "enabled" : "disabled")"
@@ -144,6 +138,66 @@
         <div style="height: 110px;"></div>
     </div>
 </div>
+
+@if (selectedReminderId is not null && GetReminderById(selectedReminderId.Value) is { } editingReminder)
+{
+    <div class="time-picker-backdrop" @onclick="CloseTimePicker">
+        <div class="time-picker-modal glass-panel" @onclick:stopPropagation="true">
+            <h3>Reminder Time</h3>
+
+            <div class="time-picker-wheel-grid">
+                <div class="time-picker-wheel-column">
+                    <label>Hour</label>
+                    <select class="time-wheel" size="6" @bind="selectedHour">
+                        @foreach (var hour in hourOptions)
+                        {
+                            <option value="@hour">@hour</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="time-picker-wheel-column">
+                    <label>Minute</label>
+                    <select class="time-wheel" size="6" @bind="selectedMinute">
+                        @foreach (var minute in minuteOptions)
+                        {
+                            <option value="@minute">@minute</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="time-picker-wheel-column">
+                    <label>AM / PM</label>
+                    <select class="time-wheel" size="2" @bind="selectedPeriod">
+                        <option>AM</option>
+                        <option>PM</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="time-picker-actions">
+                <button type="button" class="time-picker-action-btn" @onclick="CloseTimePicker">Cancel</button>
+                <button type="button" class="time-picker-action-btn save" @onclick="() => ApplyTimePickerSelection(editingReminder)">Set Time</button>
+            </div>
+        </div>
+    </div>
+}
+
+@if (showNotificationsPrompt)
+{
+    <div class="modal-backdrop" @onclick="CloseNotificationPrompt">
+        <div class="notification-modal glass-panel" @onclick:stopPropagation="true">
+            <h3>Turn on notifications</h3>
+            <p>Enable reminders in Settings first, then come back to add reminder times.</p>
+            <div class="notification-modal-actions">
+                <button type="button" class="modal-btn" @onclick="CloseNotificationPrompt">Not now</button>
+                <button type="button" class="modal-btn modal-primary" @onclick="GoToNotificationSettings">
+                    Open Settings
+                </button>
+            </div>
+        </div>
+    </div>
+}
 
 <style>
     .view-container {
@@ -263,6 +317,10 @@
         font-weight: 700;
         cursor: pointer;
         transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
     }
 
     .choice-cell.active {
@@ -271,10 +329,50 @@
         border-color: transparent;
     }
 
+    .choice-cell.completed {
+        background: color-mix(in srgb, var(--habit-color) 58%, transparent);
+        color: var(--primary-contrast);
+        border-color: color-mix(in srgb, var(--habit-color) 38%, var(--card-border));
+    }
+
     .choice-cell:hover:not(.active):not(.empty) {
         background: color-mix(in srgb, var(--button-hover-surface) 86%, transparent);
         color: var(--text-color);
         border-color: color-mix(in srgb, var(--primary-color) 24%, var(--button-hover-border));
+    }
+
+    .choice-cell.locked {
+        cursor: not-allowed;
+        opacity: 0.82;
+        border-style: dashed;
+        background: color-mix(in srgb, var(--card-bg) 92%, transparent);
+        position: relative;
+    }
+
+    .choice-cell.locked.completed {
+        background: color-mix(in srgb, var(--habit-color) 42%, transparent);
+        border-style: solid;
+        color: var(--primary-contrast);
+    }
+
+    .choice-cell.locked:hover {
+        background: color-mix(in srgb, var(--card-bg) 92%, transparent);
+        border-color: var(--card-border);
+    }
+
+    .choice-cell:not(.locked) {
+        cursor: pointer;
+    }
+
+    .choice-cell.locked .lock-icon {
+        position: absolute;
+        top: 0.26rem;
+        right: 0.28rem;
+        opacity: 0.75;
+    }
+
+    .day-label {
+        pointer-events: none;
     }
 
     .choice-cell.empty {
@@ -318,32 +416,16 @@
         letter-spacing: 0.5px;
     }
 
-    .permission-panel,
     .empty-reminder,
     .reminder-row {
         border-radius: 18px;
         padding: 1rem;
     }
 
-    .permission-panel {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .permission-copy h3,
     .empty-reminder p {
         margin: 0;
     }
 
-    .permission-copy p {
-        margin: 0.35rem 0 0;
-        color: var(--text-muted);
-        line-height: 1.4;
-    }
-
-    .permission-btn,
     .add-reminder-btn {
         white-space: nowrap;
     }
@@ -370,6 +452,170 @@
 
     .reminder-time {
         min-width: 0;
+        text-align: left;
+        border: none;
+    }
+
+    .reminder-time-picker-button {
+        width: 100%;
+        text-align: left;
+        border: var(--outline-width, 1px) solid var(--card-border);
+        border-radius: 14px;
+        padding: 0.85rem 1rem;
+        cursor: pointer;
+        background: color-mix(in srgb, var(--card-bg) 86%, transparent);
+        color: var(--text-color);
+    }
+
+    .reminder-time-picker-button:hover {
+        background: color-mix(in srgb, var(--button-hover-surface) 88%, transparent);
+    }
+
+    .time-picker-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+        z-index: 1010;
+    }
+
+    .time-picker-modal {
+        width: min(92vw, 430px);
+        border-radius: 22px;
+        padding: 1.2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .time-picker-modal h3 {
+        margin: 0;
+    }
+
+    .time-picker-wheel-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.75rem;
+    }
+
+    .time-picker-wheel-column {
+        display: flex;
+        flex-direction: column;
+        gap: 0.45rem;
+    }
+
+    .time-picker-wheel-column label {
+        text-align: center;
+        font-size: var(--font-size-micro);
+        font-weight: 700;
+        color: var(--text-muted);
+    }
+
+    .time-wheel {
+        height: 170px;
+        padding: 0.35rem;
+        width: 100%;
+        min-height: 0;
+        border: var(--outline-width, 1px) solid var(--card-border);
+        border-radius: 14px;
+        background: color-mix(in srgb, var(--card-bg) 90%, transparent);
+        color: var(--text-color);
+        font: inherit;
+        overflow-y: auto;
+        overflow-x: hidden;
+        scrollbar-width: thin;
+    }
+
+    .time-wheel::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .time-wheel option {
+        padding: 0.5rem;
+        text-align: center;
+        font-weight: 700;
+        border-radius: 8px;
+    }
+
+    .time-picker-actions {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .time-picker-action-btn {
+        border: var(--outline-width, 1px) solid var(--card-border);
+        border-radius: 14px;
+        padding: 0.85rem 1rem;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+        background: var(--card-bg);
+        color: var(--text-color);
+        flex: 1;
+    }
+
+    .time-picker-action-btn.save {
+        background: var(--primary-color);
+        color: var(--primary-contrast);
+        border-color: transparent;
+    }
+
+    .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+        z-index: 1000;
+    }
+
+    .notification-modal {
+        width: 100%;
+        max-width: 360px;
+        border-radius: 22px;
+        padding: 1.2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.9rem;
+    }
+
+    .notification-modal h3 {
+        margin: 0;
+        font-size: var(--font-size-card-title);
+        line-height: 1.3;
+    }
+
+    .notification-modal p {
+        margin: 0;
+        color: var(--text-muted);
+    }
+
+    .notification-modal-actions {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .modal-btn {
+        flex: 1;
+        padding: 0.9rem 1rem;
+        border-radius: 14px;
+        border: var(--outline-width, 1px) solid var(--card-border);
+        background: var(--card-bg);
+        color: var(--text-color);
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .modal-primary {
+        background: var(--primary-color);
+        color: var(--primary-contrast);
+        border-color: transparent;
     }
 
     .toggle-pill,
@@ -428,14 +674,12 @@
             border-radius: 14px;
         }
 
-        .permission-panel,
         .reminders-header,
         .reminder-row {
             grid-template-columns: 1fr;
             display: grid;
         }
 
-        .permission-btn,
         .add-reminder-btn,
         .toggle-pill,
         .remove-reminder-btn {
@@ -460,22 +704,30 @@
     private readonly DateTime referenceDate = DateTime.Today;
 
     private Habit draft = new();
+    private HashSet<int> completedPastDays = new();
+    private bool showNotificationsPrompt;
+    private int? selectedReminderId;
+    private readonly string[] hourOptions = ["12", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11"];
+    private readonly string[] minuteOptions = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09",
+        "10", "11", "12", "13", "14", "15", "16", "17", "18", "19",
+        "20", "21", "22", "23", "24", "25", "26", "27", "28", "29",
+        "30", "31", "32", "33", "34", "35", "36", "37", "38", "39",
+        "40", "41", "42", "43", "44", "45", "46", "47", "48", "49",
+        "50", "51", "52", "53", "54", "55", "56", "57", "58", "59"];
+    private string selectedHour = "09";
+    private string selectedMinute = "00";
+    private string selectedPeriod = "AM";
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         draft = DraftService.Draft;
         NotificationService.StatusChanged += HandleNotificationStatusChanged;
+        await LoadCompletedPastDaysAsync();
     }
 
     public void Dispose()
     {
         NotificationService.StatusChanged -= HandleNotificationStatusChanged;
-    }
-
-    private async Task EnableNotifications()
-    {
-        await NotificationService.EnableNotificationsAsync();
-        await InvokeAsync(StateHasChanged);
     }
 
     private void AddReminder()
@@ -485,12 +737,88 @@
             return;
         }
 
+        if (!NotificationService.AppNotificationsEnabled)
+        {
+            showNotificationsPrompt = true;
+            return;
+        }
+
         draft.Reminders.Add(new HabitReminder
         {
             Id = GetNextReminderId(),
             TimeLocal = "09:00",
             Enabled = true
         });
+    }
+
+    private void OpenTimePicker(HabitReminder reminder)
+    {
+        if (TryParseReminderTime(reminder.TimeLocal, out var hour24, out var minute))
+        {
+            selectedHour = ConvertToWheelHour(hour24);
+            selectedMinute = minute;
+            selectedPeriod = hour24 >= 12 ? "PM" : "AM";
+        }
+        else
+        {
+            selectedHour = "09";
+            selectedMinute = "00";
+            selectedPeriod = "AM";
+        }
+
+        selectedReminderId = reminder.Id;
+    }
+
+    private void CloseTimePicker()
+    {
+        selectedReminderId = null;
+    }
+
+    private void ApplyTimePickerSelection(HabitReminder reminder)
+    {
+        var culture = System.Globalization.CultureInfo.InvariantCulture;
+        if (!TimeOnly.TryParseExact($"{selectedHour}:{selectedMinute} {selectedPeriod}", ["hh:mm tt"], culture, System.Globalization.DateTimeStyles.None, out var parsedTime))
+        {
+            return;
+        }
+
+        reminder.TimeLocal = parsedTime.ToString("HH:mm", System.Globalization.CultureInfo.InvariantCulture);
+        selectedReminderId = null;
+        SortRemindersByTime();
+    }
+
+    private HabitReminder? GetReminderById(int reminderId)
+    {
+        return draft.Reminders.FirstOrDefault(item => item.Id == reminderId);
+    }
+
+    private static string GetDisplayTime(HabitReminder reminder)
+    {
+        return TimeFormatHelper.ToDisplayTime(reminder.TimeLocal);
+    }
+
+    private static bool TryParseReminderTime(string timeLocal, out int hour24, out string minute)
+    {
+        if (TimeFormatHelper.TryNormalizeTo24Hour(timeLocal, out var normalizedTime))
+        {
+            var parts = normalizedTime.Split(':', StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length == 2 && int.TryParse(parts[0], out hour24) && int.TryParse(parts[1], out var minuteValue))
+            {
+                minute = minuteValue.ToString("D2");
+                return true;
+            }
+        }
+
+        hour24 = 9;
+        minute = "00";
+        return false;
+    }
+
+    private static string ConvertToWheelHour(int hour24)
+    {
+        var hour12 = hour24 % 12;
+        hour12 = hour12 == 0 ? 12 : hour12;
+        return hour12.ToString("D2");
     }
 
     private void RemoveReminder(int reminderId)
@@ -508,12 +836,11 @@
         reminder.Enabled = !reminder.Enabled;
     }
 
-    private void UpdateReminderTime(HabitReminder reminder, string? timeLocal)
+    private void SortRemindersByTime()
     {
-        if (TimeOnly.TryParse(timeLocal, out var parsedTime))
-        {
-            reminder.TimeLocal = parsedTime.ToString("HH:mm");
-        }
+        draft.Reminders = draft.Reminders
+            .OrderBy(reminder => reminder.TimeLocal)
+            .ToList();
     }
 
     private int GetNextReminderId()
@@ -521,26 +848,15 @@
         return draft.Reminders.Count == 0 ? 1 : draft.Reminders.Max(reminder => reminder.Id) + 1;
     }
 
-    private string GetPermissionTitle()
+    private void CloseNotificationPrompt()
     {
-        return NotificationService.Permission switch
-        {
-            "unsupported" => "Notifications are not supported on this browser.",
-            "denied" => "Notifications are blocked.",
-            _ when NotificationService.AppNotificationsEnabled => "Reminders are enabled.",
-            _ => "Enable notifications for reminders."
-        };
+        showNotificationsPrompt = false;
     }
 
-    private string GetPermissionDescription()
+    private void GoToNotificationSettings()
     {
-        return NotificationService.Permission switch
-        {
-            "unsupported" => "Habitee can still save reminders, but this browser cannot show system notifications.",
-            "denied" => "Allow notifications again in your browser settings if you want Habitee to alert you.",
-            _ when NotificationService.AppNotificationsEnabled => "Habitee can send best-effort reminders on this device while the app is active or recently resumed.",
-            _ => "The browser will only ask after you click the button below."
-        };
+        showNotificationsPrompt = false;
+        NavManager.NavigateTo("/settings");
     }
 
     private void SetFrequency(string frequency)
@@ -613,6 +929,11 @@
 
     private void ToggleMonthlyDay(int day)
     {
+        if (IsPastDay(day))
+        {
+            return;
+        }
+
         day = Math.Clamp(day, 1, 31);
         var selections = GetMonthlySelections();
 
@@ -639,6 +960,17 @@
         draft.MonthlyDaysCsv = string.Join(",", selections);
         draft.MonthlyDay = selections[0];
         StateHasChanged();
+    }
+
+    private bool IsPastDay(int day)
+    {
+        var selectedDate = new DateTime(referenceDate.Year, referenceDate.Month, Math.Clamp(day, 1, 31));
+        return selectedDate < DateTime.Today;
+    }
+
+    private bool IsPastDayCompleted(int day)
+    {
+        return completedPastDays.Contains(day);
     }
 
     private List<int> GetMonthlySelections()
@@ -687,6 +1019,44 @@
 
     private void HandleNotificationStatusChanged()
     {
+        if (NotificationService.AppNotificationsEnabled)
+        {
+            showNotificationsPrompt = false;
+        }
+
         _ = InvokeAsync(StateHasChanged);
     }
+
+    private async Task LoadCompletedPastDaysAsync()
+    {
+        completedPastDays = new HashSet<int>();
+
+        if (string.IsNullOrWhiteSpace(draft.Id))
+        {
+            return;
+        }
+
+        var logs = await DbService.GetLogsAsync();
+
+        completedPastDays = logs
+            .Where(log => log.HabitId == draft.Id)
+            .Select(log => new { log, date = ParseDate(log.Date) })
+            .Where(item => item.date != null
+                && item.date.Value.Year == referenceDate.Year
+                && item.date.Value.Month == referenceDate.Month
+                && item.date.Value.Date < DateTime.Today
+                && DatabaseService.IsCompleteForTarget(item.log.CompletedCount, Math.Max(1, draft.TargetCount)))
+            .Select(item => item.date!.Value.Day)
+            .Distinct()
+            .ToHashSet();
+    }
+
+    private static DateTime? ParseDate(string rawDate)
+    {
+        return DateTime.TryParseExact(rawDate, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture,
+            System.Globalization.DateTimeStyles.None, out var parsedDate)
+            ? parsedDate
+            : null;
+    }
+
 }

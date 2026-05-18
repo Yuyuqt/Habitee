@@ -39,10 +39,6 @@
                         }
                     </button>
                 </div>
-                <div class="input-group">
-                    <label>COLOR</label>
-                    <button type="button" class="picker-btn glass-panel color-btn" style="background-color: @habit.Color;" @onclick="OpenColorPicker"></button>
-                </div>
             </div>
         </div>
 
@@ -128,12 +124,12 @@
 
 @if (isIconPickerOpen)
 {
-    <Habitee.Components.IconPickerModal SelectedIcon="@habit.Icon" OnIconSelected="SelectIcon" OnClose="CloseIconPicker" />
-}
-
-@if (isColorPickerOpen)
-{
-    <Habitee.Components.ColorPickerModal SelectedColor="@habit.Color" OnColorSelected="SelectColor" OnClose="CloseColorPicker" />
+    <Habitee.Components.IconPickerModal
+        SelectedIcon="@habit.Icon"
+        SelectedColor="@habit.Color"
+        OnIconSelected="SelectIcon"
+        OnColorSelected="SelectColor"
+        OnClose="CloseIconPicker" />
 }
 
 <style>
@@ -244,10 +240,6 @@
         border-radius: 16px;
         cursor: pointer;
         padding: 0;
-    }
-
-    .color-btn {
-        border: var(--outline-width, 1px) solid color-mix(in srgb, var(--card-border) 80%, rgba(255,255,255,0.2));
     }
 
     .stepper-row {
@@ -458,14 +450,14 @@
             padding: 0 0.5rem;
         }
 
-        .fixed-bottom {
-            left: 0;
-            padding: 0 1rem;
-        }
-
         .content-scroll {
             padding: 0 1rem;
             padding-bottom: calc(var(--page-action-clearance) + 1rem);
+        }
+
+        .fixed-bottom {
+            left: 0;
+            padding: 0 1rem;
         }
 
         .form-row {
@@ -531,7 +523,6 @@
     private bool isEditing;
     private string? loadedEditId;
     private bool isIconPickerOpen;
-    private bool isColorPickerOpen;
     private bool isCountEditorOpen;
     private string editCountText = "1";
     private string countEditorError = string.Empty;
@@ -692,13 +683,9 @@
         isIconPickerOpen = false;
     }
 
-    private void OpenColorPicker() => isColorPickerOpen = true;
-    private void CloseColorPicker() => isColorPickerOpen = false;
-
     private void SelectColor(string color)
     {
         habit.Color = color;
-        isColorPickerOpen = false;
     }
 
     private async Task SaveHabit()
