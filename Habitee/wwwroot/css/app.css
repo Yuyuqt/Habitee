@@ -262,7 +262,7 @@ p {
     }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 768px) {
     html {
         font-size: 13px !important;
     }
