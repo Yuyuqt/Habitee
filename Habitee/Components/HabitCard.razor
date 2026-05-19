@@ -58,6 +58,7 @@
     .habit-header {
         display: flex;
         align-items: center;
+        flex-wrap: wrap;
         gap: 1.25rem;
         width: 100%;
     }
@@ -159,7 +160,7 @@
         transform: scale(0.9);
     }
 
-    @@media (max-width: 720px) {
+    @("@media") (max-width: 720px) {
         .habit-card {
             padding: 1rem;
             gap: 1rem;
@@ -177,17 +178,7 @@
         }
     }
 
-    @@media (max-width: 540px) {
-        .habit-header {
-            flex-direction: column;
-            align-items: stretch;
-        }
-
-        .habit-status {
-            width: 100%;
-            justify-content: space-between;
-        }
-
+    @("@media") (max-width: 540px) {
         .habit-icon-shell {
             width: 52px;
             height: 52px;
@@ -230,3 +221,5 @@
         await OnComplete.InvokeAsync(Habit);
     }
 }
+
+

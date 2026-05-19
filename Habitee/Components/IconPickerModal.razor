@@ -515,7 +515,7 @@
         font-size: var(--font-size-body-sm);
     }
 
-    @@media (max-width: 480px) {
+    @("@media") (max-width: 480px) {
         .content-scroll {
             padding: 0 1rem;
         }
@@ -794,3 +794,5 @@
             || icon.Category.Contains(searchQuery, StringComparison.OrdinalIgnoreCase);
     }
 }
+
+

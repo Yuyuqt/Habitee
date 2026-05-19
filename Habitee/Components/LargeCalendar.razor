@@ -167,7 +167,7 @@
         opacity: 0.8;
     }
 
-    @@media (max-width: 720px) {
+    @("@media") (max-width: 720px) {
         .large-calendar {
             padding: 1rem;
             margin-bottom: 1.5rem;
@@ -188,7 +188,7 @@
         }
     }
 
-    @@media (max-width: 540px) {
+    @("@media") (max-width: 540px) {
         .month-title {
             font-size: var(--font-size-card-title);
         }
@@ -223,3 +223,5 @@
         currentMonth = currentMonth.AddMonths(1);
     }
 }
+
+

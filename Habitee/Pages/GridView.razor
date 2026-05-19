@@ -151,13 +151,16 @@
     }
 
     .habit-card-grid {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        display: flex;
+        flex-wrap: wrap;
         gap: 0.8rem;
+        width: 100%;
     }
 
     .grid-habit-card {
-        width: 100%;
+        flex: 1 1 calc(25% - 0.8rem);
+        min-width: 220px;
+        max-width: 100%;
         border: var(--outline-width, 1px) solid var(--card-border);
         background: var(--card-bg);
         color: var(--text-color);
@@ -298,20 +301,9 @@
         font-size: var(--font-size-micro);
     }
 
-    @@media (max-width: 900px) {
-        .habit-card-grid {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-        }
-    }
-
-    @@media (max-width: 640px) {
+    @("@media") (max-width: 640px) {
         .grid-view {
             padding: 1.5rem 1rem 1rem;
-        }
-
-        .habit-card-grid {
-            grid-template-columns: 1fr;
-            gap: 0.75rem;
         }
 
         .grid-habit-card {
@@ -336,7 +328,7 @@
         }
     }
 
-    @@media (max-width: 540px) {
+    @("@media") (max-width: 540px) {
         .grid-header {
             margin-bottom: 1.35rem;
             padding-top: 1.5rem;
@@ -446,3 +438,5 @@
         return new HabitProgressState($"0/{habit.TargetCount}", "empty", false);
     }
 }
+
+

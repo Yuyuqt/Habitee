@@ -126,15 +126,17 @@
         padding-right: var(--layout-shell-gap);
     }
 
-    @@media (max-width: 720px) {
+    @("@media") (max-width: 720px) {
         .mobile-nav-hidden {
             --page-action-offset: calc(var(--safe-area-bottom) + 0.9rem);
             --page-action-clearance: calc(var(--page-action-height) + var(--page-action-offset));
         }
 
         .top-controls {
+            flex-wrap: wrap;
             top: calc(env(safe-area-inset-top, 0px) + 0.9rem) !important;
             right: calc(env(safe-area-inset-right, 0px) + 1.75rem) !important;
+            gap: 0.4rem;
         }
 
         .mode-toggle {
@@ -221,3 +223,5 @@
         NavManager.LocationChanged -= HandleLocationChanged;
     }
 }
+
+

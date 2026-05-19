@@ -316,19 +316,20 @@
     }
 
     .day-header {
-        display: grid;
-        grid-template-columns: minmax(180px, 1.3fr) minmax(0, 2fr);
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
         gap: 1rem;
         align-items: end;
         margin-bottom: 0.8rem;
     }
 
     .day-header-grid {
-        display: grid;
-        grid-template-columns: repeat(10, minmax(0, 1fr));
+        display: flex;
+        flex-wrap: wrap;
         gap: 0.5rem;
-        justify-content: end;
-        justify-items: center;
+        flex: 1 1 auto;
+        justify-content: flex-end;
     }
 
     .day-chip {
@@ -378,8 +379,9 @@
         border: var(--outline-width, 1px) solid var(--card-border);
         background: var(--card-bg);
         color: var(--text-color);
-        display: grid;
-        grid-template-columns: minmax(180px, 1.3fr) minmax(0, 2fr);
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
         gap: 0.8rem;
         align-items: center;
         text-align: left;
@@ -390,6 +392,7 @@
         display: flex;
         align-items: center;
         gap: 0.9rem;
+        flex: 1 1 200px;
         min-width: 0;
     }
 
@@ -473,11 +476,11 @@
     }
 
     .habit-row-days {
-        display: grid;
-        grid-template-columns: repeat(10, minmax(0, 1fr));
+        display: flex;
+        flex-wrap: wrap;
         gap: 0.5rem;
-        justify-content: end;
-        justify-items: center;
+        flex: 1 1 auto;
+        justify-content: flex-end;
     }
 
     .day-status {
@@ -540,7 +543,7 @@
         pointer-events: none;
     }
 
-    @@media (max-width: 720px) {
+    @("@media") (max-width: 720px) {
         .calendar-view {
             padding: 1.5rem 1rem 1rem;
         }
@@ -550,19 +553,8 @@
             margin-bottom: 1.5rem;
         }
 
-        .day-header {
-            grid-template-columns: 1fr;
-            gap: 0.75rem;
-        }
-
         .day-header-spacer {
             display: none;
-        }
-
-        .habit-row {
-            grid-template-columns: 1fr;
-            gap: 0.9rem;
-            padding: 0.95rem;
         }
 
         .habit-row-copy h3 {
@@ -614,7 +606,7 @@
         }
     }
 
-    @@media (max-width: 540px) {
+    @("@media") (max-width: 540px) {
         .day-header-grid,
         .habit-row-days {
             gap: 0.25rem;
@@ -789,3 +781,5 @@
         return new DayState("empty", $"0/{habit.TargetCount} progress", habit.TargetCount > 1 ? $"0/{habit.TargetCount}" : string.Empty, false);
     }
 }
+
+

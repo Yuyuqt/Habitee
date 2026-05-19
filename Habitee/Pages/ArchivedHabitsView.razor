@@ -231,7 +231,7 @@
         color: var(--text-muted);
     }
 
-    @@media (max-width: 720px) {
+    @("@media") (max-width: 720px) {
         .library-view {
             padding: 1.5rem 1rem 1rem;
         }
@@ -379,3 +379,5 @@
         return DateTimeOffset.TryParse(habit.ArchivedAt, out var parsed) ? parsed : null;
     }
 }
+
+

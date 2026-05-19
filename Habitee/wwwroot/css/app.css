@@ -263,9 +263,13 @@ p {
 }
 
 @media (max-width: 720px) {
+    html {
+        font-size: 13px !important;
+    }
+
     :root {
-        --dock-bottom-offset: 1rem;
-        --dock-height: 5.8rem;
+        --dock-bottom-offset: 0px;
+        --dock-height: 4.8rem;
         --bottom-action-gap: 0.85rem;
         --desktop-nav-clearance: 0px;
         --app-nav-clearance: var(--dock-clearance);
@@ -313,7 +317,8 @@ p {
     .logout-btn,
     .permission-btn,
     .add-reminder-btn {
-        width: 100%;
+        width: auto;
+        max-width: 100%;
     }
 
     .pager-row {
@@ -342,6 +347,10 @@ p {
 }
 
 @media (max-width: 540px) {
+    html {
+        font-size: 11px !important;
+    }
+
     .container {
         padding: 1.25rem 1rem;
     }

@@ -173,7 +173,7 @@
         color: var(--primary-contrast);
     }
 
-    @@media (max-width: 720px) {
+    @("@media") (max-width: 720px) {
         .view-container {
             padding-top: 2rem;
         }
@@ -181,6 +181,7 @@
         .app-header {
             padding: 1.5rem 1rem 1rem;
             gap: 0.5rem;
+            flex-wrap: wrap;
         }
 
         .header-action-btn {
@@ -202,7 +203,7 @@
         }
     }
 
-    @@media (max-width: 540px) {
+    @("@media") (max-width: 540px) {
         .app-header {
             align-items: flex-start;
         }
@@ -277,3 +278,5 @@
         }
     }
 }
+
+
